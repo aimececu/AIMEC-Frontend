@@ -32,6 +32,7 @@ const Admin = () => {
   const [editingProduct, setEditingProduct] = useState(null);
   const [showProductForm, setShowProductForm] = useState(false);
   const [showImportForm, setShowImportForm] = useState(false);
+  const [activeFormTab, setActiveFormTab] = useState('basic');
 
   // Estados para formulario de producto
   const [productForm, setProductForm] = useState({
@@ -42,8 +43,31 @@ const Admin = () => {
     stock_quantity: '',
     brand: '',
     category: '',
+    subcategory: '',
+    series: '',
     main_image: '',
-    is_active: true
+    images: [],
+    is_active: true,
+    specifications: {},
+    accessories: [],
+    related_products: [],
+    features: [],
+    applications: [],
+    certifications: [],
+    warranty: '',
+    lead_time: '',
+    weight: '',
+    dimensions: '',
+    voltage: '',
+    power: '',
+    temperature_range: '',
+    ip_rating: '',
+    material: '',
+    color: '',
+    country_of_origin: '',
+    compliance: '',
+    manual_url: '',
+    datasheet_url: ''
   });
 
   // Estados para importación
@@ -122,7 +146,10 @@ const Admin = () => {
       const productData = {
         ...productForm,
         price: parseFloat(productForm.price) || 0,
-        stock_quantity: parseInt(productForm.stock_quantity) || 0
+        stock_quantity: parseInt(productForm.stock_quantity) || 0,
+        weight: parseFloat(productForm.weight) || 0,
+        voltage: parseFloat(productForm.voltage) || 0,
+        power: parseFloat(productForm.power) || 0
       };
 
       if (editingProduct) {
@@ -143,8 +170,31 @@ const Admin = () => {
         stock_quantity: '',
         brand: '',
         category: '',
+        subcategory: '',
+        series: '',
         main_image: '',
-        is_active: true
+        images: [],
+        is_active: true,
+        specifications: {},
+        accessories: [],
+        related_products: [],
+        features: [],
+        applications: [],
+        certifications: [],
+        warranty: '',
+        lead_time: '',
+        weight: '',
+        dimensions: '',
+        voltage: '',
+        power: '',
+        temperature_range: '',
+        ip_rating: '',
+        material: '',
+        color: '',
+        country_of_origin: '',
+        compliance: '',
+        manual_url: '',
+        datasheet_url: ''
       });
       setEditingProduct(null);
       setShowProductForm(false);
@@ -165,8 +215,31 @@ const Admin = () => {
       stock_quantity: product.stock?.toString() || '',
       brand: product.brand || '',
       category: product.category || '',
-      main_image: product.image || '',
-      is_active: product.is_active !== false
+      subcategory: product.subcategory || '',
+      series: product.series || '',
+      main_image: product.image || product.main_image || '',
+      images: product.images || [],
+      is_active: product.is_active !== false,
+      specifications: product.specifications || {},
+      accessories: product.accessories || [],
+      related_products: product.related_products || [],
+      features: product.features || [],
+      applications: product.applications || [],
+      certifications: product.certifications || [],
+      warranty: product.warranty || '',
+      lead_time: product.lead_time || '',
+      weight: product.weight?.toString() || '',
+      dimensions: product.dimensions || '',
+      voltage: product.voltage?.toString() || '',
+      power: product.power?.toString() || '',
+      temperature_range: product.temperature_range || '',
+      ip_rating: product.ip_rating || '',
+      material: product.material || '',
+      color: product.color || '',
+      country_of_origin: product.country_of_origin || '',
+      compliance: product.compliance || '',
+      manual_url: product.manual_url || '',
+      datasheet_url: product.datasheet_url || ''
     });
     setShowProductForm(true);
   };
@@ -711,137 +784,392 @@ const Admin = () => {
                     </Button>
                   </div>
 
-                  <form onSubmit={handleProductFormSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {/* SKU */}
-                      <Input
-                        label="SKU"
-                        value={productForm.sku}
-                        onChange={(e) => handleProductFormChange('sku', e.target.value)}
-                        placeholder="PROD-001"
-                        required
-                      />
+                                     <form onSubmit={handleProductFormSubmit} className="space-y-6">
+                     {/* Pestañas del formulario */}
+                     <div className="border-b border-secondary-200 dark:border-secondary-700">
+                       <nav className="-mb-px flex space-x-8">
+                         {[
+                           { id: 'basic', label: 'Información Básica', icon: 'FiInfo' },
+                           { id: 'technical', label: 'Especificaciones Técnicas', icon: 'FiSettings' },
+                           { id: 'details', label: 'Detalles Adicionales', icon: 'FiFileText' },
+                           { id: 'media', label: 'Medios y Documentos', icon: 'FiImage' }
+                         ].map((tab) => (
+                           <button
+                             key={tab.id}
+                             type="button"
+                             onClick={() => setActiveFormTab(tab.id)}
+                             className={clsx(
+                               "flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200",
+                               activeFormTab === tab.id
+                                 ? "border-primary-500 text-primary-600 dark:text-primary-400"
+                                 : "border-transparent text-secondary-500 dark:text-secondary-400 hover:text-secondary-700 dark:hover:text-secondary-300"
+                             )}
+                           >
+                             <Icon name={tab.icon} size="sm" />
+                             {tab.label}
+                           </button>
+                         ))}
+                       </nav>
+                     </div>
 
-                      {/* Nombre */}
-                      <Input
-                        label="Nombre del Producto"
-                        value={productForm.name}
-                        onChange={(e) => handleProductFormChange('name', e.target.value)}
-                        placeholder="Nombre del producto"
-                        required
-                      />
+                     {/* Contenido de las pestañas */}
+                     {activeFormTab === 'basic' && (
+                       <div className="space-y-6">
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                           {/* SKU */}
+                           <Input
+                             label="SKU"
+                             value={productForm.sku}
+                             onChange={(e) => handleProductFormChange('sku', e.target.value)}
+                             placeholder="PROD-001"
+                             required
+                           />
 
-                      {/* Precio */}
-                      <Input
-                        label="Precio"
-                        type="number"
-                        step="0.01"
-                        value={productForm.price}
-                        onChange={(e) => handleProductFormChange('price', e.target.value)}
-                        placeholder="0.00"
-                        required
-                      />
+                           {/* Nombre */}
+                           <Input
+                             label="Nombre del Producto"
+                             value={productForm.name}
+                             onChange={(e) => handleProductFormChange('name', e.target.value)}
+                             placeholder="Nombre del producto"
+                             required
+                           />
 
-                      {/* Stock */}
-                      <Input
-                        label="Stock"
-                        type="number"
-                        value={productForm.stock_quantity}
-                        onChange={(e) => handleProductFormChange('stock_quantity', e.target.value)}
-                        placeholder="0"
-                        required
-                      />
+                           {/* Precio */}
+                           <Input
+                             label="Precio"
+                             type="number"
+                             step="0.01"
+                             value={productForm.price}
+                             onChange={(e) => handleProductFormChange('price', e.target.value)}
+                             placeholder="0.00"
+                             required
+                           />
 
-                      {/* Marca */}
-                      <Select
-                        label="Marca"
-                        value={productForm.brand}
-                        onChange={(e) => handleProductFormChange('brand', e.target.value)}
-                        required
-                      >
-                        <option value="">Seleccionar marca</option>
-                        {brands.map(brand => (
-                          <option key={brand.id} value={brand.name}>{brand.name}</option>
-                        ))}
-                      </Select>
+                           {/* Stock */}
+                           <Input
+                             label="Stock"
+                             type="number"
+                             value={productForm.stock_quantity}
+                             onChange={(e) => handleProductFormChange('stock_quantity', e.target.value)}
+                             placeholder="0"
+                             required
+                           />
 
-                      {/* Categoría */}
-                      <Select
-                        label="Categoría"
-                        value={productForm.category}
-                        onChange={(e) => handleProductFormChange('category', e.target.value)}
-                        required
-                      >
-                        <option value="">Seleccionar categoría</option>
-                        {categories.map(cat => (
-                          <option key={cat.id} value={cat.name}>{cat.name}</option>
-                        ))}
-                      </Select>
+                           {/* Marca */}
+                           <Select
+                             label="Marca"
+                             value={productForm.brand}
+                             onChange={(e) => handleProductFormChange('brand', e.target.value)}
+                             required
+                           >
+                             <option value="">Seleccionar marca</option>
+                             {brands.map(brand => (
+                               <option key={brand.id} value={brand.name}>{brand.name}</option>
+                             ))}
+                           </Select>
 
-                      {/* Imagen */}
-                      <Input
-                        label="URL de Imagen"
-                        value={productForm.main_image}
-                        onChange={(e) => handleProductFormChange('main_image', e.target.value)}
-                        placeholder="https://ejemplo.com/imagen.jpg"
-                      />
+                           {/* Categoría */}
+                           <Select
+                             label="Categoría"
+                             value={productForm.category}
+                             onChange={(e) => handleProductFormChange('category', e.target.value)}
+                             required
+                           >
+                             <option value="">Seleccionar categoría</option>
+                             {categories.map(cat => (
+                               <option key={cat.id} value={cat.name}>{cat.name}</option>
+                             ))}
+                           </Select>
 
-                      {/* Estado */}
-                      <div>
-                        <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                          Estado
-                        </label>
-                        <Select
-                          value={productForm.is_active ? 'true' : 'false'}
-                          onChange={(e) => handleProductFormChange('is_active', e.target.value === 'true')}
-                        >
-                          <option value="true">Activo</option>
-                          <option value="false">Inactivo</option>
-                        </Select>
-                      </div>
-                    </div>
+                           {/* Subcategoría */}
+                           <Input
+                             label="Subcategoría"
+                             value={productForm.subcategory}
+                             onChange={(e) => handleProductFormChange('subcategory', e.target.value)}
+                             placeholder="Subcategoría"
+                           />
 
-                    {/* Descripción */}
-                    <TextArea
-                      label="Descripción"
-                      value={productForm.description}
-                      onChange={(e) => handleProductFormChange('description', e.target.value)}
-                      placeholder="Descripción detallada del producto..."
-                      rows={4}
-                    />
+                           {/* Serie */}
+                           <Input
+                             label="Serie"
+                             value={productForm.series}
+                             onChange={(e) => handleProductFormChange('series', e.target.value)}
+                             placeholder="Serie del producto"
+                           />
 
-                    {/* Botones */}
-                    <div className="flex gap-4">
-                      <Button
-                        type="submit"
-                        className="flex-1"
-                      >
-                        {editingProduct ? 'Actualizar Producto' : 'Crear Producto'}
-                      </Button>
-                      
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => {
-                          setShowProductForm(false);
-                          setEditingProduct(null);
-                          setProductForm({
-                            sku: '',
-                            name: '',
-                            description: '',
-                            price: '',
-                            stock_quantity: '',
-                            brand: '',
-                            category: '',
-                            main_image: '',
-                            is_active: true
-                          });
-                        }}
-                      >
-                        Cancelar
-                      </Button>
-                    </div>
-                  </form>
+                           {/* Estado */}
+                           <div>
+                             <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                               Estado
+                             </label>
+                             <Select
+                               value={productForm.is_active ? 'true' : 'false'}
+                               onChange={(e) => handleProductFormChange('is_active', e.target.value === 'true')}
+                             >
+                               <option value="true">Activo</option>
+                               <option value="false">Inactivo</option>
+                             </Select>
+                           </div>
+                         </div>
+
+                         {/* Descripción */}
+                         <TextArea
+                           label="Descripción"
+                           value={productForm.description}
+                           onChange={(e) => handleProductFormChange('description', e.target.value)}
+                           placeholder="Descripción detallada del producto..."
+                           rows={4}
+                         />
+                       </div>
+                     )}
+
+                     {activeFormTab === 'technical' && (
+                       <div className="space-y-6">
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                           {/* Peso */}
+                           <Input
+                             label="Peso (kg)"
+                             type="number"
+                             step="0.01"
+                             value={productForm.weight}
+                             onChange={(e) => handleProductFormChange('weight', e.target.value)}
+                             placeholder="0.00"
+                           />
+
+                           {/* Dimensiones */}
+                           <Input
+                             label="Dimensiones"
+                             value={productForm.dimensions}
+                             onChange={(e) => handleProductFormChange('dimensions', e.target.value)}
+                             placeholder="Largo x Ancho x Alto"
+                           />
+
+                           {/* Voltaje */}
+                           <Input
+                             label="Voltaje (V)"
+                             type="number"
+                             step="0.1"
+                             value={productForm.voltage}
+                             onChange={(e) => handleProductFormChange('voltage', e.target.value)}
+                             placeholder="220"
+                           />
+
+                           {/* Potencia */}
+                           <Input
+                             label="Potencia (W)"
+                             type="number"
+                             step="0.1"
+                             value={productForm.power}
+                             onChange={(e) => handleProductFormChange('power', e.target.value)}
+                             placeholder="1000"
+                           />
+
+                           {/* Rango de temperatura */}
+                           <Input
+                             label="Rango de Temperatura"
+                             value={productForm.temperature_range}
+                             onChange={(e) => handleProductFormChange('temperature_range', e.target.value)}
+                             placeholder="-40°C a +85°C"
+                           />
+
+                           {/* IP Rating */}
+                           <Input
+                             label="IP Rating"
+                             value={productForm.ip_rating}
+                             onChange={(e) => handleProductFormChange('ip_rating', e.target.value)}
+                             placeholder="IP65"
+                           />
+
+                           {/* Material */}
+                           <Input
+                             label="Material"
+                             value={productForm.material}
+                             onChange={(e) => handleProductFormChange('material', e.target.value)}
+                             placeholder="Acero inoxidable"
+                           />
+
+                           {/* Color */}
+                           <Input
+                             label="Color"
+                             value={productForm.color}
+                             onChange={(e) => handleProductFormChange('color', e.target.value)}
+                             placeholder="Negro"
+                           />
+                         </div>
+
+                         {/* Garantía */}
+                         <Input
+                           label="Garantía"
+                           value={productForm.warranty}
+                           onChange={(e) => handleProductFormChange('warranty', e.target.value)}
+                           placeholder="2 años"
+                         />
+
+                         {/* Tiempo de entrega */}
+                         <Input
+                           label="Tiempo de Entrega"
+                           value={productForm.lead_time}
+                           onChange={(e) => handleProductFormChange('lead_time', e.target.value)}
+                           placeholder="5-7 días hábiles"
+                         />
+                       </div>
+                     )}
+
+                     {activeFormTab === 'details' && (
+                       <div className="space-y-6">
+                         {/* País de origen */}
+                         <Input
+                           label="País de Origen"
+                           value={productForm.country_of_origin}
+                           onChange={(e) => handleProductFormChange('country_of_origin', e.target.value)}
+                           placeholder="Alemania"
+                         />
+
+                         {/* Cumplimiento */}
+                         <Input
+                           label="Cumplimiento"
+                           value={productForm.compliance}
+                           onChange={(e) => handleProductFormChange('compliance', e.target.value)}
+                           placeholder="CE, UL, RoHS"
+                         />
+
+                         {/* Características */}
+                         <div>
+                           <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                             Características (una por línea)
+                           </label>
+                           <TextArea
+                             value={productForm.features.join('\n')}
+                             onChange={(e) => handleProductFormChange('features', e.target.value.split('\n').filter(f => f.trim()))}
+                             placeholder="Característica 1&#10;Característica 2&#10;Característica 3"
+                             rows={4}
+                           />
+                         </div>
+
+                         {/* Aplicaciones */}
+                         <div>
+                           <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                             Aplicaciones (una por línea)
+                           </label>
+                           <TextArea
+                             value={productForm.applications.join('\n')}
+                             onChange={(e) => handleProductFormChange('applications', e.target.value.split('\n').filter(a => a.trim()))}
+                             placeholder="Aplicación 1&#10;Aplicación 2&#10;Aplicación 3"
+                             rows={4}
+                           />
+                         </div>
+
+                         {/* Certificaciones */}
+                         <div>
+                           <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                             Certificaciones (una por línea)
+                           </label>
+                           <TextArea
+                             value={productForm.certifications.join('\n')}
+                             onChange={(e) => handleProductFormChange('certifications', e.target.value.split('\n').filter(c => c.trim()))}
+                             placeholder="ISO 9001&#10;CE&#10;UL"
+                             rows={4}
+                           />
+                         </div>
+                       </div>
+                     )}
+
+                     {activeFormTab === 'media' && (
+                       <div className="space-y-6">
+                         {/* Imagen principal */}
+                         <Input
+                           label="URL de Imagen Principal"
+                           value={productForm.main_image}
+                           onChange={(e) => handleProductFormChange('main_image', e.target.value)}
+                           placeholder="https://ejemplo.com/imagen.jpg"
+                         />
+
+                         {/* Imágenes adicionales */}
+                         <div>
+                           <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                             URLs de Imágenes Adicionales (una por línea)
+                           </label>
+                           <TextArea
+                             value={productForm.images.join('\n')}
+                             onChange={(e) => handleProductFormChange('images', e.target.value.split('\n').filter(img => img.trim()))}
+                             placeholder="https://ejemplo.com/imagen1.jpg&#10;https://ejemplo.com/imagen2.jpg"
+                             rows={4}
+                           />
+                         </div>
+
+                         {/* Manual */}
+                         <Input
+                           label="URL del Manual"
+                           value={productForm.manual_url}
+                           onChange={(e) => handleProductFormChange('manual_url', e.target.value)}
+                           placeholder="https://ejemplo.com/manual.pdf"
+                         />
+
+                         {/* Hoja de datos */}
+                         <Input
+                           label="URL de la Hoja de Datos"
+                           value={productForm.datasheet_url}
+                           onChange={(e) => handleProductFormChange('datasheet_url', e.target.value)}
+                           placeholder="https://ejemplo.com/datasheet.pdf"
+                         />
+                       </div>
+                     )}
+
+                     {/* Botones */}
+                     <div className="flex gap-4 pt-6 border-t border-secondary-200 dark:border-secondary-700">
+                       <Button
+                         type="submit"
+                         className="flex-1"
+                       >
+                         {editingProduct ? 'Actualizar Producto' : 'Crear Producto'}
+                       </Button>
+                       
+                       <Button
+                         type="button"
+                         variant="outline"
+                         onClick={() => {
+                           setShowProductForm(false);
+                           setEditingProduct(null);
+                           setProductForm({
+                             sku: '',
+                             name: '',
+                             description: '',
+                             price: '',
+                             stock_quantity: '',
+                             brand: '',
+                             category: '',
+                             subcategory: '',
+                             series: '',
+                             main_image: '',
+                             images: [],
+                             is_active: true,
+                             specifications: {},
+                             accessories: [],
+                             related_products: [],
+                             features: [],
+                             applications: [],
+                             certifications: [],
+                             warranty: '',
+                             lead_time: '',
+                             weight: '',
+                             dimensions: '',
+                             voltage: '',
+                             power: '',
+                             temperature_range: '',
+                             ip_rating: '',
+                             material: '',
+                             color: '',
+                             country_of_origin: '',
+                             compliance: '',
+                             manual_url: '',
+                             datasheet_url: ''
+                           });
+                         }}
+                       >
+                         Cancelar
+                       </Button>
+                     </div>
+                   </form>
                 </Card>
               </div>
             </div>

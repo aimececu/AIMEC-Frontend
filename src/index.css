@@ -1,4 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* Reset and base styles */
 * {
@@ -68,11 +71,6 @@ ul, ol {
 }
 
 /* Utility classes */
-.container {
-  max-width: 72rem;
-  margin: 0 auto;
-  padding: 0 1rem;
-}
 
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {

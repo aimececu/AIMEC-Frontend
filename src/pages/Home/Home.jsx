@@ -64,7 +64,7 @@ const Home = () => {
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-20">
-        <div className="container mx-auto px-4 text-center">
+        <div className="max-w-6xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
             Componentes Industriales
             <span className="block text-primary-200">de Alta Calidad</span>
@@ -92,7 +92,7 @@ const Home = () => {
 
       {/* Features Section */}
       <section className="py-16 bg-white dark:bg-secondary-900">
-        <div className="container mx-auto px-4">
+        <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-secondary-900 dark:text-white mb-4">
               ¿Por qué elegirnos?
@@ -125,7 +125,7 @@ const Home = () => {
 
       {/* Testimonials Section */}
       <section className="py-16 bg-secondary-50 dark:bg-secondary-800">
-        <div className="container mx-auto px-4">
+        <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-secondary-900 dark:text-white mb-4">
               Lo que dicen nuestros clientes
@@ -163,7 +163,7 @@ const Home = () => {
 
       {/* CTA Section */}
       <section className="py-16 bg-primary-600 text-white">
-        <div className="container mx-auto px-4 text-center">
+        <div className="max-w-6xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             ¿Listo para comenzar?
           </h2>

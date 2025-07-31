@@ -1,69 +1,77 @@
-import React, { useState } from 'react';
-import { FiPlus, FiEdit, FiTrash2, FiSave, FiX, FiSearch } from 'react-icons/fi';
-import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
-import Select from '../../components/ui/Select';
-import Card from '../../components/ui/Card';
-import clsx from 'clsx';
+import React, { useState } from "react";
+import {
+  FiPlus,
+  FiEdit,
+  FiTrash2,
+  FiSave,
+  FiX,
+  FiSearch,
+} from "react-icons/fi";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
+import Select from "../../components/ui/Select";
+import Card from "../../components/ui/Card";
+import clsx from "clsx";
 
 const Admin = () => {
   const [products, setProducts] = useState([
     {
       id: 1,
-      name: 'Controlador PLC Siemens S7-1200',
-      description: 'Controlador lógico programable de alta precisión',
+      name: "Controlador PLC Siemens S7-1200",
+      description: "Controlador lógico programable de alta precisión",
       price: 1299.99,
-      category: 'controllers',
-      brand: 'siemens',
+      category: "controllers",
+      brand: "siemens",
       stock: 15,
-      image: 'https://via.placeholder.com/300x300?text=PLC'
+      image: "https://via.placeholder.com/300x300?text=PLC",
     },
     {
       id: 2,
-      name: 'Sensor de Temperatura RTD PT100',
-      description: 'Sensor de resistencia térmica de alta precisión',
+      name: "Sensor de Temperatura RTD PT100",
+      description: "Sensor de resistencia térmica de alta precisión",
       price: 89.99,
-      category: 'sensors',
-      brand: 'omron',
+      category: "sensors",
+      brand: "omron",
       stock: 45,
-      image: 'https://via.placeholder.com/300x300?text=RTD'
-    }
+      image: "https://via.placeholder.com/300x300?text=RTD",
+    },
   ]);
 
   const [editingProduct, setEditingProduct] = useState(null);
   const [isAddingProduct, setIsAddingProduct] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
   const categories = [
-    { value: 'electronics', label: 'Electrónicos' },
-    { value: 'mechanical', label: 'Mecánicos' },
-    { value: 'automation', label: 'Automatización' },
-    { value: 'sensors', label: 'Sensores' },
-    { value: 'controllers', label: 'Controladores' },
-    { value: 'actuators', label: 'Actuadores' }
+    { value: "electronics", label: "Electrónicos" },
+    { value: "mechanical", label: "Mecánicos" },
+    { value: "automation", label: "Automatización" },
+    { value: "sensors", label: "Sensores" },
+    { value: "controllers", label: "Controladores" },
+    { value: "actuators", label: "Actuadores" },
   ];
 
   const brands = [
-    { value: 'siemens', label: 'Siemens' },
-    { value: 'allen-bradley', label: 'Allen-Bradley' },
-    { value: 'schneider', label: 'Schneider Electric' },
-    { value: 'omron', label: 'Omron' },
-    { value: 'mitsubishi', label: 'Mitsubishi' }
+    { value: "siemens", label: "Siemens" },
+    { value: "allen-bradley", label: "Allen-Bradley" },
+    { value: "schneider", label: "Schneider Electric" },
+    { value: "omron", label: "Omron" },
+    { value: "mitsubishi", label: "Mitsubishi" },
   ];
 
   const [newProduct, setNewProduct] = useState({
-    name: '',
-    description: '',
-    price: '',
-    category: '',
-    brand: '',
-    stock: '',
-    image: ''
+    name: "",
+    description: "",
+    price: "",
+    category: "",
+    brand: "",
+    stock: "",
+    image: "",
   });
 
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.description.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredProducts = products.filter(
+    (product) =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleAddProduct = () => {
@@ -72,17 +80,17 @@ const Admin = () => {
         id: Date.now(),
         ...newProduct,
         price: parseFloat(newProduct.price),
-        stock: parseInt(newProduct.stock) || 0
+        stock: parseInt(newProduct.stock) || 0,
       };
       setProducts([...products, product]);
       setNewProduct({
-        name: '',
-        description: '',
-        price: '',
-        category: '',
-        brand: '',
-        stock: '',
-        image: ''
+        name: "",
+        description: "",
+        price: "",
+        category: "",
+        brand: "",
+        stock: "",
+        image: "",
       });
       setIsAddingProduct(false);
     }
@@ -94,16 +102,18 @@ const Admin = () => {
 
   const handleSaveEdit = () => {
     if (editingProduct) {
-      setProducts(products.map(p => 
-        p.id === editingProduct.id ? editingProduct : p
-      ));
+      setProducts(
+        products.map((p) => (p.id === editingProduct.id ? editingProduct : p))
+      );
       setEditingProduct(null);
     }
   };
 
   const handleDeleteProduct = (productId) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este producto?')) {
-      setProducts(products.filter(p => p.id !== productId));
+    if (
+      window.confirm("¿Estás seguro de que quieres eliminar este producto?")
+    ) {
+      setProducts(products.filter((p) => p.id !== productId));
     }
   };
 
@@ -113,7 +123,7 @@ const Admin = () => {
 
   return (
     <div className="min-h-screen bg-secondary-50 dark:bg-secondary-900">
-      <div className="container mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-secondary-900 dark:text-white mb-2">
@@ -163,48 +173,65 @@ const Admin = () => {
               <Input
                 label="Nombre del Producto"
                 value={newProduct.name}
-                onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, name: e.target.value })
+                }
                 placeholder="Ingrese el nombre del producto"
               />
               <Input
                 label="Precio"
                 type="number"
                 value={newProduct.price}
-                onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, price: e.target.value })
+                }
                 placeholder="0.00"
               />
               <Select
                 label="Categoría"
                 options={categories}
                 value={newProduct.category}
-                onChange={(value) => setNewProduct({ ...newProduct, category: value })}
+                onChange={(value) =>
+                  setNewProduct({ ...newProduct, category: value })
+                }
                 placeholder="Seleccionar categoría"
               />
               <Select
                 label="Marca"
                 options={brands}
                 value={newProduct.brand}
-                onChange={(value) => setNewProduct({ ...newProduct, brand: value })}
+                onChange={(value) =>
+                  setNewProduct({ ...newProduct, brand: value })
+                }
                 placeholder="Seleccionar marca"
               />
               <Input
                 label="Stock"
                 type="number"
                 value={newProduct.stock}
-                onChange={(e) => setNewProduct({ ...newProduct, stock: e.target.value })}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, stock: e.target.value })
+                }
                 placeholder="0"
               />
               <Input
                 label="URL de Imagen"
                 value={newProduct.image}
-                onChange={(e) => setNewProduct({ ...newProduct, image: e.target.value })}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, image: e.target.value })
+                }
                 placeholder="https://ejemplo.com/imagen.jpg"
               />
               <div className="md:col-span-2">
                 <Input
                   label="Descripción"
                   value={newProduct.description}
-                  onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
+                  onChange={(e) =>
+                    setNewProduct({
+                      ...newProduct,
+                      description: e.target.value,
+                    })
+                  }
                   placeholder="Descripción detallada del producto"
                 />
               </div>
@@ -248,7 +275,10 @@ const Admin = () => {
               </thead>
               <tbody>
                 {filteredProducts.map((product) => (
-                  <tr key={product.id} className="border-b border-secondary-100 dark:border-secondary-800">
+                  <tr
+                    key={product.id}
+                    className="border-b border-secondary-100 dark:border-secondary-800"
+                  >
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
                         <img
@@ -256,7 +286,8 @@ const Admin = () => {
                           alt={product.name}
                           className="w-12 h-12 rounded-lg object-cover bg-secondary-100 dark:bg-secondary-700"
                           onError={(e) => {
-                            e.target.src = 'https://via.placeholder.com/48x48?text=Producto';
+                            e.target.src =
+                              "https://via.placeholder.com/48x48?text=Producto";
                           }}
                         />
                         <div>
@@ -271,21 +302,24 @@ const Admin = () => {
                     </td>
                     <td className="py-3 px-4">
                       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
-                        {categories.find(c => c.value === product.category)?.label || product.category}
+                        {categories.find((c) => c.value === product.category)
+                          ?.label || product.category}
                       </span>
                     </td>
                     <td className="py-3 px-4 font-medium text-secondary-900 dark:text-white">
                       ${product.price.toFixed(2)}
                     </td>
                     <td className="py-3 px-4">
-                      <span className={clsx(
-                        'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium',
-                        product.stock > 10
-                          ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
-                          : product.stock > 0
-                          ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'
-                          : 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200'
-                      )}>
+                      <span
+                        className={clsx(
+                          "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium",
+                          product.stock > 10
+                            ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+                            : product.stock > 0
+                            ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
+                            : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
+                        )}
+                      >
                         {product.stock} unidades
                       </span>
                     </td>
@@ -334,42 +368,71 @@ const Admin = () => {
                 <Input
                   label="Nombre del Producto"
                   value={editingProduct.name}
-                  onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })}
+                  onChange={(e) =>
+                    setEditingProduct({
+                      ...editingProduct,
+                      name: e.target.value,
+                    })
+                  }
                 />
                 <Input
                   label="Precio"
                   type="number"
                   value={editingProduct.price}
-                  onChange={(e) => setEditingProduct({ ...editingProduct, price: parseFloat(e.target.value) })}
+                  onChange={(e) =>
+                    setEditingProduct({
+                      ...editingProduct,
+                      price: parseFloat(e.target.value),
+                    })
+                  }
                 />
                 <Select
                   label="Categoría"
                   options={categories}
                   value={editingProduct.category}
-                  onChange={(value) => setEditingProduct({ ...editingProduct, category: value })}
+                  onChange={(value) =>
+                    setEditingProduct({ ...editingProduct, category: value })
+                  }
                 />
                 <Select
                   label="Marca"
                   options={brands}
                   value={editingProduct.brand}
-                  onChange={(value) => setEditingProduct({ ...editingProduct, brand: value })}
+                  onChange={(value) =>
+                    setEditingProduct({ ...editingProduct, brand: value })
+                  }
                 />
                 <Input
                   label="Stock"
                   type="number"
                   value={editingProduct.stock}
-                  onChange={(e) => setEditingProduct({ ...editingProduct, stock: parseInt(e.target.value) })}
+                  onChange={(e) =>
+                    setEditingProduct({
+                      ...editingProduct,
+                      stock: parseInt(e.target.value),
+                    })
+                  }
                 />
                 <Input
                   label="URL de Imagen"
                   value={editingProduct.image}
-                  onChange={(e) => setEditingProduct({ ...editingProduct, image: e.target.value })}
+                  onChange={(e) =>
+                    setEditingProduct({
+                      ...editingProduct,
+                      image: e.target.value,
+                    })
+                  }
                 />
                 <div className="md:col-span-2">
                   <Input
                     label="Descripción"
                     value={editingProduct.description}
-                    onChange={(e) => setEditingProduct({ ...editingProduct, description: e.target.value })}
+                    onChange={(e) =>
+                      setEditingProduct({
+                        ...editingProduct,
+                        description: e.target.value,
+                      })
+                    }
                   />
                 </div>
               </div>
@@ -377,10 +440,7 @@ const Admin = () => {
                 <Button onClick={handleSaveEdit} icon={<FiSave />}>
                   Guardar Cambios
                 </Button>
-                <Button
-                  variant="secondary"
-                  onClick={handleCancelEdit}
-                >
+                <Button variant="secondary" onClick={handleCancelEdit}>
                   Cancelar
                 </Button>
               </div>
@@ -392,4 +452,4 @@ const Admin = () => {
   );
 };
 
-export default Admin; 
+export default Admin;

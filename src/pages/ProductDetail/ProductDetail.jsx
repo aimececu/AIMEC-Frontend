@@ -129,7 +129,7 @@ const ProductDetail = () => {
 
   return (
     <div className="min-h-screen bg-secondary-50 dark:bg-secondary-900">
-      <div className="container mx-auto px-4 py-8">
+              <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <nav className="mb-6">
           <ol className="flex items-center space-x-2 text-sm text-secondary-600 dark:text-secondary-400">

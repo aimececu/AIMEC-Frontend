@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FiChevronDown, FiSearch, FiX } from 'react-icons/fi';
+import { Icon } from './components';
 import clsx from 'clsx';
 
 const Select = ({ 
@@ -101,7 +101,7 @@ const Select = ({
                       }}
                       className="hover:bg-primary-200 rounded-full p-0.5"
                     >
-                      <FiX className="w-3 h-3" />
+                      <Icon name="FiX" size="xs" />
                     </button>
                   </span>
                 ))
@@ -111,9 +111,11 @@ const Select = ({
                 </span>
               )}
             </div>
-            <FiChevronDown 
+            <Icon 
+              name="FiChevronDown"
+              size="sm"
               className={clsx(
-                'w-4 h-4 text-secondary-400 transition-transform duration-200',
+                'text-secondary-400 transition-transform duration-200',
                 isOpen && 'rotate-180'
               )} 
             />
@@ -125,7 +127,7 @@ const Select = ({
             {searchable && (
               <div className="p-2 border-b border-secondary-200 dark:border-secondary-700">
                 <div className="relative">
-                  <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-secondary-400" />
+                  <Icon name="FiSearch" size="sm" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary-400" />
                   <input
                     type="text"
                     value={searchTerm}

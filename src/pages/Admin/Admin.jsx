@@ -1,453 +1,853 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
-  FiPlus,
-  FiEdit,
-  FiTrash2,
-  FiSave,
-  FiX,
-  FiSearch,
-} from "react-icons/fi";
-import Button from "../../components/ui/Button";
-import Input from "../../components/ui/Input";
-import Select from "../../components/ui/Select";
-import Card from "../../components/ui/Card";
+  Icon,
+  Container,
+  Heading,
+  Card,
+  Button,
+  Input,
+  Select,
+  TextArea,
+  ImageWithFallback
+} from "../../components/ui/components";
+import { useAuth } from "../../context/AuthContext";
+import { productService, categoryService, brandService } from "../../services/database";
+import { productImportService, defaultTemplates } from "../../services/importService";
 import clsx from "clsx";
 
 const Admin = () => {
-  const [products, setProducts] = useState([
-    {
-      id: 1,
-      name: "Controlador PLC Siemens S7-1200",
-      description: "Controlador lógico programable de alta precisión",
-      price: 1299.99,
-      category: "controllers",
-      brand: "siemens",
-      stock: 15,
-      image: "https://via.placeholder.com/300x300?text=PLC",
-    },
-    {
-      id: 2,
-      name: "Sensor de Temperatura RTD PT100",
-      description: "Sensor de resistencia térmica de alta precisión",
-      price: 89.99,
-      category: "sensors",
-      brand: "omron",
-      stock: 45,
-      image: "https://via.placeholder.com/300x300?text=RTD",
-    },
-  ]);
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  
+  // Estados principales
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({});
 
+  // Estados para formularios
   const [editingProduct, setEditingProduct] = useState(null);
-  const [isAddingProduct, setIsAddingProduct] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [showProductForm, setShowProductForm] = useState(false);
+  const [showImportForm, setShowImportForm] = useState(false);
 
-  const categories = [
-    { value: "electronics", label: "Electrónicos" },
-    { value: "mechanical", label: "Mecánicos" },
-    { value: "automation", label: "Automatización" },
-    { value: "sensors", label: "Sensores" },
-    { value: "controllers", label: "Controladores" },
-    { value: "actuators", label: "Actuadores" },
-  ];
-
-  const brands = [
-    { value: "siemens", label: "Siemens" },
-    { value: "allen-bradley", label: "Allen-Bradley" },
-    { value: "schneider", label: "Schneider Electric" },
-    { value: "omron", label: "Omron" },
-    { value: "mitsubishi", label: "Mitsubishi" },
-  ];
-
-  const [newProduct, setNewProduct] = useState({
-    name: "",
-    description: "",
-    price: "",
-    category: "",
-    brand: "",
-    stock: "",
-    image: "",
+  // Estados para formulario de producto
+  const [productForm, setProductForm] = useState({
+    sku: '',
+    name: '',
+    description: '',
+    price: '',
+    stock_quantity: '',
+    brand: '',
+    category: '',
+    main_image: '',
+    is_active: true
   });
 
-  const filteredProducts = products.filter(
-    (product) =>
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Estados para importación
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [importTemplate, setImportTemplate] = useState(null);
+  const [importProgress, setImportProgress] = useState(null);
+  const [importResults, setImportResults] = useState(null);
 
-  const handleAddProduct = () => {
-    if (newProduct.name && newProduct.price) {
-      const product = {
-        id: Date.now(),
-        ...newProduct,
-        price: parseFloat(newProduct.price),
-        stock: parseInt(newProduct.stock) || 0,
+  // Estados para filtros
+  const [filters, setFilters] = useState({
+    search: '',
+    category: '',
+    brand: '',
+    inStock: ''
+  });
+
+  // Cargar datos iniciales
+  useEffect(() => {
+    loadInitialData();
+  }, []);
+
+  const loadInitialData = async () => {
+    try {
+      setLoading(true);
+      const [productsData, categoriesData, brandsData, statsData] = await Promise.all([
+        productService.getProducts(),
+        categoryService.getCategories(),
+        brandService.getBrands(),
+        productService.getProductStats()
+      ]);
+
+      setProducts(productsData);
+      setCategories(categoriesData);
+      setBrands(brandsData);
+      setStats(statsData);
+    } catch (error) {
+      console.error('Error cargando datos:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Filtrar productos
+  const filteredProducts = products.filter(product => {
+    const matchesSearch = !filters.search || 
+      product.name.toLowerCase().includes(filters.search.toLowerCase()) ||
+      product.sku?.toLowerCase().includes(filters.search.toLowerCase());
+    
+    const matchesCategory = !filters.category || product.category === filters.category;
+    const matchesBrand = !filters.brand || product.brand === filters.brand;
+    const matchesStock = filters.inStock === '' || 
+      (filters.inStock === 'true' && product.stock > 0) ||
+      (filters.inStock === 'false' && product.stock === 0);
+
+    return matchesSearch && matchesCategory && matchesBrand && matchesStock;
+  });
+
+  // Manejar logout
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
+  // Manejar formulario de producto
+  const handleProductFormChange = (field, value) => {
+    setProductForm(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleProductFormSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      const productData = {
+        ...productForm,
+        price: parseFloat(productForm.price) || 0,
+        stock_quantity: parseInt(productForm.stock_quantity) || 0
       };
-      setProducts([...products, product]);
-      setNewProduct({
-        name: "",
-        description: "",
-        price: "",
-        category: "",
-        brand: "",
-        stock: "",
-        image: "",
+
+      if (editingProduct) {
+        await productService.updateProduct(editingProduct.id, productData);
+      } else {
+        await productService.createProduct(productData);
+      }
+
+      // Recargar productos
+      await loadInitialData();
+      
+      // Limpiar formulario
+      setProductForm({
+        sku: '',
+        name: '',
+        description: '',
+        price: '',
+        stock_quantity: '',
+        brand: '',
+        category: '',
+        main_image: '',
+        is_active: true
       });
-      setIsAddingProduct(false);
+      setEditingProduct(null);
+      setShowProductForm(false);
+      
+    } catch (error) {
+      console.error('Error guardando producto:', error);
+      alert('Error al guardar el producto');
     }
   };
 
   const handleEditProduct = (product) => {
-    setEditingProduct({ ...product });
+    setEditingProduct(product);
+    setProductForm({
+      sku: product.sku || '',
+      name: product.name || '',
+      description: product.description || '',
+      price: product.price?.toString() || '',
+      stock_quantity: product.stock?.toString() || '',
+      brand: product.brand || '',
+      category: product.category || '',
+      main_image: product.image || '',
+      is_active: product.is_active !== false
+    });
+    setShowProductForm(true);
   };
 
-  const handleSaveEdit = () => {
-    if (editingProduct) {
-      setProducts(
-        products.map((p) => (p.id === editingProduct.id ? editingProduct : p))
+  // Manejar eliminación de producto
+  const handleDeleteProduct = async (id) => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+      try {
+        await productService.deleteProduct(id);
+        setProducts(products.filter(p => p.id !== id));
+      } catch (error) {
+        console.error('Error eliminando producto:', error);
+      }
+    }
+  };
+
+  // Manejar importación de archivo
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const validation = productImportService.validateFile(file);
+      if (validation.isValid) {
+        setSelectedFile(file);
+      } else {
+        alert(`Error en archivo: ${validation.errors.join(', ')}`);
+      }
+    }
+  };
+
+  // Procesar importación
+  const handleImport = async () => {
+    if (!selectedFile || !importTemplate) {
+      alert('Por favor selecciona un archivo y una plantilla');
+      return;
+    }
+
+    try {
+      setImportProgress({ status: 'processing', message: 'Procesando archivo...' });
+      
+      const result = await productImportService.processImport(
+        selectedFile, 
+        importTemplate.id, 
+        user.id
       );
-      setEditingProduct(null);
+
+      setImportResults(result);
+      setImportProgress({ status: 'completed', message: 'Importación completada' });
+      
+      // Recargar productos
+      await loadInitialData();
+      
+    } catch (error) {
+      setImportProgress({ status: 'error', message: error.message });
+      console.error('Error en importación:', error);
     }
   };
 
-  const handleDeleteProduct = (productId) => {
-    if (
-      window.confirm("¿Estás seguro de que quieres eliminar este producto?")
-    ) {
-      setProducts(products.filter((p) => p.id !== productId));
-    }
+  // Descargar plantilla
+  const handleDownloadTemplate = (templateType) => {
+    const template = defaultTemplates[templateType];
+    if (!template) return;
+
+    const csvContent = productImportService.exportTemplateAsCSV(template);
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `plantilla-${templateType}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
   };
 
-  const handleCancelEdit = () => {
-    setEditingProduct(null);
-  };
-
-  return (
-    <div className="min-h-screen bg-secondary-50 dark:bg-secondary-900">
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-secondary-900 dark:text-white mb-2">
-            Panel de Administración
-          </h1>
-          <p className="text-secondary-600 dark:text-secondary-300">
-            Gestiona los productos del catálogo
-          </p>
-        </div>
-
-        {/* Search and Add Button */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="flex-1 relative">
-            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-secondary-400" />
-            <input
-              type="text"
-              placeholder="Buscar productos..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-3 py-2 border border-secondary-300 dark:border-secondary-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-secondary-700 text-secondary-900 dark:text-white"
-            />
-          </div>
-          <Button
-            onClick={() => setIsAddingProduct(true)}
-            icon={<FiPlus />}
-            className="whitespace-nowrap"
-          >
-            Agregar Producto
-          </Button>
-        </div>
-
-        {/* Add Product Form */}
-        {isAddingProduct && (
-          <Card className="mb-6">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-secondary-900 dark:text-white">
-                Agregar Nuevo Producto
-              </h3>
-              <Button
-                variant="ghost"
-                icon={<FiX />}
-                iconOnly
-                onClick={() => setIsAddingProduct(false)}
-              />
+  // Renderizar dashboard
+  const renderDashboard = () => (
+    <div className="space-y-6">
+      {/* Estadísticas */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-secondary-600 dark:text-secondary-400">Total Productos</p>
+              <p className="text-2xl font-bold text-primary-600 dark:text-primary-400">
+                {stats.total_products || 0}
+              </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input
-                label="Nombre del Producto"
-                value={newProduct.name}
-                onChange={(e) =>
-                  setNewProduct({ ...newProduct, name: e.target.value })
-                }
-                placeholder="Ingrese el nombre del producto"
-              />
-              <Input
-                label="Precio"
-                type="number"
-                value={newProduct.price}
-                onChange={(e) =>
-                  setNewProduct({ ...newProduct, price: e.target.value })
-                }
-                placeholder="0.00"
-              />
-              <Select
-                label="Categoría"
-                options={categories}
-                value={newProduct.category}
-                onChange={(value) =>
-                  setNewProduct({ ...newProduct, category: value })
-                }
-                placeholder="Seleccionar categoría"
-              />
-              <Select
-                label="Marca"
-                options={brands}
-                value={newProduct.brand}
-                onChange={(value) =>
-                  setNewProduct({ ...newProduct, brand: value })
-                }
-                placeholder="Seleccionar marca"
-              />
-              <Input
-                label="Stock"
-                type="number"
-                value={newProduct.stock}
-                onChange={(e) =>
-                  setNewProduct({ ...newProduct, stock: e.target.value })
-                }
-                placeholder="0"
-              />
-              <Input
-                label="URL de Imagen"
-                value={newProduct.image}
-                onChange={(e) =>
-                  setNewProduct({ ...newProduct, image: e.target.value })
-                }
-                placeholder="https://ejemplo.com/imagen.jpg"
-              />
-              <div className="md:col-span-2">
-                <Input
-                  label="Descripción"
-                  value={newProduct.description}
-                  onChange={(e) =>
-                    setNewProduct({
-                      ...newProduct,
-                      description: e.target.value,
-                    })
-                  }
-                  placeholder="Descripción detallada del producto"
-                />
-              </div>
-            </div>
-            <div className="flex gap-2 mt-4">
-              <Button onClick={handleAddProduct} icon={<FiSave />}>
-                Guardar Producto
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={() => setIsAddingProduct(false)}
-              >
-                Cancelar
-              </Button>
-            </div>
-          </Card>
-        )}
-
-        {/* Products Table */}
-        <Card>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-secondary-200 dark:border-secondary-700">
-                  <th className="text-left py-3 px-4 font-semibold text-secondary-900 dark:text-white">
-                    Producto
-                  </th>
-                  <th className="text-left py-3 px-4 font-semibold text-secondary-900 dark:text-white">
-                    Categoría
-                  </th>
-                  <th className="text-left py-3 px-4 font-semibold text-secondary-900 dark:text-white">
-                    Precio
-                  </th>
-                  <th className="text-left py-3 px-4 font-semibold text-secondary-900 dark:text-white">
-                    Stock
-                  </th>
-                  <th className="text-left py-3 px-4 font-semibold text-secondary-900 dark:text-white">
-                    Acciones
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredProducts.map((product) => (
-                  <tr
-                    key={product.id}
-                    className="border-b border-secondary-100 dark:border-secondary-800"
-                  >
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="w-12 h-12 rounded-lg object-cover bg-secondary-100 dark:bg-secondary-700"
-                          onError={(e) => {
-                            e.target.src =
-                              "https://via.placeholder.com/48x48?text=Producto";
-                          }}
-                        />
-                        <div>
-                          <div className="font-medium text-secondary-900 dark:text-white">
-                            {product.name}
-                          </div>
-                          <div className="text-sm text-secondary-500 dark:text-secondary-400">
-                            {product.description}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
-                        {categories.find((c) => c.value === product.category)
-                          ?.label || product.category}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 font-medium text-secondary-900 dark:text-white">
-                      ${product.price.toFixed(2)}
-                    </td>
-                    <td className="py-3 px-4">
-                      <span
-                        className={clsx(
-                          "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium",
-                          product.stock > 10
-                            ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                            : product.stock > 0
-                            ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
-                            : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
-                        )}
-                      >
-                        {product.stock} unidades
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          icon={<FiEdit />}
-                          iconOnly
-                          onClick={() => handleEditProduct(product)}
-                        />
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          icon={<FiTrash2 />}
-                          iconOnly
-                          onClick={() => handleDeleteProduct(product.id)}
-                          className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                        />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <Icon name="FiPackage" className="text-3xl text-primary-500" />
           </div>
         </Card>
 
-        {/* Edit Product Modal */}
-        {editingProduct && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-secondary-900 dark:text-white">
-                  Editar Producto
-                </h3>
+        <Card className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-secondary-600 dark:text-secondary-400">En Stock</p>
+              <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                {stats.in_stock || 0}
+              </p>
+            </div>
+            <Icon name="FiCheckCircle" className="text-3xl text-green-500" />
+          </div>
+        </Card>
+
+        <Card className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-secondary-600 dark:text-secondary-400">Sin Stock</p>
+              <p className="text-2xl font-bold text-red-600 dark:text-red-400">
+                {stats.out_of_stock || 0}
+              </p>
+            </div>
+            <Icon name="FiAlertCircle" className="text-3xl text-red-500" />
+          </div>
+        </Card>
+
+        <Card className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-secondary-600 dark:text-secondary-400">Stock Bajo</p>
+              <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
+                {stats.low_stock || 0}
+              </p>
+            </div>
+            <Icon name="FiAlertTriangle" className="text-3xl text-yellow-500" />
+          </div>
+        </Card>
+      </div>
+
+      {/* Acciones rápidas */}
+      <Card className="p-6">
+        <Heading level={3} className="mb-4">Acciones Rápidas</Heading>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Button 
+            onClick={() => setShowProductForm(true)}
+            className="flex items-center gap-2"
+          >
+            <Icon name="FiPlus" />
+            Agregar Producto
+          </Button>
+          
+          <Button 
+            variant="outline"
+            onClick={() => setShowImportForm(true)}
+            className="flex items-center gap-2"
+          >
+            <Icon name="FiUpload" />
+            Importar Productos
+          </Button>
+          
+          <Button 
+            variant="outline"
+            onClick={() => setActiveTab('specifications')}
+            className="flex items-center gap-2"
+          >
+            <Icon name="FiSettings" />
+            Gestionar Especificaciones
+          </Button>
+        </div>
+      </Card>
+    </div>
+  );
+
+  // Renderizar lista de productos
+  const renderProductsList = () => (
+    <div className="space-y-6">
+      {/* Filtros */}
+      <Card className="p-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Input
+            placeholder="Buscar productos..."
+            value={filters.search}
+            onChange={(e) => setFilters({...filters, search: e.target.value})}
+          />
+          
+          <Select
+            value={filters.category}
+            onChange={(e) => setFilters({...filters, category: e.target.value})}
+          >
+            <option value="">Todas las categorías</option>
+            {categories.map(cat => (
+              <option key={cat.id} value={cat.name}>{cat.name}</option>
+            ))}
+          </Select>
+          
+          <Select
+            value={filters.brand}
+            onChange={(e) => setFilters({...filters, brand: e.target.value})}
+          >
+            <option value="">Todas las marcas</option>
+            {brands.map(brand => (
+              <option key={brand.id} value={brand.name}>{brand.name}</option>
+            ))}
+          </Select>
+          
+          <Select
+            value={filters.inStock}
+            onChange={(e) => setFilters({...filters, inStock: e.target.value})}
+          >
+            <option value="">Todo el stock</option>
+            <option value="true">En stock</option>
+            <option value="false">Sin stock</option>
+          </Select>
+        </div>
+      </Card>
+
+      {/* Lista de productos */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        {filteredProducts.map((product) => (
+          <Card key={product.id} className="overflow-hidden">
+            <div className="aspect-square bg-secondary-100 dark:bg-secondary-700">
+              <ImageWithFallback
+                src={product.image || product.main_image}
+                alt={product.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-secondary-500 dark:text-secondary-400 bg-secondary-100 dark:bg-secondary-700 px-2 py-1 rounded-full">
+                  {product.category}
+                </span>
+                <span className="text-xs text-secondary-500 dark:text-secondary-400">
+                  {product.brand}
+                </span>
+              </div>
+              
+              <h3 className="font-semibold text-secondary-900 dark:text-white mb-2 line-clamp-2">
+                {product.name}
+              </h3>
+              
+              <p className="text-sm text-secondary-600 dark:text-secondary-300 mb-3 line-clamp-2">
+                {product.description}
+              </p>
+              
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-bold text-primary-600 dark:text-primary-400">
+                  ${product.price.toFixed(2)}
+                </span>
+                <span className={clsx(
+                  "text-xs px-2 py-1 rounded-full",
+                  product.stock > 10 
+                    ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+                    : product.stock > 0
+                    ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
+                    : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
+                )}>
+                  {product.stock > 0 ? `${product.stock} en stock` : 'Sin stock'}
+                </span>
+              </div>
+              
+              <div className="flex gap-2">
                 <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleEditProduct(product)}
+                  className="flex-1"
+                >
+                  <Icon name="FiEdit" size="sm" className="mr-1" />
+                  Editar
+                </Button>
+                
+                <Button
+                  size="sm"
                   variant="ghost"
-                  icon={<FiX />}
-                  iconOnly
-                  onClick={handleCancelEdit}
-                />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input
-                  label="Nombre del Producto"
-                  value={editingProduct.name}
-                  onChange={(e) =>
-                    setEditingProduct({
-                      ...editingProduct,
-                      name: e.target.value,
-                    })
-                  }
-                />
-                <Input
-                  label="Precio"
-                  type="number"
-                  value={editingProduct.price}
-                  onChange={(e) =>
-                    setEditingProduct({
-                      ...editingProduct,
-                      price: parseFloat(e.target.value),
-                    })
-                  }
-                />
-                <Select
-                  label="Categoría"
-                  options={categories}
-                  value={editingProduct.category}
-                  onChange={(value) =>
-                    setEditingProduct({ ...editingProduct, category: value })
-                  }
-                />
-                <Select
-                  label="Marca"
-                  options={brands}
-                  value={editingProduct.brand}
-                  onChange={(value) =>
-                    setEditingProduct({ ...editingProduct, brand: value })
-                  }
-                />
-                <Input
-                  label="Stock"
-                  type="number"
-                  value={editingProduct.stock}
-                  onChange={(e) =>
-                    setEditingProduct({
-                      ...editingProduct,
-                      stock: parseInt(e.target.value),
-                    })
-                  }
-                />
-                <Input
-                  label="URL de Imagen"
-                  value={editingProduct.image}
-                  onChange={(e) =>
-                    setEditingProduct({
-                      ...editingProduct,
-                      image: e.target.value,
-                    })
-                  }
-                />
-                <div className="md:col-span-2">
-                  <Input
-                    label="Descripción"
-                    value={editingProduct.description}
-                    onChange={(e) =>
-                      setEditingProduct({
-                        ...editingProduct,
-                        description: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-              </div>
-              <div className="flex gap-2 mt-4">
-                <Button onClick={handleSaveEdit} icon={<FiSave />}>
-                  Guardar Cambios
-                </Button>
-                <Button variant="secondary" onClick={handleCancelEdit}>
-                  Cancelar
+                  onClick={() => handleDeleteProduct(product.id)}
+                  className="text-red-600 hover:text-red-700"
+                >
+                  <Icon name="FiTrash2" size="sm" />
                 </Button>
               </div>
-            </Card>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+
+  // Renderizar formulario de importación
+  const renderImportForm = () => (
+    <Card className="p-6">
+      <Heading level={3} className="mb-4">Importar Productos</Heading>
+      
+      <div className="space-y-6">
+        {/* Selección de archivo */}
+        <div>
+          <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+            Seleccionar Archivo
+          </label>
+          <input
+            type="file"
+            accept=".csv,.xlsx,.xls"
+            onChange={handleFileSelect}
+            className="block w-full text-sm text-secondary-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
+          />
+          {selectedFile && (
+            <p className="text-sm text-secondary-600 dark:text-secondary-400 mt-2">
+              Archivo seleccionado: {selectedFile.name}
+            </p>
+          )}
+        </div>
+
+        {/* Selección de plantilla */}
+        <div>
+          <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+            Plantilla de Importación
+          </label>
+          <Select
+            value={importTemplate?.id || ''}
+            onChange={(e) => {
+              const template = Object.values(defaultTemplates).find(t => t.name === e.target.value);
+              setImportTemplate(template);
+            }}
+          >
+            <option value="">Seleccionar plantilla...</option>
+            {Object.entries(defaultTemplates).map(([key, template]) => (
+              <option key={key} value={template.name}>{template.name}</option>
+            ))}
+          </Select>
+        </div>
+
+        {/* Descargar plantillas */}
+        <div>
+          <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+            Descargar Plantillas
+          </label>
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleDownloadTemplate('basic')}
+            >
+              Plantilla Básica
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleDownloadTemplate('industrial')}
+            >
+              Plantilla Industrial
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleDownloadTemplate('sensors')}
+            >
+              Plantilla Sensores
+            </Button>
+          </div>
+        </div>
+
+        {/* Progreso de importación */}
+        {importProgress && (
+          <div className={clsx(
+            "p-4 rounded-lg",
+            importProgress.status === 'processing' && "bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800",
+            importProgress.status === 'completed' && "bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800",
+            importProgress.status === 'error' && "bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800"
+          )}>
+            <p className="text-sm font-medium">
+              {importProgress.message}
+            </p>
           </div>
         )}
+
+        {/* Resultados de importación */}
+        {importResults && (
+          <div className="bg-secondary-50 dark:bg-secondary-800 p-4 rounded-lg">
+            <h4 className="font-medium mb-2">Resultados de Importación</h4>
+            <div className="text-sm space-y-1">
+              <p>Total procesados: {importResults.results.total}</p>
+              <p className="text-green-600">Exitosos: {importResults.results.successful.length}</p>
+              <p className="text-red-600">Fallidos: {importResults.results.failed.length}</p>
+            </div>
+            
+            {importResults.results.failed.length > 0 && (
+              <details className="mt-3">
+                <summary className="cursor-pointer text-sm font-medium">Ver errores</summary>
+                <div className="mt-2 text-xs space-y-1">
+                  {importResults.results.failed.slice(0, 5).map((error, index) => (
+                    <div key={index} className="text-red-600">
+                      Fila {error.row}: {error.errors.join(', ')}
+                    </div>
+                  ))}
+                </div>
+              </details>
+            )}
+          </div>
+        )}
+
+        {/* Botones de acción */}
+        <div className="flex gap-4">
+          <Button
+            onClick={handleImport}
+            disabled={!selectedFile || !importTemplate || importProgress?.status === 'processing'}
+            loading={importProgress?.status === 'processing'}
+            className="flex-1"
+          >
+            {importProgress?.status === 'processing' ? 'Importando...' : 'Iniciar Importación'}
+          </Button>
+          
+          <Button
+            variant="outline"
+            onClick={() => {
+              setShowImportForm(false);
+              setSelectedFile(null);
+              setImportTemplate(null);
+              setImportProgress(null);
+              setImportResults(null);
+            }}
+          >
+            Cancelar
+          </Button>
+        </div>
       </div>
+    </Card>
+  );
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-secondary-50 dark:bg-secondary-900">
+        <Container>
+          <div className="py-16 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+            <p className="text-secondary-600 dark:text-secondary-300">
+              Cargando panel de administración...
+            </p>
+          </div>
+        </Container>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-secondary-50 dark:bg-secondary-900">
+      <Container>
+        <div className="py-8">
+          {/* Header con información del usuario */}
+          <div className="mb-8">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                <Heading level={1} className="mb-2">
+                  Panel de Administración
+                </Heading>
+                <p className="text-secondary-600 dark:text-secondary-300">
+                  Gestiona los productos del catálogo
+                </p>
+              </div>
+              
+              {/* User info and logout */}
+              <div className="flex items-center gap-4">
+                <div className="text-right">
+                  <p className="text-sm font-medium text-secondary-900 dark:text-white">
+                    {user?.name}
+                  </p>
+                  <p className="text-xs text-secondary-500 dark:text-secondary-400">
+                    {user?.email}
+                  </p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleLogout}
+                  className="text-red-600 hover:text-red-700"
+                >
+                  <Icon name="FiLogOut" size="sm" className="mr-2" />
+                  Cerrar Sesión
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Tabs de navegación */}
+          <div className="mb-6">
+            <nav className="flex space-x-8">
+              {[
+                { id: 'dashboard', label: 'Dashboard', icon: 'FiHome' },
+                { id: 'products', label: 'Productos', icon: 'FiPackage' },
+                { id: 'import', label: 'Importar', icon: 'FiUpload' },
+                { id: 'specifications', label: 'Especificaciones', icon: 'FiSettings' }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={clsx(
+                    "flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200",
+                    activeTab === tab.id
+                      ? "border-primary-500 text-primary-600 dark:text-primary-400"
+                      : "border-transparent text-secondary-500 dark:text-secondary-400 hover:text-secondary-700 dark:hover:text-secondary-300"
+                  )}
+                >
+                  <Icon name={tab.icon} size="sm" />
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
+          </div>
+
+          {/* Contenido de tabs */}
+          <div className="space-y-6">
+            {activeTab === 'dashboard' && renderDashboard()}
+            {activeTab === 'products' && renderProductsList()}
+            {activeTab === 'import' && renderImportForm()}
+            {activeTab === 'specifications' && (
+              <Card className="p-6">
+                <Heading level={3} className="mb-4">Gestión de Especificaciones</Heading>
+                <p className="text-secondary-600 dark:text-secondary-300">
+                  Aquí podrás gestionar los tipos de especificaciones dinámicas para los productos.
+                </p>
+                {/* Implementar gestión de especificaciones */}
+              </Card>
+            )}
+          </div>
+
+          {/* Formulario de producto (modal) */}
+          {showProductForm && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+              <div className="bg-white dark:bg-secondary-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                <Card className="p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <Heading level={3}>
+                      {editingProduct ? 'Editar Producto' : 'Agregar Nuevo Producto'}
+                    </Heading>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setShowProductForm(false);
+                        setEditingProduct(null);
+                        setProductForm({
+                          sku: '',
+                          name: '',
+                          description: '',
+                          price: '',
+                          stock_quantity: '',
+                          brand: '',
+                          category: '',
+                          main_image: '',
+                          is_active: true
+                        });
+                      }}
+                    >
+                      <Icon name="FiX" size="sm" />
+                    </Button>
+                  </div>
+
+                  <form onSubmit={handleProductFormSubmit} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* SKU */}
+                      <Input
+                        label="SKU"
+                        value={productForm.sku}
+                        onChange={(e) => handleProductFormChange('sku', e.target.value)}
+                        placeholder="PROD-001"
+                        required
+                      />
+
+                      {/* Nombre */}
+                      <Input
+                        label="Nombre del Producto"
+                        value={productForm.name}
+                        onChange={(e) => handleProductFormChange('name', e.target.value)}
+                        placeholder="Nombre del producto"
+                        required
+                      />
+
+                      {/* Precio */}
+                      <Input
+                        label="Precio"
+                        type="number"
+                        step="0.01"
+                        value={productForm.price}
+                        onChange={(e) => handleProductFormChange('price', e.target.value)}
+                        placeholder="0.00"
+                        required
+                      />
+
+                      {/* Stock */}
+                      <Input
+                        label="Stock"
+                        type="number"
+                        value={productForm.stock_quantity}
+                        onChange={(e) => handleProductFormChange('stock_quantity', e.target.value)}
+                        placeholder="0"
+                        required
+                      />
+
+                      {/* Marca */}
+                      <Select
+                        label="Marca"
+                        value={productForm.brand}
+                        onChange={(e) => handleProductFormChange('brand', e.target.value)}
+                        required
+                      >
+                        <option value="">Seleccionar marca</option>
+                        {brands.map(brand => (
+                          <option key={brand.id} value={brand.name}>{brand.name}</option>
+                        ))}
+                      </Select>
+
+                      {/* Categoría */}
+                      <Select
+                        label="Categoría"
+                        value={productForm.category}
+                        onChange={(e) => handleProductFormChange('category', e.target.value)}
+                        required
+                      >
+                        <option value="">Seleccionar categoría</option>
+                        {categories.map(cat => (
+                          <option key={cat.id} value={cat.name}>{cat.name}</option>
+                        ))}
+                      </Select>
+
+                      {/* Imagen */}
+                      <Input
+                        label="URL de Imagen"
+                        value={productForm.main_image}
+                        onChange={(e) => handleProductFormChange('main_image', e.target.value)}
+                        placeholder="https://ejemplo.com/imagen.jpg"
+                      />
+
+                      {/* Estado */}
+                      <div>
+                        <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                          Estado
+                        </label>
+                        <Select
+                          value={productForm.is_active ? 'true' : 'false'}
+                          onChange={(e) => handleProductFormChange('is_active', e.target.value === 'true')}
+                        >
+                          <option value="true">Activo</option>
+                          <option value="false">Inactivo</option>
+                        </Select>
+                      </div>
+                    </div>
+
+                    {/* Descripción */}
+                    <TextArea
+                      label="Descripción"
+                      value={productForm.description}
+                      onChange={(e) => handleProductFormChange('description', e.target.value)}
+                      placeholder="Descripción detallada del producto..."
+                      rows={4}
+                    />
+
+                    {/* Botones */}
+                    <div className="flex gap-4">
+                      <Button
+                        type="submit"
+                        className="flex-1"
+                      >
+                        {editingProduct ? 'Actualizar Producto' : 'Crear Producto'}
+                      </Button>
+                      
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          setShowProductForm(false);
+                          setEditingProduct(null);
+                          setProductForm({
+                            sku: '',
+                            name: '',
+                            description: '',
+                            price: '',
+                            stock_quantity: '',
+                            brand: '',
+                            category: '',
+                            main_image: '',
+                            is_active: true
+                          });
+                        }}
+                      >
+                        Cancelar
+                      </Button>
+                    </div>
+                  </form>
+                </Card>
+              </div>
+            </div>
+          )}
+        </div>
+      </Container>
     </div>
   );
 };

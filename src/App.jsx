@@ -1,11 +1,16 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider as CustomThemeProvider } from './context/ThemeContext';
+import { CartProvider } from './context/CartContext';
+import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navigation/Navbar';
 import Footer from './components/Navigation/Footer';
+import ProtectedRoute from './components/Auth/ProtectedRoute';
 import Home from './pages/Home/Home';
 import Catalog from './pages/Catalog/Catalog';
 import Admin from './pages/Admin/Admin';
 import ProductDetail from './pages/ProductDetail/ProductDetail';
+import Quotation from './pages/Quotation/Quotation';
+import Login from './pages/Auth/Login';
 
 const AppContent = () => {
   return (
@@ -16,8 +21,17 @@ const AppContent = () => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/catalogo" element={<Catalog />} />
-            <Route path="/admin" element={<Admin />} />
             <Route path="/producto/:id" element={<ProductDetail />} />
+            <Route path="/cotizacion" element={<Quotation />} />
+            <Route path="/login" element={<Login />} />
+            <Route 
+              path="/admin" 
+              element={
+                <ProtectedRoute>
+                  <Admin />
+                </ProtectedRoute>
+              } 
+            />
           </Routes>
         </main>
         <Footer />
@@ -29,7 +43,11 @@ const AppContent = () => {
 const App = () => {
   return (
     <CustomThemeProvider>
-      <AppContent />
+      <AuthProvider>
+        <CartProvider>
+          <AppContent />
+        </CartProvider>
+      </AuthProvider>
     </CustomThemeProvider>
   );
 };

@@ -1,330 +1,321 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { FiSearch, FiFilter, FiGrid, FiList, FiStar } from "react-icons/fi";
-import ProductCard from "../../components/ui/ProductCard";
+import React, { useState, useEffect } from "react";
+import {
+  Icon,
+  Container,
+  Heading,
+  Card,
+  Button,
+  Input,
+  Select,
+  ProductCard
+} from "../../components/ui/components";
+import { productService, categoryService, brandService } from "../../services/database";
 import clsx from "clsx";
 
 const Catalog = () => {
-  const [viewMode, setViewMode] = useState("grid");
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedBrand, setSelectedBrand] = useState("");
-  const [priceRange, setPriceRange] = useState([0, 10000]);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedSubcategory, setSelectedSubcategory] = useState("all");
+  const [selectedSeries, setSelectedSeries] = useState("all");
+  const [viewMode, setViewMode] = useState("grid"); // 'grid' o 'list'
+  const [sortOption, setSortOption] = useState("default");
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [series, setSeries] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Datos de ejemplo
-  const categories = [
-    { id: "electronics", name: "Electrónicos", count: 45 },
-    { id: "mechanical", name: "Mecánicos", count: 32 },
-    { id: "automation", name: "Automatización", count: 28 },
-    { id: "sensors", name: "Sensores", count: 56 },
-    { id: "controllers", name: "Controladores", count: 23 },
-    { id: "actuators", name: "Actuadores", count: 19 },
-  ];
+  // Cargar datos desde la base de datos
+  useEffect(() => {
+    loadData();
+  }, []);
 
-  const brands = [
-    { id: "siemens", name: "Siemens", count: 15 },
-    { id: "allen-bradley", name: "Allen-Bradley", count: 12 },
-    { id: "schneider", name: "Schneider Electric", count: 18 },
-    { id: "omron", name: "Omron", count: 8 },
-    { id: "mitsubishi", name: "Mitsubishi", count: 10 },
-  ];
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      const [productsData, categoriesData, brandsData] = await Promise.all([
+        productService.getProducts(),
+        categoryService.getCategories(),
+        brandService.getBrands()
+      ]);
 
-  const products = [
-    {
-      id: 1,
-      name: "Controlador PLC Siemens S7-1200",
-      description:
-        "Controlador lógico programable de alta precisión para automatización industrial",
-      price: 1299.99,
-      originalPrice: 1499.99,
-      image: "https://via.placeholder.com/300x300?text=PLC+S7-1200",
-      category: "controllers",
-      brand: "siemens",
-      rating: 4.8,
-      inStock: true,
-    },
-    {
-      id: 2,
-      name: "Sensor de Temperatura RTD PT100",
-      description:
-        "Sensor de resistencia térmica de alta precisión para medición de temperatura",
-      price: 89.99,
-      image: "https://via.placeholder.com/300x300?text=RTD+PT100",
-      category: "sensors",
-      brand: "omron",
-      rating: 4.6,
-      inStock: true,
-    },
-    {
-      id: 3,
-      name: 'HMI Touch Screen 7"',
-      description:
-        "Panel de operador táctil resistivo con interfaz gráfica avanzada",
-      price: 599.99,
-      image: "https://via.placeholder.com/300x300?text=HMI+7inch",
-      category: "automation",
-      brand: "allen-bradley",
-      rating: 4.5,
-      inStock: true,
-    },
-    {
-      id: 4,
-      name: "Servomotor AC 1kW",
-      description:
-        "Motor servo de corriente alterna de alta precisión y torque",
-      price: 899.99,
-      image: "https://via.placeholder.com/300x300?text=Servo+1kW",
-      category: "mechanical",
-      brand: "mitsubishi",
-      rating: 4.7,
-      inStock: false,
-    },
-    {
-      id: 5,
-      name: "Válvula Solenoide 3/2",
-      description: "Válvula neumática de tres vías y dos posiciones",
-      price: 45.99,
-      image: "https://via.placeholder.com/300x300?text=Valve+3-2",
-      category: "actuators",
-      brand: "schneider",
-      rating: 4.3,
-      inStock: true,
-    },
-    {
-      id: 6,
-      name: "Convertidor de Frecuencia 5.5kW",
-      description: "Inversor de frecuencia para control de motores AC",
-      price: 749.99,
-      image: "https://via.placeholder.com/300x300?text=VFD+5.5kW",
-      category: "electronics",
-      brand: "siemens",
-      rating: 4.9,
-      inStock: true,
-    },
-  ];
+      setProducts(productsData);
+      setCategories(categoriesData);
+      setBrands(brandsData);
+      
+      // Extraer series únicas de los productos
+      const uniqueSeries = [...new Set(productsData.map(product => product.series_name).filter(Boolean))];
+      setSeries(uniqueSeries);
+    } catch (error) {
+      console.error('Error cargando datos:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const filteredProducts = products.filter((product) => {
-    const matchesSearch =
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory =
-      !selectedCategory || product.category === selectedCategory;
-    const matchesBrand = !selectedBrand || product.brand === selectedBrand;
-    const matchesPrice =
-      product.price >= priceRange[0] && product.price <= priceRange[1];
+  // Obtener subcategorías de la categoría seleccionada
+  const getSubcategories = () => {
+    if (selectedCategory === "all") return [];
+    const category = categories.find(cat => cat.id === selectedCategory);
+    return category ? category.subcategories : [];
+  };
 
-    return matchesSearch && matchesCategory && matchesBrand && matchesPrice;
-  });
+  // Obtener series de la categoría seleccionada
+  const getSeries = () => {
+    if (selectedCategory === "all") return series;
+    return series.filter(seriesItem => seriesItem.category === selectedCategory);
+  };
+
+  const subcategories = getSubcategories();
+  const availableSeries = getSeries();
+
+  const filteredProducts = products
+    .filter((product) => {
+      const matchesSearch = 
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.series?.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesCategory = selectedCategory === "all" || product.category === selectedCategory;
+      const matchesSubcategory = selectedSubcategory === "all" || product.subcategory === selectedSubcategory;
+      const matchesSeries = selectedSeries === "all" || product.series === selectedSeries;
+      
+      return matchesSearch && matchesCategory && matchesSubcategory && matchesSeries;
+    })
+    .sort((a, b) => {
+      switch (sortOption) {
+        case "price-low":
+          return a.price - b.price;
+        case "price-high":
+          return b.price - a.price;
+        case "name":
+          return a.name.localeCompare(b.name);
+        case "rating":
+          return b.rating - a.rating;
+        case "stock":
+          return b.stock - a.stock;
+        default:
+          return 0;
+      }
+    });
+
+
 
   return (
     <div className="min-h-screen bg-secondary-50 dark:bg-secondary-900">
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8 ">
-          <h1 className="text-3xl md:text-4xl font-bold text-secondary-900 dark:text-white mb-2">
-            Catálogo de Productos
-          </h1>
-          <p className="text-secondary-600 dark:text-secondary-300">
-            Descubre nuestra amplia gama de componentes industriales
-          </p>
-        </div>
+      <Container size="xl">
+        <div className="py-8">
+          {/* Header */}
+          <div className="mb-8">
+            <Heading level={1} className="mb-2">
+              Catálogo de Productos Siemens
+            </Heading>
+            <p className="text-secondary-600 dark:text-secondary-300">
+              Soluciones de automatización industrial de alta calidad
+            </p>
+          </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar Filters */}
-          <div className="lg:w-80 flex-shrink-0">
-            <div className="bg-white dark:bg-secondary-800 rounded-lg shadow-md p-6 sticky top-4">
-              <h3 className="text-lg font-semibold text-secondary-900 dark:text-white mb-4 flex items-center gap-2">
-                <FiFilter className="w-5 h-5" />
-                Filtros
-              </h3>
+          {/* Main Content */}
+          <div className="flex flex-col xl:flex-row gap-6">
+            {/* Sidebar Filters - Más compacto */}
+            <div className="xl:w-72 flex-shrink-0">
+              <Card padding="lg" className="sticky top-4">
+                <Heading level={3} className="mb-4 flex items-center gap-2">
+                  <Icon name="FiFilter" />
+                  Filtros
+                </Heading>
 
-              {/* Search */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                  Buscar
-                </label>
-                <div className="relative">
-                  <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-secondary-400" />
-                  <input
-                    type="text"
-                    placeholder="Buscar productos..."
+                {/* Search */}
+                <div className="mb-6">
+                  <Input
+                    label="Buscar productos"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-3 py-2 border border-secondary-300 dark:border-secondary-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-secondary-700 text-secondary-900 dark:text-white"
+                    placeholder="Nombre, descripción..."
+                    icon={<Icon name="FiSearch" size="sm" />}
                   />
                 </div>
-              </div>
 
-              {/* Categories */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                  Categorías
-                </label>
-                <div className="space-y-2">
-                  {categories.map((category) => (
-                    <label
-                      key={category.id}
-                      className="flex items-center justify-between cursor-pointer"
-                    >
-                      <div className="flex items-center">
-                        <input
-                          type="radio"
-                          name="category"
-                          value={category.id}
-                          checked={selectedCategory === category.id}
-                          onChange={(e) => setSelectedCategory(e.target.value)}
-                          className="mr-2 text-primary-600 focus:ring-primary-500"
-                        />
-                        <span className="text-sm text-secondary-700 dark:text-secondary-300">
-                          {category.name}
-                        </span>
-                      </div>
-                      <span className="text-xs text-secondary-500 dark:text-secondary-400 bg-secondary-100 dark:bg-secondary-700 px-2 py-1 rounded-full">
-                        {category.count}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Brands */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                  Marcas
-                </label>
-                <div className="space-y-2">
-                  {brands.map((brand) => (
-                    <label
-                      key={brand.id}
-                      className="flex items-center justify-between cursor-pointer"
-                    >
-                      <div className="flex items-center">
-                        <input
-                          type="radio"
-                          name="brand"
-                          value={brand.id}
-                          checked={selectedBrand === brand.id}
-                          onChange={(e) => setSelectedBrand(e.target.value)}
-                          className="mr-2 text-primary-600 focus:ring-primary-500"
-                        />
-                        <span className="text-sm text-secondary-700 dark:text-secondary-300">
-                          {brand.name}
-                        </span>
-                      </div>
-                      <span className="text-xs text-secondary-500 dark:text-secondary-400 bg-secondary-100 dark:bg-secondary-700 px-2 py-1 rounded-full">
-                        {brand.count}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Price Range */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                  Rango de Precio
-                </label>
-                <div className="space-y-2">
-                  <input
-                    type="range"
-                    min="0"
-                    max="10000"
-                    value={priceRange[1]}
-                    onChange={(e) =>
-                      setPriceRange([priceRange[0], parseInt(e.target.value)])
-                    }
-                    className="w-full"
+                {/* Category Filter */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                    Categoría
+                  </label>
+                  <Select
+                    options={[
+                      { value: "all", label: "Todas las categorías" },
+                      ...categories.map(cat => ({
+                        value: cat.id,
+                        label: cat.name
+                      }))
+                    ]}
+                    value={selectedCategory}
+                    onChange={setSelectedCategory}
                   />
-                  <div className="flex justify-between text-xs text-secondary-500 dark:text-secondary-400">
-                    <span>${priceRange[0]}</span>
-                    <span>${priceRange[1]}</span>
+                </div>
+
+                {/* Subcategory Filter */}
+                {subcategories.length > 0 && (
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                      Subcategoría
+                    </label>
+                    <Select
+                      options={[
+                        { value: "all", label: "Todas las subcategorías" },
+                        ...subcategories.map(sub => ({
+                          value: sub.id,
+                          label: sub.name
+                        }))
+                      ]}
+                      value={selectedSubcategory}
+                      onChange={setSelectedSubcategory}
+                    />
+                  </div>
+                )}
+
+                {/* Series Filter */}
+                {series.length > 0 && (
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                      Serie
+                    </label>
+                    <Select
+                      options={[
+                        { value: "all", label: "Todas las series" },
+                        ...series.map(s => ({
+                          value: s.id,
+                          label: s.name
+                        }))
+                      ]}
+                      value={selectedSeries}
+                      onChange={setSelectedSeries}
+                    />
+                  </div>
+                )}
+
+                {/* Clear Filters */}
+                {(selectedCategory !== "all" || selectedSubcategory !== "all" || selectedSeries !== "all" || searchTerm) && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    fullWidth
+                    onClick={() => {
+                      setSelectedCategory("all");
+                      setSelectedSubcategory("all");
+                      setSelectedSeries("all");
+                      setSearchTerm("");
+                    }}
+                  >
+                    <Icon name="FiX" size="sm" className="mr-2" />
+                    Limpiar Filtros
+                  </Button>
+                )}
+              </Card>
+            </div>
+
+            {/* Products Section */}
+            <div className="flex-1 min-w-0">
+              {/* Toolbar */}
+              <Card padding="md" className="mb-6">
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                  <div className="flex-1 text-secondary-600 dark:text-secondary-300 text-sm">
+                    Mostrando {filteredProducts.length} productos
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    {/* Sort */}
+                    <Select
+                      options={[
+                        { value: "default", label: "Ordenar por" },
+                        { value: "name", label: "Nombre A-Z" },
+                        { value: "price-low", label: "Precio: Menor a Mayor" },
+                        { value: "price-high", label: "Precio: Mayor a Menor" },
+                        { value: "rating", label: "Mejor Valorados" },
+                        { value: "stock", label: "Más Stock" }
+                      ]}
+                      value={sortOption}
+                      onChange={setSortOption}
+                      className="w-48"
+                    />
+
+                    {/* View Mode Toggle */}
+                    <div className="flex items-center gap-1 bg-secondary-100 dark:bg-secondary-700 rounded-lg p-1">
+                      <button
+                        onClick={() => setViewMode("grid")}
+                        className={clsx(
+                          "p-2 rounded-md transition-colors duration-200",
+                          viewMode === "grid"
+                            ? "bg-white dark:bg-secondary-600 text-primary-600 dark:text-primary-400 shadow-sm"
+                            : "text-secondary-600 dark:text-secondary-300 hover:text-secondary-900 dark:hover:text-white"
+                        )}
+                      >
+                        <Icon name="FiGrid" size="sm" />
+                      </button>
+                      <button
+                        onClick={() => setViewMode("list")}
+                        className={clsx(
+                          "p-2 rounded-md transition-colors duration-200",
+                          viewMode === "list"
+                            ? "bg-white dark:bg-secondary-600 text-primary-600 dark:text-primary-400 shadow-sm"
+                            : "text-secondary-600 dark:text-secondary-300 hover:text-secondary-900 dark:hover:text-white"
+                        )}
+                      >
+                        <Icon name="FiList" size="sm" />
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Card>
 
-              {/* Clear Filters */}
-              <button
-                onClick={() => {
-                  setSearchTerm("");
-                  setSelectedCategory("");
-                  setSelectedBrand("");
-                  setPriceRange([0, 10000]);
-                }}
-                className="w-full px-4 py-2 bg-secondary-200 dark:bg-secondary-700 text-secondary-800 dark:text-white rounded-lg hover:bg-secondary-300 dark:hover:bg-secondary-600 transition-colors duration-200"
-              >
-                Limpiar Filtros
-              </button>
-            </div>
-          </div>
-
-          {/* Products Grid */}
-          <div className="flex-1">
-            {/* Toolbar */}
-            <div className="bg-white dark:bg-secondary-800 rounded-lg shadow-md p-4 mb-6">
-              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div className="text-sm text-secondary-600 dark:text-secondary-300">
-                  {filteredProducts.length} productos encontrados
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-secondary-600 dark:text-secondary-300">
-                    Vista:
-                  </span>
-                  <button
-                    onClick={() => setViewMode("grid")}
-                    className={clsx(
-                      "p-2 rounded-lg transition-colors duration-200",
-                      viewMode === "grid"
-                        ? "bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400"
-                        : "bg-secondary-100 dark:bg-secondary-700 text-secondary-600 dark:text-secondary-300 hover:bg-secondary-200 dark:hover:bg-secondary-600"
-                    )}
+              {/* Products Grid/List */}
+              {filteredProducts.length === 0 ? (
+                <Card padding="lg" className="text-center">
+                  <div className="text-secondary-400 dark:text-secondary-500 text-6xl mb-4">
+                    🔍
+                  </div>
+                  <Heading level={3} className="mb-2">
+                    No se encontraron productos
+                  </Heading>
+                  <p className="text-secondary-600 dark:text-secondary-300 mb-4">
+                    Intenta ajustar los filtros o términos de búsqueda
+                  </p>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setSelectedCategory("all");
+                      setSelectedSubcategory("all");
+                      setSelectedSeries("all");
+                      setSearchTerm("");
+                    }}
                   >
-                    <FiGrid className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => setViewMode("list")}
-                    className={clsx(
-                      "p-2 rounded-lg transition-colors duration-200",
-                      viewMode === "list"
-                        ? "bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400"
-                        : "bg-secondary-100 dark:bg-secondary-700 text-secondary-600 dark:text-secondary-300 hover:bg-secondary-200 dark:hover:bg-secondary-600"
-                    )}
-                  >
-                    <FiList className="w-4 h-4" />
-                  </button>
+                    <Icon name="FiRefreshCw" size="sm" className="mr-2" />
+                    Limpiar Filtros
+                  </Button>
+                </Card>
+              ) : (
+                <div
+                  className={clsx(
+                    "grid gap-6",
+                    viewMode === "grid" // Ajuste para 4 columnas en 2xl
+                      ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4"
+                      : "grid-cols-1"
+                  )}
+                >
+                  {filteredProducts.map((product) => (
+                    <ProductCard 
+                      key={product.id} 
+                      product={product} 
+                      viewMode={viewMode}
+                      showSpecs={viewMode === 'list'}
+                    />
+                  ))}
                 </div>
-              </div>
+              )}
             </div>
-
-            {/* Products */}
-            {filteredProducts.length > 0 ? (
-              <div
-                className={clsx(
-                  "grid gap-6",
-                  viewMode === "grid"
-                    ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-                    : "grid-cols-1"
-                )}
-              >
-                {filteredProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <div className="text-secondary-400 dark:text-secondary-500 text-6xl mb-4">
-                  🔍
-                </div>
-                <h3 className="text-xl font-semibold text-secondary-900 dark:text-white mb-2">
-                  No se encontraron productos
-                </h3>
-                <p className="text-secondary-600 dark:text-secondary-300">
-                  Intenta ajustar los filtros de búsqueda
-                </p>
-              </div>
-            )}
           </div>
         </div>
-      </div>
+      </Container>
     </div>
   );
 };

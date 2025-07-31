@@ -1,391 +1,415 @@
-import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { FiStar, FiShoppingCart, FiHeart, FiShare2, FiTruck, FiShield, FiArrowLeft } from 'react-icons/fi';
-import Button from '../../components/ui/Button';
-import clsx from 'clsx';
+import React, { useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import {
+  Icon,
+  Container,
+  Heading,
+  Card,
+  Button,
+  Input,
+  ProductCard,
+  ImageWithFallback
+} from "../../components/ui/components";
+import { useCart } from "../../context/CartContext";
+import { siemensProducts } from "../../data/siemensProducts";
+import clsx from "clsx";
 
 const ProductDetail = () => {
   const { id } = useParams();
-  const [selectedImage, setSelectedImage] = useState(0);
+  const { addToCart, isInCart } = useCart();
   const [quantity, setQuantity] = useState(1);
+  const [activeTab, setActiveTab] = useState("description");
 
-  // Datos de ejemplo - en una app real esto vendría de una API
-  const product = {
-    id: parseInt(id),
-    name: 'Controlador PLC Siemens S7-1200',
-    description: 'Controlador lógico programable de alta precisión para automatización industrial. Este PLC ofrece un rendimiento excepcional con procesamiento rápido y múltiples interfaces de comunicación.',
-    longDescription: `
-      El Siemens S7-1200 es un controlador lógico programable compacto y potente diseñado para aplicaciones de automatización industrial. 
-      
-      Características principales:
-      • CPU con procesador de 32 bits
-      • Memoria de programa de hasta 100 KB
-      • Hasta 8 módulos de expansión
-      • Interfaces de comunicación: PROFINET, RS485
-      • Compatible con software TIA Portal
-      • Certificaciones de seguridad industrial
-      
-      Aplicaciones típicas:
-      • Control de máquinas industriales
-      • Automatización de procesos
-      • Sistemas de monitoreo
-      • Control de motores y actuadores
-    `,
-    price: 1299.99,
-    originalPrice: 1499.99,
-    images: [
-      'https://via.placeholder.com/600x400?text=PLC+Front',
-      'https://via.placeholder.com/600x400?text=PLC+Side',
-      'https://via.placeholder.com/600x400?text=PLC+Back',
-      'https://via.placeholder.com/600x400?text=PLC+Connections'
-    ],
-    category: 'Controladores',
-    brand: 'Siemens',
-    rating: 4.8,
-    reviews: 127,
-    stock: 15,
-    sku: 'S7-1200-001',
-    weight: '0.5 kg',
-    dimensions: '120 x 100 x 75 mm',
-    warranty: '2 años',
-    specifications: {
-      'Procesador': '32-bit ARM Cortex-M4',
-      'Memoria de Programa': '100 KB',
-      'Memoria de Datos': '4 KB',
-      'Entradas Digitales': '14',
-      'Salidas Digitales': '10',
-      'Entradas Analógicas': '2',
-      'Salidas Analógicas': '2',
-      'Comunicación': 'PROFINET, RS485',
-      'Temperatura de Operación': '-20°C a +60°C',
-      'Voltaje de Alimentación': '24V DC'
-    },
-    features: [
-      'Procesamiento rápido y eficiente',
-      'Interfaces de comunicación múltiples',
-      'Programación intuitiva con TIA Portal',
-      'Alta confiabilidad industrial',
-      'Fácil instalación y configuración',
-      'Soporte técnico especializado'
-    ]
-  };
+  // Buscar el producto por ID
+  const product = siemensProducts.find(p => p.id === id);
 
-  const relatedProducts = [
-    {
-      id: 2,
-      name: 'HMI Touch Screen 7"',
-      price: 599.99,
-      image: 'https://via.placeholder.com/300x300?text=HMI+7inch',
-      rating: 4.5
-    },
-    {
-      id: 3,
-      name: 'Sensor de Temperatura RTD PT100',
-      price: 89.99,
-      image: 'https://via.placeholder.com/300x300?text=RTD+PT100',
-      rating: 4.6
-    },
-    {
-      id: 4,
-      name: 'Servomotor AC 1kW',
-      price: 899.99,
-      image: 'https://via.placeholder.com/300x300?text=Servo+1kW',
-      rating: 4.7
-    }
-  ];
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-secondary-50 dark:bg-secondary-900">
+        <Container>
+          <div className="py-16 text-center">
+            <div className="text-secondary-400 dark:text-secondary-500 text-8xl mb-6">
+              🔍
+            </div>
+            <Heading level={1} className="mb-4">
+              Producto no encontrado
+            </Heading>
+            <p className="text-secondary-600 dark:text-secondary-300 mb-8">
+              El producto que buscas no existe o ha sido removido
+            </p>
+            <Button as={Link} to="/catalogo">
+              <Icon name="FiArrowLeft" className="mr-2" />
+              Volver al Catálogo
+            </Button>
+          </div>
+        </Container>
+      </div>
+    );
+  }
 
-  const renderStars = (rating) => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <FiStar 
-        key={i} 
-        className={clsx(
-          'w-4 h-4',
-          i < rating ? 'text-yellow-400 fill-current' : 'text-secondary-300'
-        )} 
-      />
-    ));
-  };
+  const {
+    name,
+    description,
+    price,
+    originalPrice,
+    image,
+    rating,
+    category,
+    brand,
+    series,
+    stock,
+    specifications,
+    accessories,
+    relatedProducts,
+    features,
+    applications,
+    certifications,
+    warranty,
+    leadTime
+  } = product;
 
   const handleAddToCart = () => {
-    console.log('Agregar al carrito:', { product, quantity });
+    addToCart(product, quantity);
   };
 
-  const handleAddToWishlist = () => {
-    console.log('Agregar a favoritos:', product);
-  };
+  const renderStars = (rating) => {
+    const stars = [];
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 !== 0;
 
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: product.name,
-        text: product.description,
-        url: window.location.href
-      });
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      alert('Enlace copiado al portapapeles');
+    for (let i = 0; i < fullStars; i++) {
+      stars.push(
+        <Icon key={i} name="FiStar" size="sm" className="text-yellow-400 fill-current" />
+      );
     }
+
+    if (hasHalfStar) {
+      stars.push(
+        <Icon key="half" name="FiStar" size="sm" className="text-yellow-400 fill-current" />
+      );
+    }
+
+    const emptyStars = 5 - Math.ceil(rating);
+    for (let i = 0; i < emptyStars; i++) {
+      stars.push(
+        <Icon key={`empty-${i}`} name="FiStar" size="sm" className="text-secondary-300" />
+      );
+    }
+
+    return stars;
   };
+
+  // Obtener productos relacionados
+  const getRelatedProducts = () => {
+    if (!relatedProducts) return [];
+    return siemensProducts.filter(p => relatedProducts.includes(p.id)).slice(0, 4);
+  };
+
+  const relatedProductsList = getRelatedProducts();
 
   return (
     <div className="min-h-screen bg-secondary-50 dark:bg-secondary-900">
-              <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Breadcrumb */}
-        <nav className="mb-6">
-          <ol className="flex items-center space-x-2 text-sm text-secondary-600 dark:text-secondary-400">
-            <li>
-              <Link to="/" className="hover:text-primary-600 dark:hover:text-primary-400">
-                Inicio
-              </Link>
-            </li>
-            <li>/</li>
-            <li>
-              <Link to="/catalogo" className="hover:text-primary-600 dark:hover:text-primary-400">
-                Catálogo
-              </Link>
-            </li>
-            <li>/</li>
-            <li className="text-secondary-900 dark:text-white">{product.name}</li>
-          </ol>
-        </nav>
+      <Container>
+        <div className="py-8">
+          {/* Breadcrumb */}
+          <nav className="mb-6">
+            <ol className="flex items-center space-x-2 text-sm text-secondary-600 dark:text-secondary-400">
+              <li>
+                <Link to="/" className="hover:text-primary-600 dark:hover:text-primary-400">
+                  Inicio
+                </Link>
+              </li>
+              <li>
+                <Icon name="FiChevronRight" size="sm" />
+              </li>
+              <li>
+                <Link to="/catalogo" className="hover:text-primary-600 dark:hover:text-primary-400">
+                  Catálogo
+                </Link>
+              </li>
+              <li>
+                <Icon name="FiChevronRight" size="sm" />
+              </li>
+              <li className="text-secondary-900 dark:text-white font-medium">
+                {name}
+              </li>
+            </ol>
+          </nav>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          {/* Product Images */}
-          <div>
-            <div className="mb-4">
-              <img
-                src={product.images[selectedImage]}
-                alt={product.name}
-                className="w-full h-96 object-cover rounded-lg bg-white dark:bg-secondary-800"
-                onError={(e) => {
-                  e.target.src = 'https://via.placeholder.com/600x400?text=Producto';
-                }}
-              />
-            </div>
-            <div className="grid grid-cols-4 gap-2">
-              {product.images.map((image, index) => (
-                <button
-                  key={index}
-                  onClick={() => setSelectedImage(index)}
-                  className={clsx(
-                    'w-full h-20 rounded-lg overflow-hidden border-2 transition-all duration-200',
-                    selectedImage === index
-                      ? 'border-primary-500'
-                      : 'border-secondary-200 dark:border-secondary-700 hover:border-primary-300'
-                  )}
-                >
-                  <img
-                    src={image}
-                    alt={`${product.name} ${index + 1}`}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.src = 'https://via.placeholder.com/150x100?text=Producto';
-                    }}
-                  />
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Product Info */}
-          <div>
-            <div className="mb-4">
-              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
-                {product.category}
-              </span>
+          {/* Product Main Info */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            {/* Product Image */}
+            <div className="space-y-4">
+              <div className="aspect-square bg-white dark:bg-secondary-800 rounded-lg overflow-hidden shadow-lg">
+                <ImageWithFallback
+                  src={image}
+                  alt={name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
             </div>
 
-            <h1 className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">
-              {product.name}
-            </h1>
-
-            <div className="flex items-center gap-2 mb-4">
-              {renderStars(product.rating)}
-              <span className="text-sm text-secondary-600 dark:text-secondary-400">
-                ({product.rating}) • {product.reviews} reseñas
-              </span>
-            </div>
-
-            <div className="mb-6">
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-bold text-primary-600 dark:text-primary-400">
-                  ${product.price.toFixed(2)}
+            {/* Product Details */}
+            <div className="space-y-6">
+              {/* Category and Brand */}
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-secondary-500 dark:text-secondary-400 bg-secondary-100 dark:bg-secondary-700 px-3 py-1 rounded-full">
+                  {category}
                 </span>
-                {product.originalPrice > product.price && (
-                  <span className="text-lg text-secondary-400 line-through">
-                    ${product.originalPrice.toFixed(2)}
+                {series && (
+                  <span className="text-sm text-secondary-500 dark:text-secondary-400 bg-primary-100 dark:bg-primary-900 px-3 py-1 rounded-full">
+                    {series}
+                  </span>
+                )}
+                <span className="text-sm text-secondary-500 dark:text-secondary-400">
+                  {brand}
+                </span>
+              </div>
+
+              {/* Product Name */}
+              <Heading level={1} className="text-3xl lg:text-4xl">
+                {name}
+              </Heading>
+
+              {/* Rating */}
+              {rating && (
+                <div className="flex items-center gap-2">
+                  {renderStars(rating)}
+                  <span className="text-secondary-600 dark:text-secondary-300">
+                    ({rating})
+                  </span>
+                </div>
+              )}
+
+              {/* Price */}
+              <div className="flex items-baseline gap-3">
+                <span className="text-3xl font-bold text-primary-600 dark:text-primary-400">
+                  ${price.toFixed(2)}
+                </span>
+                {originalPrice && originalPrice > price && (
+                  <span className="text-xl text-secondary-400 line-through">
+                    ${originalPrice.toFixed(2)}
                   </span>
                 )}
               </div>
-              {product.originalPrice > product.price && (
-                <span className="text-sm text-green-600 dark:text-green-400">
-                  {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% de descuento
-                </span>
-              )}
-            </div>
 
-            <p className="text-secondary-600 dark:text-secondary-300 mb-6">
-              {product.description}
-            </p>
-
-            {/* Stock Status */}
-            <div className="mb-6">
-              <span className={clsx(
-                'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium',
-                product.stock > 10
-                  ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
-                  : product.stock > 0
-                  ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'
-                  : 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200'
-              )}>
-                {product.stock > 0 ? `${product.stock} unidades disponibles` : 'Sin stock'}
-              </span>
-            </div>
-
-            {/* Quantity Selector */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                Cantidad
-              </label>
+              {/* Stock Status */}
               <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="w-10 h-10 flex items-center justify-center border border-secondary-300 dark:border-secondary-600 rounded-lg hover:bg-secondary-50 dark:hover:bg-secondary-700"
-                >
-                  -
-                </button>
-                <input
-                  type="number"
-                  min="1"
-                  max={product.stock}
-                  value={quantity}
-                  onChange={(e) => setQuantity(Math.max(1, Math.min(product.stock, parseInt(e.target.value) || 1)))}
-                  className="w-16 h-10 text-center border border-secondary-300 dark:border-secondary-600 rounded-lg bg-white dark:bg-secondary-700 text-secondary-900 dark:text-white"
-                />
-                <button
-                  onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-                  className="w-10 h-10 flex items-center justify-center border border-secondary-300 dark:border-secondary-600 rounded-lg hover:bg-secondary-50 dark:hover:bg-secondary-700"
-                >
-                  +
-                </button>
+                <span className={clsx(
+                  "text-sm px-3 py-1 rounded-full",
+                  stock > 10 
+                    ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+                    : stock > 0
+                    ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
+                    : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
+                )}>
+                  {stock > 0 ? `${stock} unidades en stock` : 'Sin stock'}
+                </span>
+                {leadTime && (
+                  <span className="text-sm text-secondary-600 dark:text-secondary-400">
+                    Tiempo de entrega: {leadTime}
+                  </span>
+                )}
               </div>
-            </div>
 
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 mb-6">
-              <Button
-                onClick={handleAddToCart}
-                icon={<FiShoppingCart />}
-                className="flex-1"
-                disabled={product.stock === 0}
-              >
-                Agregar al Carrito
-              </Button>
-              <Button
-                variant="outline"
-                onClick={handleAddToWishlist}
-                icon={<FiHeart />}
-                iconOnly
-              />
-              <Button
-                variant="outline"
-                onClick={handleShare}
-                icon={<FiShare2 />}
-                iconOnly
-              />
-            </div>
+              {/* Description */}
+              <p className="text-secondary-600 dark:text-secondary-300 text-lg leading-relaxed">
+                {description}
+              </p>
 
-            {/* Product Features */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-              <div className="flex items-center gap-2 text-sm text-secondary-600 dark:text-secondary-400">
-                <FiTruck className="w-4 h-4" />
-                <span>Envío gratis</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-secondary-600 dark:text-secondary-400">
-                <FiShield className="w-4 h-4" />
-                <span>{product.warranty} garantía</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-secondary-600 dark:text-secondary-400">
-                <FiStar className="w-4 h-4" />
-                <span>Calidad premium</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Product Details Tabs */}
-        <div className="mb-12">
-          <div className="bg-white dark:bg-secondary-800 rounded-lg shadow-md">
-            <div className="border-b border-secondary-200 dark:border-secondary-700">
-              <nav className="flex space-x-8 px-6">
-                <button className="py-4 px-1 border-b-2 border-primary-500 text-primary-600 dark:text-primary-400 font-medium">
-                  Descripción
-                </button>
-                <button className="py-4 px-1 border-b-2 border-transparent text-secondary-500 dark:text-secondary-400 hover:text-secondary-700 dark:hover:text-secondary-300">
-                  Especificaciones
-                </button>
-                <button className="py-4 px-1 border-b-2 border-transparent text-secondary-500 dark:text-secondary-400 hover:text-secondary-700 dark:hover:text-secondary-300">
-                  Reseñas
-                </button>
-              </nav>
-            </div>
-            <div className="p-6">
-              <div className="prose prose-secondary dark:prose-invert max-w-none">
-                <p className="text-secondary-600 dark:text-secondary-300 whitespace-pre-line">
-                  {product.longDescription}
-                </p>
-                
-                <h3 className="text-lg font-semibold text-secondary-900 dark:text-white mt-6 mb-3">
-                  Características Destacadas
-                </h3>
-                <ul className="list-disc list-inside space-y-1 text-secondary-600 dark:text-secondary-300">
-                  {product.features.map((feature, index) => (
-                    <li key={index}>{feature}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Related Products */}
-        <div>
-          <h2 className="text-2xl font-bold text-secondary-900 dark:text-white mb-6">
-            Productos Relacionados
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {relatedProducts.map((relatedProduct) => (
-              <Link
-                key={relatedProduct.id}
-                to={`/producto/${relatedProduct.id}`}
-                className="bg-white dark:bg-secondary-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200"
-              >
-                <img
-                  src={relatedProduct.image}
-                  alt={relatedProduct.name}
-                  className="w-full h-48 object-cover"
-                  onError={(e) => {
-                    e.target.src = 'https://via.placeholder.com/300x300?text=Producto';
-                  }}
-                />
-                <div className="p-4">
-                  <h3 className="font-semibold text-secondary-900 dark:text-white mb-2 line-clamp-2">
-                    {relatedProduct.name}
-                  </h3>
-                  <div className="flex items-center justify-between">
-                    <span className="text-lg font-bold text-primary-600 dark:text-primary-400">
-                      ${relatedProduct.price.toFixed(2)}
-                    </span>
-                    <div className="flex items-center gap-1">
-                      {renderStars(relatedProduct.rating)}
-                    </div>
+              {/* Add to Cart */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center border border-secondary-300 dark:border-secondary-600 rounded-lg">
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="px-3 py-2 text-secondary-600 dark:text-secondary-400 hover:text-secondary-900 dark:hover:text-white"
+                    >
+                      <Icon name="FiMinus" size="sm" />
+                    </button>
+                    <Input
+                      type="number"
+                      value={quantity}
+                      onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                      className="w-20 text-center border-0"
+                      min="1"
+                    />
+                    <button
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="px-3 py-2 text-secondary-600 dark:text-secondary-400 hover:text-secondary-900 dark:hover:text-white"
+                    >
+                      <Icon name="FiPlus" size="sm" />
+                    </button>
                   </div>
                 </div>
-              </Link>
-            ))}
+
+                <Button
+                  onClick={handleAddToCart}
+                  fullWidth
+                  size="lg"
+                  disabled={stock === 0}
+                  className={clsx(
+                    isInCart(product.id) && "bg-green-600 hover:bg-green-700"
+                  )}
+                >
+                  <Icon 
+                    name={isInCart(product.id) ? "FiCheck" : "FiShoppingCart"} 
+                    className="mr-2" 
+                  />
+                  {isInCart(product.id) ? "Agregado a Cotización" : "Agregar a Cotización"}
+                </Button>
+              </div>
+
+              {/* Quick Info */}
+              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-secondary-200 dark:border-secondary-700">
+                {warranty && (
+                  <div className="text-center">
+                    <Icon name="FiShield" className="mx-auto mb-1 text-primary-600" />
+                    <div className="text-sm font-medium">Garantía</div>
+                    <div className="text-xs text-secondary-600 dark:text-secondary-400">{warranty}</div>
+                  </div>
+                )}
+                {certifications && certifications.length > 0 && (
+                  <div className="text-center">
+                    <Icon name="FiAward" className="mx-auto mb-1 text-primary-600" />
+                    <div className="text-sm font-medium">Certificaciones</div>
+                    <div className="text-xs text-secondary-600 dark:text-secondary-400">
+                      {certifications.join(', ')}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
+
+          {/* Product Tabs */}
+          <Card className="mb-8">
+            <div className="border-b border-secondary-200 dark:border-secondary-700">
+              <nav className="flex space-x-8">
+                {['description', 'specifications', 'features', 'applications'].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={clsx(
+                      "py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200",
+                      activeTab === tab
+                        ? "border-primary-500 text-primary-600 dark:text-primary-400"
+                        : "border-transparent text-secondary-500 dark:text-secondary-400 hover:text-secondary-700 dark:hover:text-secondary-300"
+                    )}
+                  >
+                    {tab === 'description' && 'Descripción'}
+                    {tab === 'specifications' && 'Especificaciones'}
+                    {tab === 'features' && 'Características'}
+                    {tab === 'applications' && 'Aplicaciones'}
+                  </button>
+                ))}
+              </nav>
+            </div>
+
+            <div className="p-6">
+              {activeTab === 'description' && (
+                <div className="prose dark:prose-invert max-w-none">
+                  <p className="text-secondary-600 dark:text-secondary-300 leading-relaxed">
+                    {description}
+                  </p>
+                </div>
+              )}
+
+              {activeTab === 'specifications' && specifications && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {Object.entries(specifications).map(([key, value]) => (
+                    <div key={key} className="flex justify-between py-2 border-b border-secondary-100 dark:border-secondary-700">
+                      <span className="font-medium text-secondary-700 dark:text-secondary-300 capitalize">
+                        {key.replace(/([A-Z])/g, ' $1').trim()}:
+                      </span>
+                      <span className="text-secondary-600 dark:text-secondary-400">
+                        {value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {activeTab === 'features' && features && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {features.map((feature, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Icon name="FiCheck" className="text-green-600" size="sm" />
+                      <span className="text-secondary-700 dark:text-secondary-300">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {activeTab === 'applications' && applications && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {applications.map((application, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Icon name="FiTarget" className="text-blue-600" size="sm" />
+                      <span className="text-secondary-700 dark:text-secondary-300">{application}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </Card>
+
+          {/* Accessories */}
+          {accessories && accessories.length > 0 && (
+            <div className="mb-8">
+              <Heading level={2} className="mb-6">
+                Accesorios Disponibles
+              </Heading>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {accessories.map((accessory) => (
+                  <Card key={accessory.id} className="p-4">
+                    <div className="aspect-square bg-secondary-100 dark:bg-secondary-700 rounded-lg mb-3">
+                      <ImageWithFallback
+                        src={accessory.image}
+                        alt={accessory.name}
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                    </div>
+                    <h4 className="font-semibold text-secondary-900 dark:text-white mb-1 line-clamp-2">
+                      {accessory.name}
+                    </h4>
+                    <p className="text-sm text-secondary-600 dark:text-secondary-300 mb-3 line-clamp-2">
+                      {accessory.description}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-primary-600 dark:text-primary-400">
+                        ${accessory.price.toFixed(2)}
+                      </span>
+                      <Button size="sm" variant="outline">
+                        <Icon name="FiPlus" size="sm" className="mr-1" />
+                        Agregar
+                      </Button>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Related Products */}
+          {relatedProductsList.length > 0 && (
+            <div>
+              <Heading level={2} className="mb-6">
+                Productos Relacionados
+              </Heading>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {relatedProductsList.map((relatedProduct) => (
+                  <ProductCard
+                    key={relatedProduct.id}
+                    product={relatedProduct}
+                    showActions={true}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-      </div>
+      </Container>
     </div>
   );
 };

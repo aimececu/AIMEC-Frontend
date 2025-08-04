@@ -1,10 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-
-// Credenciales del admin (en producción esto debería estar en una base de datos)
-const ADMIN_CREDENTIALS = {
-  email: 'admin@aimec.com',
-  password: 'admin123'
-};
+import { authEndpoints } from '../api/endpoints/auth.js';
+import { authUtils } from '../api/client.js';
 
 // Estado inicial
 const initialState = {
@@ -31,25 +27,31 @@ export const AuthProvider = ({ children }) => {
 
   // Verificar si hay una sesión guardada al cargar
   useEffect(() => {
-    const checkAuth = () => {
-      const savedAuth = localStorage.getItem('adminAuth');
-      if (savedAuth) {
-        try {
-          const authData = JSON.parse(savedAuth);
-          // Verificar si la sesión no ha expirado (24 horas)
-          const now = new Date().getTime();
-          if (authData.expiresAt && now < authData.expiresAt) {
+    const checkAuth = async () => {
+      try {
+        const sessionId = authUtils.getSessionId();
+        const user = authUtils.getCurrentUser();
+        
+        if (sessionId && user) {
+          // Verificar si el token sigue siendo válido
+          const isValid = await authEndpoints.verifyAuth();
+          if (isValid) {
             setState({
               isAuthenticated: true,
-              user: authData.user,
+              user: user,
               isLoading: false
             });
             return;
+          } else {
+            // Token inválido, limpiar datos
+            authUtils.clearAuth();
           }
-        } catch (error) {
-          console.error('Error al cargar la autenticación:', error);
         }
+      } catch (error) {
+        console.error('Error al verificar autenticación:', error);
+        authUtils.clearAuth();
       }
+      
       setState(prev => ({ ...prev, isLoading: false }));
     };
 
@@ -59,78 +61,49 @@ export const AuthProvider = ({ children }) => {
   // Función de login
   const login = async (email, password) => {
     try {
-      // Simular delay de red
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Verificar credenciales
-      if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
-        const user = {
-          id: 1,
-          email: email,
-          name: 'Administrador',
-          role: 'admin'
-        };
-
-        // Crear sesión con expiración (24 horas)
-        const expiresAt = new Date().getTime() + (24 * 60 * 60 * 1000);
-        const authData = {
-          user,
-          expiresAt
-        };
-
-        // Guardar en localStorage
-        localStorage.setItem('adminAuth', JSON.stringify(authData));
-
-        // Actualizar estado
+      const response = await authEndpoints.login(email, password);
+      
+      if (response.success) {
         setState({
           isAuthenticated: true,
-          user,
+          user: response.data.user,
           isLoading: false
         });
-
-        return { success: true };
-      } else {
-        return { 
-          success: false, 
-          error: 'Credenciales incorrectas. Por favor, verifica tu email y contraseña.' 
-        };
       }
+      
+      return response;
     } catch (error) {
       return { 
         success: false, 
-        error: 'Error al iniciar sesión. Por favor, intenta nuevamente.' 
+        error: error.message || 'Error al iniciar sesión. Por favor, intenta nuevamente.' 
       };
     }
   };
 
   // Función de logout
-  const logout = () => {
-    // Limpiar localStorage
-    localStorage.removeItem('adminAuth');
-    
-    // Actualizar estado
-    setState({
-      isAuthenticated: false,
-      user: null,
-      isLoading: false
-    });
+  const logout = async () => {
+    try {
+      await authEndpoints.logout();
+    } catch (error) {
+      console.error('Error en logout:', error);
+    } finally {
+      // Actualizar estado
+      setState({
+        isAuthenticated: false,
+        user: null,
+        isLoading: false
+      });
+    }
   };
 
   // Verificar si la sesión está activa
-  const checkSession = () => {
-    const savedAuth = localStorage.getItem('adminAuth');
-    if (savedAuth) {
-      try {
-        const authData = JSON.parse(savedAuth);
-        const now = new Date().getTime();
-        if (authData.expiresAt && now < authData.expiresAt) {
-          return true;
-        }
-      } catch (error) {
-        console.error('Error al verificar la sesión:', error);
-      }
+  const checkSession = async () => {
+    try {
+      return await authEndpoints.verifyAuth();
+    } catch (error) {
+      console.error('Error al verificar la sesión:', error);
+      return false;
     }
-    return false;
   };
 
   const value = {

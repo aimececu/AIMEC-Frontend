@@ -12,7 +12,8 @@ import {
   ImageWithFallback
 } from "../../components/ui/components";
 import { useAuth } from "../../context/AuthContext";
-import { productService, categoryService, brandService } from "../../services/database";
+import { productEndpoints } from "../../api/endpoints/products.js";
+import { categoryEndpoints } from "../../api/endpoints/categories.js";
 import { productImportService, defaultTemplates } from "../../services/importService";
 import clsx from "clsx";
 
@@ -92,17 +93,26 @@ const Admin = () => {
   const loadInitialData = async () => {
     try {
       setLoading(true);
-      const [productsData, categoriesData, brandsData, statsData] = await Promise.all([
-        productService.getProducts(),
-        categoryService.getCategories(),
-        brandService.getBrands(),
-        productService.getProductStats()
+      const [productsResponse, categoriesResponse, statsResponse] = await Promise.all([
+        productEndpoints.getProducts(),
+        categoryEndpoints.getCategories(),
+        productEndpoints.getProductStats()
       ]);
 
-      setProducts(productsData);
-      setCategories(categoriesData);
-      setBrands(brandsData);
-      setStats(statsData);
+      if (productsResponse.success) {
+        setProducts(productsResponse.data);
+      }
+      
+      if (categoriesResponse.success) {
+        setCategories(categoriesResponse.data);
+      }
+      
+      if (statsResponse.success) {
+        setStats(statsResponse.data);
+      }
+      
+      // Por ahora usamos un array vacío para brands ya que no tenemos ese endpoint
+      setBrands([]);
     } catch (error) {
       console.error('Error cargando datos:', error);
     } finally {
@@ -153,9 +163,15 @@ const Admin = () => {
       };
 
       if (editingProduct) {
-        await productService.updateProduct(editingProduct.id, productData);
+        const response = await productEndpoints.updateProduct(editingProduct.id, productData);
+        if (!response.success) {
+          throw new Error(response.error || 'Error al actualizar el producto');
+        }
       } else {
-        await productService.createProduct(productData);
+        const response = await productEndpoints.createProduct(productData);
+        if (!response.success) {
+          throw new Error(response.error || 'Error al crear el producto');
+        }
       }
 
       // Recargar productos
@@ -248,10 +264,15 @@ const Admin = () => {
   const handleDeleteProduct = async (id) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar este producto?')) {
       try {
-        await productService.deleteProduct(id);
-        setProducts(products.filter(p => p.id !== id));
+        const response = await productEndpoints.deleteProduct(id);
+        if (response.success) {
+          setProducts(products.filter(p => p.id !== id));
+        } else {
+          throw new Error(response.error || 'Error al eliminar el producto');
+        }
       } catch (error) {
         console.error('Error eliminando producto:', error);
+        alert('Error al eliminar el producto');
       }
     }
   };

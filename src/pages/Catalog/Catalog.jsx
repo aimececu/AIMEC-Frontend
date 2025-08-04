@@ -9,7 +9,8 @@ import {
   Select,
   ProductCard
 } from "../../components/ui/components";
-import { productService, categoryService, brandService } from "../../services/database";
+import { productEndpoints } from "../../api/endpoints/products.js";
+import { categoryEndpoints } from "../../api/endpoints/categories.js";
 import clsx from "clsx";
 
 const Catalog = () => {
@@ -33,19 +34,26 @@ const Catalog = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [productsData, categoriesData, brandsData] = await Promise.all([
-        productService.getProducts(),
-        categoryService.getCategories(),
-        brandService.getBrands()
+      const [productsResponse, categoriesResponse] = await Promise.all([
+        productEndpoints.getProducts(),
+        categoryEndpoints.getCategories()
       ]);
 
-      setProducts(productsData);
-      setCategories(categoriesData);
-      setBrands(brandsData);
+      console.log({productsResponse, categoriesResponse});
       
-      // Extraer series únicas de los productos
-      const uniqueSeries = [...new Set(productsData.map(product => product.series_name).filter(Boolean))];
-      setSeries(uniqueSeries);
+      if (productsResponse.success) {
+        setProducts(productsResponse.data);
+        // Extraer series únicas de los productos
+        const uniqueSeries = [...new Set(productsResponse.data.map(product => product.series_name).filter(Boolean))];
+        setSeries(uniqueSeries);
+      }
+      
+      if (categoriesResponse.success) {
+        setCategories(categoriesResponse.data);
+      }
+      
+      // Por ahora usamos un array vacío para brands ya que no tenemos ese endpoint
+      setBrands([]);
     } catch (error) {
       console.error('Error cargando datos:', error);
     } finally {

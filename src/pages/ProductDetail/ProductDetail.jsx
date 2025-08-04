@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import {
   Icon,
@@ -11,7 +11,7 @@ import {
   ImageWithFallback
 } from "../../components/ui/components";
 import { useCart } from "../../context/CartContext";
-import { siemensProducts } from "../../data/siemensProducts";
+import { productEndpoints } from "../../api/endpoints/products.js";
 import clsx from "clsx";
 
 const ProductDetail = () => {
@@ -19,11 +19,52 @@ const ProductDetail = () => {
   const { addToCart, isInCart } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("description");
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Buscar el producto por ID
-  const product = siemensProducts.find(p => p.id === id);
+  // Cargar el producto desde la API
+  useEffect(() => {
+    const loadProduct = async () => {
+      try {
+        setLoading(true);
+        const response = await productEndpoints.getProductById(id);
+        if (response.success) {
+          setProduct(response.data);
+        } else {
+          setError('Producto no encontrado');
+        }
+      } catch (error) {
+        console.error('Error cargando producto:', error);
+        setError('Error al cargar el producto');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  if (!product) {
+    if (id) {
+      loadProduct();
+    }
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-secondary-50 dark:bg-secondary-900">
+        <Container>
+          <div className="py-16 text-center">
+            <div className="text-secondary-400 dark:text-secondary-500 text-4xl mb-6">
+              ⏳
+            </div>
+            <Heading level={1} className="mb-4">
+              Cargando producto...
+            </Heading>
+          </div>
+        </Container>
+      </div>
+    );
+  }
+
+  if (error || !product) {
     return (
       <div className="min-h-screen bg-secondary-50 dark:bg-secondary-900">
         <Container>
@@ -35,7 +76,7 @@ const ProductDetail = () => {
               Producto no encontrado
             </Heading>
             <p className="text-secondary-600 dark:text-secondary-300 mb-8">
-              El producto que buscas no existe o ha sido removido
+              {error || 'El producto que buscas no existe o ha sido removido'}
             </p>
             <Button as={Link} to="/catalogo">
               <Icon name="FiArrowLeft" className="mr-2" />
@@ -102,7 +143,9 @@ const ProductDetail = () => {
   // Obtener productos relacionados
   const getRelatedProducts = () => {
     if (!relatedProducts) return [];
-    return siemensProducts.filter(p => relatedProducts.includes(p.id)).slice(0, 4);
+    // Por ahora retornamos un array vacío ya que necesitaríamos un endpoint específico
+    // para productos relacionados o cargar todos los productos
+    return [];
   };
 
   const relatedProductsList = getRelatedProducts();

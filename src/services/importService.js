@@ -4,7 +4,7 @@
 // Esta es una versión temporal que simula la importación
 // hasta que se configuren las dependencias de Excel/CSV
 
-import { productService, importService as dbImportService } from './database.js';
+// Removido import de database.js ya que ahora usamos los endpoints del backend
 
 // Simular delay de red
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));

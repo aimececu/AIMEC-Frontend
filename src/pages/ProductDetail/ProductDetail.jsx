@@ -12,6 +12,7 @@ import {
 } from "../../components/ui/components";
 import { useCart } from "../../context/CartContext";
 import { productEndpoints } from "../../api/endpoints/products.js";
+import { transformProduct } from "../../services/dataTransform.js";
 import clsx from "clsx";
 
 const ProductDetail = () => {
@@ -30,7 +31,7 @@ const ProductDetail = () => {
         setLoading(true);
         const response = await productEndpoints.getProductById(id);
         if (response.success) {
-          setProduct(response.data);
+          setProduct(transformProduct(response.data));
         } else {
           setError('Producto no encontrado');
         }

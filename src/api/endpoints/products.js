@@ -53,7 +53,7 @@ export const productEndpoints = {
 
   // Obtener productos por categoría
   async getProductsByCategory(categoryId, filters = {}) {
-    const categoryFilters = { ...filters, category: categoryId };
+    const categoryFilters = { ...filters, category_id: categoryId };
     const endpoint = buildEndpoint('/products', categoryFilters);
     return await apiRequest(endpoint);
   },

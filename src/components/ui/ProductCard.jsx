@@ -152,11 +152,12 @@ const ProductCard = ({
               </div>
 
               {/* Quick Specs (if available) */}
-              {showSpecs && specifications && (
+              {showSpecs && specifications && Object.keys(specifications).length > 0 && (
                 <div className="mt-2 text-xs text-secondary-500 dark:text-secondary-400">
-                  {specifications.cpu && <div>CPU: {specifications.cpu}</div>}
-                  {specifications.memory && <div>Memoria: {specifications.memory}</div>}
+                  {specifications.voltage && <div>Voltaje: {specifications.voltage}</div>}
+                  {specifications.current && <div>Corriente: {specifications.current}</div>}
                   {specifications.power && <div>Potencia: {specifications.power}</div>}
+                  {specifications.temperature && <div>Temperatura: {specifications.temperature}</div>}
                 </div>
               )}
             </div>

@@ -11,6 +11,8 @@ import {
 } from "../../components/ui/components";
 import { productEndpoints } from "../../api/endpoints/products.js";
 import { categoryEndpoints } from "../../api/endpoints/categories.js";
+import { brandEndpoints } from "../../api/endpoints/brands.js";
+import { transformProductsList, transformCategoriesList, transformBrandsList } from "../../services/dataTransform.js";
 import clsx from "clsx";
 
 const Catalog = () => {
@@ -34,26 +36,29 @@ const Catalog = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [productsResponse, categoriesResponse] = await Promise.all([
+      const [productsResponse, categoriesResponse, brandsResponse] = await Promise.all([
         productEndpoints.getProducts(),
-        categoryEndpoints.getCategories()
+        categoryEndpoints.getCategories(),
+        brandEndpoints.getBrands()
       ]);
 
-      console.log({productsResponse, categoriesResponse});
+      console.log({productsResponse, categoriesResponse, brandsResponse});
       
-      if (productsResponse.success) {
-        setProducts(productsResponse.data);
-        // Extraer series únicas de los productos
-        const uniqueSeries = [...new Set(productsResponse.data.map(product => product.series_name).filter(Boolean))];
-        setSeries(uniqueSeries);
-      }
+      // Transformar productos
+      const transformedProducts = transformProductsList(productsResponse);
+      setProducts(transformedProducts.products);
       
-      if (categoriesResponse.success) {
-        setCategories(categoriesResponse.data);
-      }
+      // Extraer series únicas de los productos
+      const uniqueSeries = [...new Set(transformedProducts.products.map(product => product.series).filter(Boolean))];
+      setSeries(uniqueSeries);
       
-      // Por ahora usamos un array vacío para brands ya que no tenemos ese endpoint
-      setBrands([]);
+      // Transformar categorías
+      const transformedCategories = transformCategoriesList(categoriesResponse);
+      setCategories(transformedCategories);
+      
+      // Transformar marcas
+      const transformedBrands = transformBrandsList(brandsResponse);
+      setBrands(transformedBrands);
     } catch (error) {
       console.error('Error cargando datos:', error);
     } finally {
@@ -64,7 +69,7 @@ const Catalog = () => {
   // Obtener subcategorías de la categoría seleccionada
   const getSubcategories = () => {
     if (selectedCategory === "all") return [];
-    const category = categories.find(cat => cat.id === selectedCategory);
+    const category = categories.find(cat => cat.id === parseInt(selectedCategory));
     return category ? category.subcategories : [];
   };
 
@@ -84,8 +89,8 @@ const Catalog = () => {
         product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.series?.toLowerCase().includes(searchTerm.toLowerCase());
       
-      const matchesCategory = selectedCategory === "all" || product.category === selectedCategory;
-      const matchesSubcategory = selectedSubcategory === "all" || product.subcategory === selectedSubcategory;
+      const matchesCategory = selectedCategory === "all" || product.category_id === parseInt(selectedCategory);
+      const matchesSubcategory = selectedSubcategory === "all" || product.subcategory_id === parseInt(selectedSubcategory);
       const matchesSeries = selectedSeries === "all" || product.series === selectedSeries;
       
       return matchesSearch && matchesCategory && matchesSubcategory && matchesSeries;

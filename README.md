@@ -108,6 +108,31 @@ npm install
 
 ### 3. Configurar variables de entorno
 ```bash
+# Crear archivo .env basado en .env.example
+cp .env.example .env
+```
+
+Edita el archivo `.env` con tus configuraciones:
+
+```env
+# URL de la API del backend
+VITE_API_URL=http://localhost:3750/api
+
+# Configuración de la aplicación
+VITE_APP_NAME=AIMEC
+VITE_APP_VERSION=1.0.0
+```
+
+### 4. Verificar que el backend esté corriendo
+Asegúrate de que el backend esté ejecutándose en `http://localhost:3750` antes de iniciar el frontend.
+
+### 2. Instalar dependencias
+```bash
+npm install
+```
+
+### 3. Configurar variables de entorno
+```bash
 # Crear archivo .env
 cp .env.example .env
 

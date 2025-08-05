@@ -14,6 +14,8 @@ import {
 import { useAuth } from "../../context/AuthContext";
 import { productEndpoints } from "../../api/endpoints/products.js";
 import { categoryEndpoints } from "../../api/endpoints/categories.js";
+import { brandEndpoints } from "../../api/endpoints/brands.js";
+import { transformProductsList, transformCategoriesList, transformBrandsList } from "../../services/dataTransform.js";
 import { productImportService, defaultTemplates } from "../../services/importService";
 import clsx from "clsx";
 
@@ -93,26 +95,28 @@ const Admin = () => {
   const loadInitialData = async () => {
     try {
       setLoading(true);
-      const [productsResponse, categoriesResponse, statsResponse] = await Promise.all([
+      const [productsResponse, categoriesResponse, brandsResponse, statsResponse] = await Promise.all([
         productEndpoints.getProducts(),
         categoryEndpoints.getCategories(),
+        brandEndpoints.getBrands(),
         productEndpoints.getProductStats()
       ]);
 
-      if (productsResponse.success) {
-        setProducts(productsResponse.data);
-      }
-      
-      if (categoriesResponse.success) {
-        setCategories(categoriesResponse.data);
-      }
-      
+      // Transformar productos
+      const transformedProducts = transformProductsList(productsResponse);
+      setProducts(transformedProducts.products);
+
+      // Transformar categorías
+      const transformedCategories = transformCategoriesList(categoriesResponse);
+      setCategories(transformedCategories);
+
+      // Transformar marcas
+      const transformedBrands = transformBrandsList(brandsResponse);
+      setBrands(transformedBrands);
+
       if (statsResponse.success) {
         setStats(statsResponse.data);
       }
-      
-      // Por ahora usamos un array vacío para brands ya que no tenemos ese endpoint
-      setBrands([]);
     } catch (error) {
       console.error('Error cargando datos:', error);
     } finally {

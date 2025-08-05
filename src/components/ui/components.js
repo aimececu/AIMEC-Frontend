@@ -5,6 +5,7 @@ export { default as Heading } from './Heading';
 export { default as Icon } from './Icon';
 export { default as ImageWithFallback } from './ImageWithFallback';
 export { default as Input } from './Input';
+export { default as Loader } from './Loader';
 export { default as ProductCard } from './ProductCard';
 export { default as Section } from './Section';
 export { default as Select } from './Select';

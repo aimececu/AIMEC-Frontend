@@ -13,7 +13,7 @@ export const transformProduct = (product) => {
     originalPrice: product.original_price ? parseFloat(product.original_price) : null,
     stock: product.stock_quantity || 0,
     image: product.main_image || product.additional_images?.[0] || null,
-    rating: 4.5, // Por defecto, ya que no tenemos rating en el backend
+    rating: product.rating || 4.5, // Usar el rating del backend si existe
     
     // Extraer datos de las relaciones
     category: product.category?.name || '',
@@ -28,6 +28,11 @@ export const transformProduct = (product) => {
     // Especificaciones transformadas
     specifications: transformSpecifications(product.specifications),
     
+    // Características, aplicaciones y certificaciones
+    features: transformFeatures(product.features),
+    applications: transformApplications(product.applications),
+    certifications: transformCertifications(product.certifications),
+    
     // Información adicional
     is_featured: product.is_featured || false,
     is_active: product.is_active !== false,
@@ -36,6 +41,8 @@ export const transformProduct = (product) => {
     dimensions: product.dimensions,
     warranty_months: product.warranty_months,
     lead_time_days: product.lead_time_days,
+    warranty: product.warranty_months ? `${product.warranty_months} meses` : null,
+    leadTime: product.lead_time_days ? `${product.lead_time_days} días` : null,
     
     // Imágenes adicionales
     additional_images: product.additional_images || [],
@@ -134,7 +141,7 @@ export const transformProductsList = (response) => {
   
   const products = Array.isArray(response.data) 
     ? response.data.map(transformProduct)
-    : response.data.products?.map(transformProduct) || [];
+    : [];
   
   return {
     products,
@@ -164,4 +171,25 @@ export const transformBrandsList = (response) => {
     : [];
   
   return brands;
+};
+
+// Transformar características del producto
+export const transformFeatures = (features = []) => {
+  if (!Array.isArray(features)) return [];
+  
+  return features.map(feature => feature.feature?.name || feature.name || '').filter(Boolean);
+};
+
+// Transformar aplicaciones del producto
+export const transformApplications = (applications = []) => {
+  if (!Array.isArray(applications)) return [];
+  
+  return applications.map(app => app.application?.name || app.name || '').filter(Boolean);
+};
+
+// Transformar certificaciones del producto
+export const transformCertifications = (certifications = []) => {
+  if (!Array.isArray(certifications)) return [];
+  
+  return certifications.map(cert => cert.certification?.name || cert.name || '').filter(Boolean);
 }; 

@@ -8,7 +8,8 @@ import {
   Button,
   Input,
   ProductCard,
-  ImageWithFallback
+  ImageWithFallback,
+  Loader
 } from "../../components/ui/components";
 import { useCart } from "../../context/CartContext";
 import { productEndpoints } from "../../api/endpoints/products.js";
@@ -53,12 +54,15 @@ const ProductDetail = () => {
       <div className="min-h-screen bg-secondary-50 dark:bg-secondary-900">
         <Container>
           <div className="py-16 text-center">
-            <div className="text-secondary-400 dark:text-secondary-500 text-4xl mb-6">
-              ⏳
-            </div>
-            <Heading level={1} className="mb-4">
-              Cargando producto...
-            </Heading>
+            <Loader 
+              size="xl" 
+              variant="spinner" 
+              text="Cargando producto..." 
+              className="mb-6"
+            />
+            <p className="text-secondary-600 dark:text-secondary-300">
+              Obteniendo información del producto...
+            </p>
           </div>
         </Container>
       </div>

@@ -32,27 +32,39 @@ export const AuthProvider = ({ children }) => {
         const sessionId = authUtils.getSessionId();
         const user = authUtils.getCurrentUser();
         
+        console.log('🔍 Verificando sesión:', { sessionId: !!sessionId, user: !!user });
+        
         if (sessionId && user) {
           // Verificar si el token sigue siendo válido
           const isValid = await authEndpoints.verifyAuth();
+          console.log('🔍 Resultado de verificación:', isValid);
+          
           if (isValid) {
             setState({
               isAuthenticated: true,
               user: user,
               isLoading: false
             });
+            console.log('✅ Sesión válida, usuario autenticado');
             return;
           } else {
             // Token inválido, limpiar datos
+            console.log('❌ Sesión inválida, limpiando datos');
             authUtils.clearAuth();
           }
+        } else {
+          console.log('❌ No hay sesión guardada');
         }
       } catch (error) {
-        console.error('Error al verificar autenticación:', error);
+        console.error('❌ Error al verificar autenticación:', error);
         authUtils.clearAuth();
       }
       
-      setState(prev => ({ ...prev, isLoading: false }));
+      setState(prev => ({ 
+        isAuthenticated: false, 
+        user: null, 
+        isLoading: false 
+      }));
     };
 
     checkAuth();
@@ -61,7 +73,10 @@ export const AuthProvider = ({ children }) => {
   // Función de login
   const login = async (email, password) => {
     try {
+      console.log('🔐 Intentando login con:', email);
       const response = await authEndpoints.login(email, password);
+      
+      console.log('🔐 Respuesta de login:', response);
       
       if (response.success) {
         setState({
@@ -69,10 +84,12 @@ export const AuthProvider = ({ children }) => {
           user: response.data.user,
           isLoading: false
         });
+        console.log('✅ Login exitoso, usuario autenticado');
       }
       
       return response;
     } catch (error) {
+      console.error('❌ Error en login:', error);
       return { 
         success: false, 
         error: error.message || 'Error al iniciar sesión. Por favor, intenta nuevamente.' 
@@ -83,9 +100,11 @@ export const AuthProvider = ({ children }) => {
   // Función de logout
   const logout = async () => {
     try {
+      console.log('🚪 Iniciando logout...');
       await authEndpoints.logout();
+      console.log('✅ Logout exitoso');
     } catch (error) {
-      console.error('Error en logout:', error);
+      console.error('❌ Error en logout:', error);
     } finally {
       // Actualizar estado
       setState({
@@ -93,6 +112,7 @@ export const AuthProvider = ({ children }) => {
         user: null,
         isLoading: false
       });
+      console.log('🔄 Estado actualizado después del logout');
     }
   };
 

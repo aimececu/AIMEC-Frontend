@@ -7,7 +7,8 @@ import {
   Button,
   Input,
   Select,
-  ProductCard
+  ProductCard,
+  Loader
 } from "../../components/ui/components";
 import { productEndpoints } from "../../api/endpoints/products.js";
 import { categoryEndpoints } from "../../api/endpoints/categories.js";
@@ -282,7 +283,19 @@ const Catalog = () => {
               </Card>
 
               {/* Products Grid/List */}
-              {filteredProducts.length === 0 ? (
+              {loading ? (
+                <Card padding="lg" className="text-center">
+                  <Loader 
+                    size="lg" 
+                    variant="spinner" 
+                    text="Cargando productos..." 
+                    className="mb-4"
+                  />
+                  <p className="text-secondary-600 dark:text-secondary-300">
+                    Obteniendo información de productos...
+                  </p>
+                </Card>
+              ) : filteredProducts.length === 0 ? (
                 <Card padding="lg" className="text-center">
                   <div className="text-secondary-400 dark:text-secondary-500 text-6xl mb-4">
                     🔍

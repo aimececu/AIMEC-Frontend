@@ -5,6 +5,7 @@ const TextArea = ({
   label, 
   error, 
   helperText, 
+  onChange,
   className = '', 
   ...props 
 }) => {
@@ -26,6 +27,7 @@ const TextArea = ({
       
       <textarea
         className={classes}
+        onChange={(e) => onChange(e.target.value)}
         {...props}
       />
       

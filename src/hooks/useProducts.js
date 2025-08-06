@@ -4,6 +4,7 @@ import { productEndpoints } from '../api/endpoints/products.js';
 export const useProducts = (loadInitialData) => {
   const [editingProduct, setEditingProduct] = useState(null);
   const [showProductForm, setShowProductForm] = useState(false);
+  const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
   const [productForm, setProductForm] = useState({
     sku: '',
     name: '',
@@ -30,6 +31,14 @@ export const useProducts = (loadInitialData) => {
     meta_keywords: ''
   });
 
+  const showToast = (message, type = 'success') => {
+    setToast({ isVisible: true, message, type });
+  };
+
+  const hideToast = () => {
+    setToast({ isVisible: false, message: '', type: 'success' });
+  };
+
   const handleProductFormSubmit = async (e) => {
     e.preventDefault();
     
@@ -48,24 +57,23 @@ export const useProducts = (loadInitialData) => {
         if (!response.success) {
           throw new Error(response.error || 'Error al actualizar el producto');
         }
+        // Mostrar mensaje de éxito sin cerrar el formulario
+        showToast('Producto actualizado exitosamente', 'success');
       } else {
         const response = await productEndpoints.createProduct(productData);
         if (!response.success) {
           throw new Error(response.error || 'Error al crear el producto');
         }
+        // Para productos nuevos, sí cerrar el formulario y recargar
+        await loadInitialData();
+        resetProductForm();
+        setShowProductForm(false);
+        setEditingProduct(null);
+        showToast('Producto creado exitosamente', 'success');
       }
-
-      // Recargar productos
-      await loadInitialData();
-      
-      // Limpiar formulario
-      resetProductForm();
-      
-      setShowProductForm(false);
-      setEditingProduct(null);
     } catch (error) {
       console.error('Error al guardar producto:', error);
-      alert(error.message);
+      showToast(error.message, 'error');
     }
   };
 
@@ -175,6 +183,9 @@ export const useProducts = (loadInitialData) => {
     handleEditProduct,
     handleDeleteProduct,
     handleAddProduct,
-    handleCancelForm
+    handleCancelForm,
+    toast,
+    showToast,
+    hideToast
   };
 }; 

@@ -6,6 +6,7 @@ import {
   Button,
   Icon,
   Loader,
+  Toast,
 } from "../../components/ui/components";
 import { useAuth } from "../../context/AuthContext";
 import AdminDashboard from "./components/AdminDashboard";
@@ -41,6 +42,8 @@ const Admin = () => {
     handleDeleteProduct,
     handleAddProduct,
     handleCancelForm,
+    toast,
+    hideToast,
   } = useProducts(loadInitialData);
 
   // Manejar logout
@@ -164,6 +167,14 @@ const Admin = () => {
               editingProduct={editingProduct}
             />
           )}
+
+          {/* Toast de notificaciones */}
+          <Toast
+            message={toast.message}
+            type={toast.type}
+            isVisible={toast.isVisible}
+            onClose={hideToast}
+          />
         </div>
       </Container>
     </div>

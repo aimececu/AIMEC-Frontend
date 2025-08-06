@@ -19,8 +19,6 @@ const ProductForm = ({
 }) => {
   const [activeFormTab, setActiveFormTab] = useState("basic");
 
-  console.log("productForm", productForm);
-
   const handleFormChange = (field, value) => {
     setProductForm((prev) => ({
       ...prev,

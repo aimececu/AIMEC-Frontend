@@ -1,21 +1,30 @@
-import React, { useState } from 'react';
-import { Card, Input, Select, TextArea, Button, Heading } from '../../../components/ui/components';
+import React, { useState } from "react";
+import {
+  Card,
+  Input,
+  Select,
+  TextArea,
+  Button,
+  Heading,
+} from "../../../components/ui/components";
 
-const ProductForm = ({ 
-  productForm, 
-  setProductForm, 
-  categories, 
-  brands, 
-  onSubmit, 
-  onCancel, 
-  editingProduct 
+const ProductForm = ({
+  productForm,
+  setProductForm,
+  categories,
+  brands,
+  onSubmit,
+  onCancel,
+  editingProduct,
 }) => {
-  const [activeFormTab, setActiveFormTab] = useState('basic');
+  const [activeFormTab, setActiveFormTab] = useState("basic");
+
+  console.log("productForm", productForm);
 
   const handleFormChange = (field, value) => {
-    setProductForm(prev => ({
+    setProductForm((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
@@ -25,7 +34,7 @@ const ProductForm = ({
         <Card className="p-6">
           <div className="flex items-center justify-between mb-6">
             <Heading level={3}>
-              {editingProduct ? 'Editar Producto' : 'Agregar Nuevo Producto'}
+              {editingProduct ? "Editar Producto" : "Agregar Nuevo Producto"}
             </Heading>
             <Button
               variant="ghost"
@@ -40,18 +49,18 @@ const ProductForm = ({
           {/* Tabs del formulario */}
           <div className="flex space-x-1 mb-6 p-1 bg-secondary-100 dark:bg-secondary-700 rounded-lg">
             {[
-              { id: 'basic', label: 'Básico', icon: 'FiFileText' },
-              { id: 'technical', label: 'Técnico', icon: 'FiSettings' },
-              { id: 'media', label: 'Multimedia', icon: 'FiImage' },
-              { id: 'seo', label: 'SEO', icon: 'FiSearch' }
+              { id: "basic", label: "Básico", icon: "FiFileText" },
+              { id: "technical", label: "Técnico", icon: "FiSettings" },
+              { id: "media", label: "Multimedia", icon: "FiImage" },
+              { id: "seo", label: "SEO", icon: "FiSearch" },
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveFormTab(tab.id)}
                 className={`flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors ${
                   activeFormTab === tab.id
-                    ? 'bg-white dark:bg-secondary-600 text-primary-600 dark:text-primary-400 shadow-sm'
-                    : 'text-secondary-600 dark:text-secondary-400 hover:text-secondary-900 dark:hover:text-white'
+                    ? "bg-white dark:bg-secondary-600 text-primary-600 dark:text-primary-400 shadow-sm"
+                    : "text-secondary-600 dark:text-secondary-400 hover:text-secondary-900 dark:hover:text-white"
                 }`}
               >
                 {tab.label}
@@ -60,14 +69,14 @@ const ProductForm = ({
           </div>
 
           <form onSubmit={onSubmit}>
-            {activeFormTab === 'basic' && (
+            {activeFormTab === "basic" && (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* SKU */}
                   <Input
                     label="SKU"
                     value={productForm.sku}
-                    onChange={(e) => handleFormChange('sku', e.target.value)}
+                    onChange={(value) => handleFormChange("sku", value)}
                     placeholder="Código SKU"
                     required
                   />
@@ -76,7 +85,7 @@ const ProductForm = ({
                   <Input
                     label="Nombre"
                     value={productForm.name}
-                    onChange={(e) => handleFormChange('name', e.target.value)}
+                    onChange={(value) => handleFormChange("name", value)}
                     placeholder="Nombre del producto"
                     required
                   />
@@ -87,7 +96,7 @@ const ProductForm = ({
                     type="number"
                     step="0.01"
                     value={productForm.price}
-                    onChange={(e) => handleFormChange('price', e.target.value)}
+                    onChange={(value) => handleFormChange("price", value)}
                     placeholder="0.00"
                     required
                   />
@@ -97,42 +106,41 @@ const ProductForm = ({
                     label="Stock"
                     type="number"
                     value={productForm.stock_quantity}
-                    onChange={(e) => handleFormChange('stock_quantity', e.target.value)}
+                    onChange={(value) =>
+                      handleFormChange("stock_quantity", value)
+                    }
                     placeholder="0"
                     required
                   />
-
                   {/* Marca */}
                   <Select
                     label="Marca"
                     value={productForm.brand}
-                    onChange={(e) => handleFormChange('brand', e.target.value)}
+                    onChange={(value) => handleFormChange("brand", value)}
                     required
-                  >
-                    <option value="">Seleccionar marca</option>
-                    {brands.map(brand => (
-                      <option key={brand.id} value={brand.name}>{brand.name}</option>
-                    ))}
-                  </Select>
+                    options={brands.map((brand) => ({
+                      label: brand.name,
+                      value: brand.id,
+                    }))}
+                  />
 
                   {/* Categoría */}
                   <Select
                     label="Categoría"
                     value={productForm.category}
-                    onChange={(e) => handleFormChange('category', e.target.value)}
+                    onChange={(value) => handleFormChange("category", value)}
                     required
-                  >
-                    <option value="">Seleccionar categoría</option>
-                    {categories.map(cat => (
-                      <option key={cat.id} value={cat.name}>{cat.name}</option>
-                    ))}
-                  </Select>
+                    options={categories.map((cat) => ({
+                      label: cat.name,
+                      value: cat.id,
+                    }))}
+                  />
 
                   {/* Subcategoría */}
                   <Input
                     label="Subcategoría"
                     value={productForm.subcategory}
-                    onChange={(e) => handleFormChange('subcategory', e.target.value)}
+                    onChange={(value) => handleFormChange("subcategory", value)}
                     placeholder="Subcategoría"
                   />
 
@@ -140,7 +148,7 @@ const ProductForm = ({
                   <Input
                     label="Serie"
                     value={productForm.series}
-                    onChange={(e) => handleFormChange('series', e.target.value)}
+                    onChange={(value) => handleFormChange("series", value)}
                     placeholder="Serie del producto"
                   />
 
@@ -150,12 +158,15 @@ const ProductForm = ({
                       Estado
                     </label>
                     <Select
-                      value={productForm.is_active ? 'true' : 'false'}
-                      onChange={(e) => handleFormChange('is_active', e.target.value === 'true')}
-                    >
-                      <option value="true">Activo</option>
-                      <option value="false">Inactivo</option>
-                    </Select>
+                      value={productForm.is_active ? "true" : "false"}
+                      onChange={(value) =>
+                        handleFormChange("is_active", value === "true")
+                      }
+                      options={[
+                        { label: "Activo", value: "true" },
+                        { label: "Inactivo", value: "false" },
+                      ]}
+                    />
                   </div>
                 </div>
 
@@ -163,14 +174,14 @@ const ProductForm = ({
                 <TextArea
                   label="Descripción"
                   value={productForm.description}
-                  onChange={(e) => handleFormChange('description', e.target.value)}
+                  onChange={(value) => handleFormChange("description", value)}
                   placeholder="Descripción detallada del producto..."
                   rows={4}
                 />
               </div>
             )}
 
-            {activeFormTab === 'technical' && (
+            {activeFormTab === "technical" && (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Peso */}
@@ -179,7 +190,7 @@ const ProductForm = ({
                     type="number"
                     step="0.01"
                     value={productForm.weight}
-                    onChange={(e) => handleFormChange('weight', e.target.value)}
+                    onChange={(value) => handleFormChange("weight", value)}
                     placeholder="0.00"
                   />
 
@@ -187,7 +198,7 @@ const ProductForm = ({
                   <Input
                     label="Dimensiones"
                     value={productForm.dimensions}
-                    onChange={(e) => handleFormChange('dimensions', e.target.value)}
+                    onChange={(value) => handleFormChange("dimensions", value)}
                     placeholder="Largo x Ancho x Alto"
                   />
 
@@ -197,7 +208,7 @@ const ProductForm = ({
                     type="number"
                     step="0.1"
                     value={productForm.voltage}
-                    onChange={(e) => handleFormChange('voltage', e.target.value)}
+                    onChange={(value) => handleFormChange("voltage", value)}
                     placeholder="0.0"
                   />
 
@@ -207,7 +218,7 @@ const ProductForm = ({
                     type="number"
                     step="0.1"
                     value={productForm.power}
-                    onChange={(e) => handleFormChange('power', e.target.value)}
+                    onChange={(value) => handleFormChange("power", value)}
                     placeholder="0.0"
                   />
 
@@ -215,7 +226,9 @@ const ProductForm = ({
                   <Input
                     label="Rango de Temperatura"
                     value={productForm.temperature_range}
-                    onChange={(e) => handleFormChange('temperature_range', e.target.value)}
+                    onChange={(value) =>
+                      handleFormChange("temperature_range", value)
+                    }
                     placeholder="Ej: -10°C a +50°C"
                   />
 
@@ -223,7 +236,7 @@ const ProductForm = ({
                   <Input
                     label="IP Rating"
                     value={productForm.ip_rating}
-                    onChange={(e) => handleFormChange('ip_rating', e.target.value)}
+                    onChange={(value) => handleFormChange("ip_rating", value)}
                     placeholder="Ej: IP65"
                   />
 
@@ -231,7 +244,7 @@ const ProductForm = ({
                   <Input
                     label="Material"
                     value={productForm.material}
-                    onChange={(e) => handleFormChange('material', e.target.value)}
+                    onChange={(value) => handleFormChange("material", value)}
                     placeholder="Material del producto"
                   />
 
@@ -239,45 +252,52 @@ const ProductForm = ({
                   <Input
                     label="Color"
                     value={productForm.color}
-                    onChange={(e) => handleFormChange('color', e.target.value)}
+                    onChange={(value) => handleFormChange("color", value)}
                     placeholder="Color del producto"
                   />
                 </div>
               </div>
             )}
 
-            {activeFormTab === 'media' && (
+            {activeFormTab === "media" && (
               <div className="space-y-6">
                 <Input
                   label="Imagen Principal"
                   value={productForm.main_image}
-                  onChange={(e) => handleFormChange('main_image', e.target.value)}
+                  onChange={(value) => handleFormChange("main_image", value)}
                   placeholder="URL de la imagen principal"
                 />
 
                 <TextArea
                   label="Imágenes Adicionales (URLs separadas por comas)"
-                  value={productForm.additional_images?.join(', ') || ''}
-                  onChange={(e) => handleFormChange('additional_images', e.target.value.split(',').map(url => url.trim()))}
+                  value={productForm.additional_images?.join(", ") || ""}
+                  onChange={(value) =>
+                    handleFormChange(
+                      "additional_images",
+                      value.split(",").map((url) => url.trim())
+                    )
+                  }
                   placeholder="https://ejemplo.com/imagen1.jpg, https://ejemplo.com/imagen2.jpg"
                   rows={3}
                 />
               </div>
             )}
 
-            {activeFormTab === 'seo' && (
+            {activeFormTab === "seo" && (
               <div className="space-y-6">
                 <Input
                   label="Meta Title"
                   value={productForm.meta_title}
-                  onChange={(e) => handleFormChange('meta_title', e.target.value)}
+                  onChange={(value) => handleFormChange("meta_title", value)}
                   placeholder="Título para SEO"
                 />
 
                 <TextArea
                   label="Meta Description"
                   value={productForm.meta_description}
-                  onChange={(e) => handleFormChange('meta_description', e.target.value)}
+                  onChange={(value) =>
+                    handleFormChange("meta_description", value)
+                  }
                   placeholder="Descripción para SEO"
                   rows={3}
                 />
@@ -285,7 +305,7 @@ const ProductForm = ({
                 <Input
                   label="Meta Keywords"
                   value={productForm.meta_keywords}
-                  onChange={(e) => handleFormChange('meta_keywords', e.target.value)}
+                  onChange={(value) => handleFormChange("meta_keywords", value)}
                   placeholder="Palabras clave separadas por comas"
                 />
               </div>
@@ -293,15 +313,11 @@ const ProductForm = ({
 
             {/* Botones de acción */}
             <div className="flex justify-end gap-4 mt-8 pt-6 border-t border-secondary-200 dark:border-secondary-700">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onCancel}
-              >
+              <Button type="button" variant="outline" onClick={onCancel}>
                 Cancelar
               </Button>
               <Button type="submit">
-                {editingProduct ? 'Actualizar Producto' : 'Crear Producto'}
+                {editingProduct ? "Actualizar Producto" : "Crear Producto"}
               </Button>
             </div>
           </form>
@@ -311,4 +327,4 @@ const ProductForm = ({
   );
 };
 
-export default ProductForm; 
+export default ProductForm;

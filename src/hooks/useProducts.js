@@ -69,16 +69,28 @@ export const useProducts = (loadInitialData) => {
     }
   };
 
-  const handleEditProduct = (product) => {
+  const handleEditProduct = (product, categories = [], brands = []) => {
     setEditingProduct(product);
+    
+    // Función para mapear nombre a ID
+    const getCategoryId = (categoryName) => {
+      const category = categories.find(cat => cat.name === categoryName);
+      return category ? category.id : '';
+    };
+
+    const getBrandId = (brandName) => {
+      const brand = brands.find(b => b.name === brandName);
+      return brand ? brand.id : '';
+    };
+
     setProductForm({
       sku: product.sku || '',
       name: product.name || '',
       description: product.description || '',
       price: product.price?.toString() || '',
       stock_quantity: product.stock?.toString() || '',
-      brand: product.brand || '',
-      category: product.category || '',
+      brand: getBrandId(product.brand),
+      category: getCategoryId(product.category),
       subcategory: product.subcategory || '',
       series: product.series || '',
       main_image: product.image || product.main_image || '',

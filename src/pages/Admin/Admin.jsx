@@ -1,29 +1,36 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Container, Heading, Button, Icon, Loader } from "../../components/ui/components";
+import {
+  Container,
+  Heading,
+  Button,
+  Icon,
+  Loader,
+} from "../../components/ui/components";
 import { useAuth } from "../../context/AuthContext";
-import AdminDashboard from './components/AdminDashboard';
-import ProductsList from './components/ProductsList';
-import ProductForm from './components/ProductForm';
-import { useAdminData } from '../../hooks/useAdminData';
-import { useProducts } from '../../hooks/useProducts';
+import AdminDashboard from "./components/AdminDashboard";
+import ProductsList from "./components/ProductsList";
+import ProductForm from "./components/ProductForm";
+import { useAdminData } from "../../hooks/useAdminData";
+import { useProducts } from "../../hooks/useProducts";
 import clsx from "clsx";
 
 const Admin = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  
+
   // Estados principales
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState("dashboard");
   const [filters, setFilters] = useState({
-    search: '',
-    category: '',
-    brand: '',
-    inStock: ''
+    search: "",
+    category: "",
+    brand: "",
+    inStock: "",
   });
 
   // Hooks personalizados
-  const { products, categories, brands, loading, stats, loadInitialData } = useAdminData();
+  const { products, categories, brands, loading, stats, loadInitialData } =
+    useAdminData();
   const {
     editingProduct,
     showProductForm,
@@ -33,13 +40,13 @@ const Admin = () => {
     handleEditProduct,
     handleDeleteProduct,
     handleAddProduct,
-    handleCancelForm
+    handleCancelForm,
   } = useProducts(loadInitialData);
 
   // Manejar logout
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate("/");
   };
 
   if (loading) {
@@ -77,7 +84,7 @@ const Admin = () => {
                   Gestiona los productos del catálogo
                 </p>
               </div>
-              
+
               {/* User info and logout */}
               <div className="flex items-center gap-4">
                 <div className="text-right">
@@ -105,8 +112,8 @@ const Admin = () => {
           <div className="mb-6">
             <nav className="flex space-x-8">
               {[
-                { id: 'dashboard', label: 'Dashboard', icon: 'FiHome' },
-                { id: 'products', label: 'Productos', icon: 'FiPackage' }
+                { id: "dashboard", label: "Dashboard", icon: "FiHome" },
+                { id: "products", label: "Productos", icon: "FiPackage" },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -125,30 +132,20 @@ const Admin = () => {
             </nav>
           </div>
 
-          {/* Debug info */}
-          <div className="mb-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-            <p className="text-sm text-yellow-800 dark:text-yellow-200">
-              Debug: Productos: {products.length} | Categorías: {categories.length} | Marcas: {brands.length}
-            </p>
-          </div>
-
           {/* Contenido de tabs */}
           <div className="space-y-6">
-            {activeTab === 'dashboard' && (
-              <AdminDashboard 
-                stats={stats}
-                onAddProduct={handleAddProduct}
-              />
+            {activeTab === "dashboard" && (
+              <AdminDashboard stats={stats} onAddProduct={handleAddProduct} />
             )}
-            
-            {activeTab === 'products' && (
+
+            {activeTab === "products" && (
               <ProductsList
                 products={products}
                 categories={categories}
                 brands={brands}
                 filters={filters}
                 setFilters={setFilters}
-                onEditProduct={handleEditProduct}
+                onEditProduct={(product) => handleEditProduct(product, categories, brands)}
                 onDeleteProduct={handleDeleteProduct}
                 onAddProduct={handleAddProduct}
               />

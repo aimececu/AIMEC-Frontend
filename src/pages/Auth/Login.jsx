@@ -52,10 +52,10 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-secondary-50 dark:bg-secondary-900 flex items-center justify-center p-4">
       <Container size="sm">
-        <div className="max-w-md mx-auto">
-          <Card padding="lg">
+        <div className="max-w-max mx-auto ">
+          <Card padding="xl">
             <div className="text-center mb-6">
-              <Heading level={1} className="mb-2">
+              <Heading level={2} className="mb-2">
                 Administración
               </Heading>
               <p className="text-secondary-600 dark:text-secondary-300">

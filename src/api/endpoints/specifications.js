@@ -3,22 +3,23 @@
 // =====================================================
 
 import { apiRequest, buildEndpoint } from '../client';
+import { ENDPOINTS } from '../../config/api';
 
 export const specificationEndpoints = {
   // Obtener todas las especificaciones
   async getSpecifications(filters = {}) {
-    const endpoint = buildEndpoint('/specifications', filters);
+    const endpoint = buildEndpoint(ENDPOINTS.SPECIFICATIONS.LIST, filters);
     return await apiRequest(endpoint);
   },
 
   // Obtener especificación por ID
   async getSpecificationById(id) {
-    return await apiRequest(`/specifications/${id}`);
+    return await apiRequest(ENDPOINTS.SPECIFICATIONS.DETAIL(id));
   },
 
   // Crear especificación
   async createSpecification(specData) {
-    return await apiRequest('/specifications', {
+    return await apiRequest(ENDPOINTS.SPECIFICATIONS.CREATE, {
       method: 'POST',
       body: JSON.stringify(specData)
     });
@@ -26,7 +27,7 @@ export const specificationEndpoints = {
 
   // Actualizar especificación
   async updateSpecification(id, specData) {
-    return await apiRequest(`/specifications/${id}`, {
+    return await apiRequest(ENDPOINTS.SPECIFICATIONS.UPDATE(id), {
       method: 'PUT',
       body: JSON.stringify(specData)
     });
@@ -34,7 +35,7 @@ export const specificationEndpoints = {
 
   // Eliminar especificación
   async deleteSpecification(id) {
-    return await apiRequest(`/specifications/${id}`, {
+    return await apiRequest(ENDPOINTS.SPECIFICATIONS.DELETE(id), {
       method: 'DELETE'
     });
   },

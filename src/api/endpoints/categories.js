@@ -3,21 +3,22 @@
 // =====================================================
 
 import { apiRequest } from '../client';
+import { ENDPOINTS } from '../../config/api';
 
 export const categoryEndpoints = {
   // Obtener todas las categorías
   async getCategories() {
-    return await apiRequest('/categories');
+    return await apiRequest(ENDPOINTS.CATEGORIES.LIST);
   },
 
   // Obtener categoría por ID
   async getCategoryById(id) {
-    return await apiRequest(`/categories/${id}`);
+    return await apiRequest(ENDPOINTS.CATEGORIES.DETAIL(id));
   },
 
   // Crear categoría
   async createCategory(categoryData) {
-    return await apiRequest('/categories', {
+    return await apiRequest(ENDPOINTS.CATEGORIES.CREATE, {
       method: 'POST',
       body: JSON.stringify(categoryData)
     });
@@ -25,7 +26,7 @@ export const categoryEndpoints = {
 
   // Actualizar categoría
   async updateCategory(id, categoryData) {
-    return await apiRequest(`/categories/${id}`, {
+    return await apiRequest(ENDPOINTS.CATEGORIES.UPDATE(id), {
       method: 'PUT',
       body: JSON.stringify(categoryData)
     });
@@ -33,7 +34,7 @@ export const categoryEndpoints = {
 
   // Eliminar categoría
   async deleteCategory(id) {
-    return await apiRequest(`/categories/${id}`, {
+    return await apiRequest(ENDPOINTS.CATEGORIES.DELETE(id), {
       method: 'DELETE'
     });
   },

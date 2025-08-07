@@ -21,11 +21,15 @@ export const apiRequest = async (endpoint, options = {}) => {
   // Configuración por defecto
   const config = {
     headers: {
-      'Content-Type': 'application/json',
       ...options.headers
     },
     ...options
   };
+
+  // Solo agregar Content-Type si no es FormData
+  if (!(options.body instanceof FormData)) {
+    config.headers['Content-Type'] = 'application/json';
+  }
 
   // Agregar sessionID si existe
   const sessionId = localStorage.getItem(AUTH_CONFIG.SESSION_KEY);

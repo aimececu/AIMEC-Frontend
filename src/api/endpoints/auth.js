@@ -3,11 +3,12 @@
 // =====================================================
 
 import { apiRequest, authUtils } from '../client';
+import { ENDPOINTS } from '../../config/api';
 
 export const authEndpoints = {
   // Login
   async login(email, password) {
-    const response = await apiRequest('/auth/login', {
+    const response = await apiRequest(ENDPOINTS.AUTH.LOGIN, {
       method: 'POST',
       body: JSON.stringify({ email, password })
     });
@@ -22,7 +23,7 @@ export const authEndpoints = {
   // Logout
   async logout() {
     try {
-      await apiRequest('/auth/logout', { method: 'POST' });
+      await apiRequest(ENDPOINTS.AUTH.LOGOUT, { method: 'POST' });
     } catch (error) {
       console.warn('Error en logout:', error);
     } finally {
@@ -33,7 +34,7 @@ export const authEndpoints = {
   // Verificar autenticación
   async verifyAuth() {
     try {
-      const response = await apiRequest('/auth/verify');
+      const response = await apiRequest(ENDPOINTS.AUTH.VERIFY);
       return response.success;
     } catch (error) {
       return false;
@@ -42,12 +43,12 @@ export const authEndpoints = {
 
   // Obtener perfil
   async getProfile() {
-    return await apiRequest('/auth/profile');
+    return await apiRequest(ENDPOINTS.AUTH.PROFILE);
   },
 
   // Actualizar perfil
   async updateProfile(profileData) {
-    return await apiRequest('/auth/profile', {
+    return await apiRequest(ENDPOINTS.AUTH.PROFILE, {
       method: 'PUT',
       body: JSON.stringify(profileData)
     });
@@ -55,7 +56,15 @@ export const authEndpoints = {
 
   // Registrar usuario (solo admin)
   async register(userData) {
-    return await apiRequest('/auth/register', {
+    return await apiRequest(ENDPOINTS.AUTH.REGISTER, {
+      method: 'POST',
+      body: JSON.stringify(userData)
+    });
+  },
+
+  // Registrar primer administrador
+  async registerInitial(userData) {
+    return await apiRequest(ENDPOINTS.AUTH.REGISTER_INITIAL, {
       method: 'POST',
       body: JSON.stringify(userData)
     });

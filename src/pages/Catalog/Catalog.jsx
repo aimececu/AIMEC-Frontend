@@ -144,7 +144,7 @@ const Catalog = () => {
                   <Input
                     label="Buscar productos"
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(value) => setSearchTerm(value)}
                     placeholder="Nombre, descripción..."
                     icon={<Icon name="FiSearch" size="sm" />}
                   />

@@ -72,7 +72,7 @@ const ProductsList = ({
           <Input
             placeholder="Buscar productos..."
             value={filters.search}
-            onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+            onChange={(value) => setFilters({ ...filters, search: value })}
           />
 
           <Select

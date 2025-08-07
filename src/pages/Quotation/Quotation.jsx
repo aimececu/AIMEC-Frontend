@@ -217,26 +217,26 @@ const Quotation = () => {
                   <Input
                     label="Nombre completo"
                     value={customerInfo.name}
-                    onChange={(e) => setCustomerInfo({...customerInfo, name: e.target.value})}
+                    onChange={(value) => setCustomerInfo({...customerInfo, name: value})}
                     placeholder="Tu nombre completo"
                   />
                   <Input
                     label="Email"
                     type="email"
                     value={customerInfo.email}
-                    onChange={(e) => setCustomerInfo({...customerInfo, email: e.target.value})}
+                    onChange={(value) => setCustomerInfo({...customerInfo, email: value})}
                     placeholder="tu@email.com"
                   />
                   <Input
                     label="Teléfono"
                     value={customerInfo.phone}
-                    onChange={(e) => setCustomerInfo({...customerInfo, phone: e.target.value})}
+                    onChange={(value) => setCustomerInfo({...customerInfo, phone: value})}
                     placeholder="+1 234 567 8900"
                   />
                   <Input
                     label="Empresa"
                     value={customerInfo.company}
-                    onChange={(e) => setCustomerInfo({...customerInfo, company: e.target.value})}
+                    onChange={(value) => setCustomerInfo({...customerInfo, company: value})}
                     placeholder="Nombre de tu empresa"
                   />
                   <div>

@@ -1,49 +1,48 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { 
-  Icon, 
-  Container, 
-  Heading, 
-  Card, 
-  Button, 
-  Input 
-} from '../../components/ui/components';
-import { useAuth } from '../../context/AuthContext';
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import {
+  Icon,
+  Container,
+  Heading,
+  Card,
+  Button,
+  Input,
+} from "../../components/ui/components";
+import { useAuth } from "../../context/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [formData, setFormData] = useState({
-    email: '',
-    password: ''
+    email: "",
+    password: "",
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
+  const handleInputChange = (value, fieldName) => {
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [fieldName]: value,
     }));
-    if (error) setError('');
+    if (error) setError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
+    setError("");
 
     try {
       const result = await login(formData.email, formData.password);
-      
+
       if (result.success) {
-        navigate('/admin');
+        navigate("/admin");
       } else {
         setError(result.error);
       }
     } catch (error) {
-      setError('Error inesperado. Por favor, intenta nuevamente.');
+      setError("Error inesperado. Por favor, intenta nuevamente.");
     } finally {
       setIsLoading(false);
     }
@@ -69,7 +68,7 @@ const Login = () => {
                 type="email"
                 name="email"
                 value={formData.email}
-                onChange={handleInputChange}
+                onChange={(value) => handleInputChange(value, "email")}
                 placeholder="admin@aimec.com"
                 required
               />
@@ -79,7 +78,7 @@ const Login = () => {
                 type="password"
                 name="password"
                 value={formData.password}
-                onChange={handleInputChange}
+                onChange={(value) => handleInputChange(value, "password")}
                 placeholder="••••••••"
                 required
               />
@@ -98,7 +97,7 @@ const Login = () => {
                 disabled={isLoading}
                 loading={isLoading}
               >
-                {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+                {isLoading ? "Iniciando sesión..." : "Iniciar Sesión"}
               </Button>
             </form>
 
@@ -112,8 +111,12 @@ const Login = () => {
             </div>
 
             <div className="mt-4 p-3 bg-secondary-50 dark:bg-secondary-800 rounded-lg text-xs text-secondary-600 dark:text-secondary-400">
-              <div><strong>Email:</strong> admin@aimec.com</div>
-              <div><strong>Contraseña:</strong> admin123</div>
+              <div>
+                <strong>Email:</strong> admin@aimec.com
+              </div>
+              <div>
+                <strong>Contraseña:</strong> admin123
+              </div>
             </div>
           </Card>
         </div>
@@ -122,4 +125,4 @@ const Login = () => {
   );
 };
 
-export default Login; 
+export default Login;

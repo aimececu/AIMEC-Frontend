@@ -17,58 +17,15 @@ const ProductCard = ({
     description,
     price,
     image,
-    rating,
     category,
     brand,
     series,
     stock,
     specifications,
-    accessories,
-    relatedProducts,
   } = product;
   const { addToCart, isInCart } = useCart();
 
-  const renderStars = (rating) => {
-    const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
 
-    for (let i = 0; i < fullStars; i++) {
-      stars.push(
-        <Icon
-          key={i}
-          name="FiStar"
-          size="sm"
-          className="text-yellow-400 fill-current"
-        />
-      );
-    }
-
-    if (hasHalfStar) {
-      stars.push(
-        <Icon
-          key="half"
-          name="FiStar"
-          size="sm"
-          className="text-yellow-400 fill-current"
-        />
-      );
-    }
-
-    const emptyStars = 5 - Math.ceil(rating);
-    for (let i = 0; i < emptyStars; i++) {
-      stars.push(
-        <Icon
-          key={`empty-${i}`}
-          name="FiStar"
-          size="sm"
-          className="text-secondary-300"
-        />
-      );
-    }
-
-    return stars;
-  };
 
   const handleAddToQuotation = (e) => {
     e.preventDefault();
@@ -87,13 +44,13 @@ const ProductCard = ({
         {...props}
       >
         <div className="flex">
-          {/* Product Image - Más pequeña en vista lista */}
-          <div className="relative w-32 h-32 flex-shrink-0 bg-secondary-100 dark:bg-secondary-700">
-            <ImageWithFallback
-              src={image}
-              alt={name}
-              className="w-full h-full object-cover"
-            />
+                     {/* Product Image - Más pequeña en vista lista */}
+           <div className="relative w-40 h-40 flex-shrink-0 bg-secondary-100 dark:bg-secondary-700">
+             <ImageWithFallback
+               src={image}
+               alt={name}
+               className="w-full h-full object-contain p-2"
+             />
             {showActions && (
               <div className="absolute top-2 right-2 flex flex-col gap-1">
                 <Link
@@ -151,15 +108,7 @@ const ProductCard = ({
                 </h3>
               </Link>
 
-              {/* Rating */}
-              {rating && (
-                <div className="flex items-center gap-1 mb-2">
-                  {renderStars(rating)}
-                  <span className="text-sm text-secondary-500 dark:text-secondary-400 ml-1">
-                    ({rating})
-                  </span>
-                </div>
-              )}
+
 
               {/* Description - Más espacio en vista lista */}
               <p className="text-sm text-secondary-600 dark:text-secondary-300 line-clamp-2 mb-2">
@@ -184,20 +133,17 @@ const ProductCard = ({
 
               {/* Quick Specs (if available) */}
               {showSpecs &&
-                specifications &&
-                Object.keys(specifications).length > 0 && (
+                specifications && Array.isArray(specifications) && specifications.length > 0 && (
                   <div className="mt-2 text-xs text-secondary-500 dark:text-secondary-400">
-                    {specifications.voltage && (
-                      <div>Voltaje: {specifications.voltage}</div>
-                    )}
-                    {specifications.current && (
-                      <div>Corriente: {specifications.current}</div>
-                    )}
-                    {specifications.power && (
-                      <div>Potencia: {specifications.power}</div>
-                    )}
-                    {specifications.temperature && (
-                      <div>Temperatura: {specifications.temperature}</div>
+                    {specifications.slice(0, 3).map((spec, index) => (
+                      <div key={index}>
+                        {spec.name}: {spec.value}
+                      </div>
+                    ))}
+                    {specifications.length > 3 && (
+                      <div className="text-secondary-500">
+                        +{specifications.length - 3} más...
+                      </div>
                     )}
                   </div>
                 )}
@@ -314,15 +260,7 @@ const ProductCard = ({
           </h3>
         </Link>
 
-        {/* Rating */}
-        {rating && (
-          <div className="flex items-center gap-1 mb-2">
-            {renderStars(rating)}
-            <span className="text-xs text-secondary-500 dark:text-secondary-400 ml-1">
-              ({rating})
-            </span>
-          </div>
-        )}
+
 
         {/* Description */}
         <p className="text-xs text-secondary-600 dark:text-secondary-300 mb-3 line-clamp-2 min-h-[2rem]">

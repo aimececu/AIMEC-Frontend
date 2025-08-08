@@ -53,12 +53,7 @@ export const siemensProducts = [
       }
     ],
     
-    // Productos relacionados (misma serie)
-    relatedProducts: [
-      'siemens-s7-1200-advanced',
-      'siemens-s7-1200-compact',
-      'siemens-s7-1200-safety'
-    ],
+
     
     // Información adicional
     features: [
@@ -118,11 +113,7 @@ export const siemensProducts = [
       }
     ],
     
-    relatedProducts: [
-      'siemens-s7-1200-basic',
-      'siemens-s7-1200-compact',
-      'siemens-s7-1500'
-    ],
+
     
     features: [
       'Profinet integrado',
@@ -187,11 +178,7 @@ export const siemensProducts = [
       }
     ],
     
-    relatedProducts: [
-      'siemens-kp1200-basic',
-      'siemens-kp900-comfort',
-      'siemens-kp1500-basic'
-    ],
+
     
     features: [
       'Interfaz intuitiva',
@@ -255,11 +242,7 @@ export const siemensProducts = [
       }
     ],
     
-    relatedProducts: [
-      'siemens-v90-servo',
-      'siemens-g120',
-      'siemens-g120c'
-    ],
+
     
     features: [
       'Control vectorial',
@@ -392,11 +375,7 @@ export const siemensProducts = [
       }
     ],
     
-    relatedProducts: [
-      'siemens-rotary-actuator',
-      'siemens-pneumatic-actuator',
-      'siemens-servo-motor'
-    ],
+
     
     features: [
       'Posicionamiento preciso',

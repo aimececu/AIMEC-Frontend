@@ -114,21 +114,7 @@ export const productService = {
         return null;
       }
 
-      // Encontrar productos relacionados
-      const relatedProducts = product.relatedProducts 
-        ? siemensProducts.filter(p => product.relatedProducts.includes(p.id))
-        : [];
-
-      return {
-        ...product,
-        relatedProducts: relatedProducts.map(p => ({
-          id: p.id,
-          name: p.name,
-          price: p.price,
-          main_image: p.image,
-          slug: p.id
-        }))
-      };
+      return product;
     } catch (error) {
       console.error('Error obteniendo producto:', error);
       throw error;

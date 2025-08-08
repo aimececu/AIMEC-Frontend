@@ -9,7 +9,7 @@ import {
   Input,
   ProductCard,
   ImageWithFallback,
-  Loader
+  Loader,
 } from "../../components/ui/components";
 import { useCart } from "../../context/CartContext";
 import { productEndpoints } from "../../api/endpoints/products.js";
@@ -32,13 +32,16 @@ const ProductDetail = () => {
         setLoading(true);
         const response = await productEndpoints.getProductById(id);
         if (response.success) {
-          setProduct(transformProduct(response.data));
+          const productResponse = transformProduct(response.data);
+          console.log(productResponse);
+          
+          setProduct(productResponse);
         } else {
-          setError('Producto no encontrado');
+          setError("Producto no encontrado");
         }
       } catch (error) {
-        console.error('Error cargando producto:', error);
-        setError('Error al cargar el producto');
+        console.error("Error cargando producto:", error);
+        setError("Error al cargar el producto");
       } finally {
         setLoading(false);
       }
@@ -54,10 +57,10 @@ const ProductDetail = () => {
       <div className="min-h-screen bg-secondary-50 dark:bg-secondary-900">
         <Container>
           <div className="py-16 text-center">
-            <Loader 
-              size="xl" 
-              variant="spinner" 
-              text="Cargando producto..." 
+            <Loader
+              size="xl"
+              variant="spinner"
+              text="Cargando producto..."
               className="mb-6"
             />
             <p className="text-secondary-600 dark:text-secondary-300">
@@ -81,11 +84,11 @@ const ProductDetail = () => {
               Producto no encontrado
             </Heading>
             <p className="text-secondary-600 dark:text-secondary-300 mb-8">
-              {error || 'El producto que buscas no existe o ha sido removido'}
+              {error || "El producto que buscas no existe o ha sido removido"}
             </p>
-            <Button as={Link} to="/catalogo">
+            <Button as={Link} to="/productos">
               <Icon name="FiArrowLeft" className="mr-2" />
-              Volver al Catálogo
+              Volver a Productos
             </Button>
           </div>
         </Container>
@@ -99,61 +102,24 @@ const ProductDetail = () => {
     price,
     originalPrice,
     image,
-    rating,
     category,
     brand,
     series,
     stock,
     specifications,
-    accessories,
-    relatedProducts,
     features,
     applications,
     certifications,
     warranty,
-    leadTime
+    leadTime,
   } = product;
+
 
   const handleAddToCart = () => {
     addToCart(product, quantity);
   };
 
-  const renderStars = (rating) => {
-    const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
 
-    for (let i = 0; i < fullStars; i++) {
-      stars.push(
-        <Icon key={i} name="FiStar" size="sm" className="text-yellow-400 fill-current" />
-      );
-    }
-
-    if (hasHalfStar) {
-      stars.push(
-        <Icon key="half" name="FiStar" size="sm" className="text-yellow-400 fill-current" />
-      );
-    }
-
-    const emptyStars = 5 - Math.ceil(rating);
-    for (let i = 0; i < emptyStars; i++) {
-      stars.push(
-        <Icon key={`empty-${i}`} name="FiStar" size="sm" className="text-secondary-300" />
-      );
-    }
-
-    return stars;
-  };
-
-  // Obtener productos relacionados
-  const getRelatedProducts = () => {
-    if (!relatedProducts) return [];
-    // Por ahora retornamos un array vacío ya que necesitaríamos un endpoint específico
-    // para productos relacionados o cargar todos los productos
-    return [];
-  };
-
-  const relatedProductsList = getRelatedProducts();
 
   return (
     <div className="min-h-screen bg-secondary-50 dark:bg-secondary-900">
@@ -163,7 +129,10 @@ const ProductDetail = () => {
           <nav className="mb-6">
             <ol className="flex items-center space-x-2 text-sm text-secondary-600 dark:text-secondary-400">
               <li>
-                <Link to="/" className="hover:text-primary-600 dark:hover:text-primary-400">
+                <Link
+                  to="/"
+                  className="hover:text-primary-600 dark:hover:text-primary-400"
+                >
                   Inicio
                 </Link>
               </li>
@@ -171,8 +140,11 @@ const ProductDetail = () => {
                 <Icon name="FiChevronRight" size="sm" />
               </li>
               <li>
-                <Link to="/catalogo" className="hover:text-primary-600 dark:hover:text-primary-400">
-                  Catálogo
+                <Link
+                  to="/productos"
+                  className="hover:text-primary-600 dark:hover:text-primary-400"
+                >
+                  Productos
                 </Link>
               </li>
               <li>
@@ -219,16 +191,6 @@ const ProductDetail = () => {
                 {name}
               </Heading>
 
-              {/* Rating */}
-              {rating && (
-                <div className="flex items-center gap-2">
-                  {renderStars(rating)}
-                  <span className="text-secondary-600 dark:text-secondary-300">
-                    ({rating})
-                  </span>
-                </div>
-              )}
-
               {/* Price */}
               <div className="flex items-baseline gap-3">
                 <span className="text-3xl font-bold text-primary-600 dark:text-primary-400">
@@ -243,15 +205,17 @@ const ProductDetail = () => {
 
               {/* Stock Status */}
               <div className="flex items-center gap-2">
-                <span className={clsx(
-                  "text-sm px-3 py-1 rounded-full",
-                  stock > 10 
-                    ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                    : stock > 0
-                    ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
-                    : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
-                )}>
-                  {stock > 0 ? `${stock} unidades en stock` : 'Sin stock'}
+                <span
+                  className={clsx(
+                    "text-sm px-3 py-1 rounded-full",
+                    stock > 10
+                      ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+                      : stock > 0
+                      ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
+                      : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
+                  )}
+                >
+                  {stock > 0 ? `${stock} unidades en stock` : "Sin stock"}
                 </span>
                 {leadTime && (
                   <span className="text-sm text-secondary-600 dark:text-secondary-400">
@@ -278,7 +242,9 @@ const ProductDetail = () => {
                     <Input
                       type="number"
                       value={quantity}
-                      onChange={(value) => setQuantity(Math.max(1, parseInt(value) || 1))}
+                      onChange={(value) =>
+                        setQuantity(Math.max(1, parseInt(value) || 1))
+                      }
                       className="w-20 text-center border-0"
                       min="1"
                     />
@@ -300,32 +266,72 @@ const ProductDetail = () => {
                     isInCart(product.id) && "bg-green-600 hover:bg-green-700"
                   )}
                 >
-                  <Icon 
-                    name={isInCart(product.id) ? "FiCheck" : "FiShoppingCart"} 
-                    className="mr-2" 
+                  <Icon
+                    name={isInCart(product.id) ? "FiCheck" : "FiShoppingCart"}
+                    className="mr-2"
                   />
-                  {isInCart(product.id) ? "Agregado a Cotización" : "Agregar a Cotización"}
+                  {isInCart(product.id)
+                    ? "Agregado a Cotización"
+                    : "Agregar a Cotización"}
                 </Button>
-              </div>
 
-              {/* Quick Info */}
-              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-secondary-200 dark:border-secondary-700">
-                {warranty && (
-                  <div className="text-center">
-                    <Icon name="FiShield" className="mx-auto mb-1 text-primary-600" />
-                    <div className="text-sm font-medium">Garantía</div>
-                    <div className="text-xs text-secondary-600 dark:text-secondary-400">{warranty}</div>
-                  </div>
-                )}
-                {certifications && certifications.length > 0 && (
-                  <div className="text-center">
-                    <Icon name="FiAward" className="mx-auto mb-1 text-primary-600" />
-                    <div className="text-sm font-medium">Certificaciones</div>
-                    <div className="text-xs text-secondary-600 dark:text-secondary-400">
-                      {certifications.join(', ')}
-                    </div>
-                  </div>
-                )}
+                {/* Cotización Directa */}
+                <div className="grid grid-cols-2 gap-3">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => {
+                      const subject = encodeURIComponent(`Cotización: ${name}`);
+                      const body =
+                        encodeURIComponent(`Hola, me interesa cotizar el siguiente producto:
+                          Producto: ${name}
+                          Marca: ${brand}
+                          Categoría: ${category}
+                          ${series ? `Serie: ${series}` : ""}
+                          Precio: $${price.toFixed(2)}
+                          Cantidad: ${quantity}
+
+                          Por favor, envíenme más información sobre disponibilidad y condiciones de entrega.
+
+                          Saludos cordiales.`);
+                      window.open(
+                        `mailto:ventas@aimec.com?subject=${subject}&body=${body}`,
+                        "_blank"
+                      );
+                    }}
+                    className="flex items-center justify-center gap-2"
+                  >
+                    <Icon name="FiMail" size="sm" />
+                    Cotizar por Email
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => {
+                      const message =
+                        encodeURIComponent(`Hola, me interesa cotizar el siguiente producto:
+                          *${name}*
+                          • Marca: ${brand}
+                          • Categoría: ${category}
+                          ${series ? `• Serie: ${series}` : ""}
+                          • Precio: $${price.toFixed(2)}
+                          • Cantidad: ${quantity}
+
+                          ¿Podrían enviarme más información sobre disponibilidad y condiciones de entrega?
+
+                          Gracias.`);
+                      window.open(
+                        `https://wa.me/51999999999?text=${message}`,
+                        "_blank"
+                      );
+                    }}
+                    className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white border-green-600 hover:border-green-700"
+                  >
+                    <Icon name="FiMessageCircle" size="sm" />
+                    Cotizar por WhatsApp
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -334,7 +340,12 @@ const ProductDetail = () => {
           <Card className="mb-8">
             <div className="border-b border-secondary-200 dark:border-secondary-700">
               <nav className="flex space-x-8">
-                {['description', 'specifications', 'features', 'applications'].map((tab) => (
+                {[
+                  "description",
+                  "specifications",
+                  "features",
+                  "applications",
+                ].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
@@ -345,17 +356,17 @@ const ProductDetail = () => {
                         : "border-transparent text-secondary-500 dark:text-secondary-400 hover:text-secondary-700 dark:hover:text-secondary-300"
                     )}
                   >
-                    {tab === 'description' && 'Descripción'}
-                    {tab === 'specifications' && 'Especificaciones'}
-                    {tab === 'features' && 'Características'}
-                    {tab === 'applications' && 'Aplicaciones'}
+                    {tab === "description" && "Descripción"}
+                    {tab === "specifications" && "Especificaciones"}
+                    {tab === "features" && "Características"}
+                    {tab === "applications" && "Aplicaciones"}
                   </button>
                 ))}
               </nav>
             </div>
 
             <div className="p-6">
-              {activeTab === 'description' && (
+              {activeTab === "description" && (
                 <div className="prose dark:prose-invert max-w-none">
                   <p className="text-secondary-600 dark:text-secondary-300 leading-relaxed">
                     {description}
@@ -363,12 +374,15 @@ const ProductDetail = () => {
                 </div>
               )}
 
-              {activeTab === 'specifications' && specifications && (
+              {activeTab === "specifications" && specifications && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {Object.entries(specifications).map(([key, value]) => (
-                    <div key={key} className="flex justify-between py-2 border-b border-secondary-100 dark:border-secondary-700">
+                    <div
+                      key={key}
+                      className="flex justify-between py-2 border-b border-secondary-100 dark:border-secondary-700"
+                    >
                       <span className="font-medium text-secondary-700 dark:text-secondary-300 capitalize">
-                        {key.replace(/([A-Z])/g, ' $1').trim()}:
+                        {key.replace(/([A-Z])/g, " $1").trim()}:
                       </span>
                       <span className="text-secondary-600 dark:text-secondary-400">
                         {value}
@@ -378,23 +392,35 @@ const ProductDetail = () => {
                 </div>
               )}
 
-              {activeTab === 'features' && features && (
+              {activeTab === "features" && features && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {features.map((feature, index) => (
                     <div key={index} className="flex items-center gap-2">
-                      <Icon name="FiCheck" className="text-green-600" size="sm" />
-                      <span className="text-secondary-700 dark:text-secondary-300">{feature}</span>
+                      <Icon
+                        name="FiCheck"
+                        className="text-green-600"
+                        size="sm"
+                      />
+                      <span className="text-secondary-700 dark:text-secondary-300">
+                        {feature}
+                      </span>
                     </div>
                   ))}
                 </div>
               )}
 
-              {activeTab === 'applications' && applications && (
+              {activeTab === "applications" && applications && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {applications.map((application, index) => (
                     <div key={index} className="flex items-center gap-2">
-                      <Icon name="FiTarget" className="text-blue-600" size="sm" />
-                      <span className="text-secondary-700 dark:text-secondary-300">{application}</span>
+                      <Icon
+                        name="FiTarget"
+                        className="text-blue-600"
+                        size="sm"
+                      />
+                      <span className="text-secondary-700 dark:text-secondary-300">
+                        {application}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -402,64 +428,11 @@ const ProductDetail = () => {
             </div>
           </Card>
 
-          {/* Accessories */}
-          {accessories && accessories.length > 0 && (
-            <div className="mb-8">
-              <Heading level={2} className="mb-6">
-                Accesorios Disponibles
-              </Heading>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {accessories.map((accessory) => (
-                  <Card key={accessory.id} className="p-4">
-                    <div className="aspect-square bg-secondary-100 dark:bg-secondary-700 rounded-lg mb-3">
-                      <ImageWithFallback
-                        src={accessory.image}
-                        alt={accessory.name}
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                    </div>
-                    <h4 className="font-semibold text-secondary-900 dark:text-white mb-1 line-clamp-2">
-                      {accessory.name}
-                    </h4>
-                    <p className="text-sm text-secondary-600 dark:text-secondary-300 mb-3 line-clamp-2">
-                      {accessory.description}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-primary-600 dark:text-primary-400">
-                        ${accessory.price.toFixed(2)}
-                      </span>
-                      <Button size="sm" variant="outline">
-                        <Icon name="FiPlus" size="sm" className="mr-1" />
-                        Agregar
-                      </Button>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          )}
 
-          {/* Related Products */}
-          {relatedProductsList.length > 0 && (
-            <div>
-              <Heading level={2} className="mb-6">
-                Productos Relacionados
-              </Heading>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {relatedProductsList.map((relatedProduct) => (
-                  <ProductCard
-                    key={relatedProduct.id}
-                    product={relatedProduct}
-                    showActions={true}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </Container>
     </div>
   );
 };
 
-export default ProductDetail; 
+export default ProductDetail;

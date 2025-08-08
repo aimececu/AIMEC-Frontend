@@ -1,137 +1,203 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { 
-  Button, 
-  Card, 
-  Container, 
-  Heading, 
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  Button,
+  Card,
+  Container,
+  Heading,
+  HeroSlider,
   Icon,
-  Input, 
-  Section, 
-  TextArea 
-} from '../../components/ui/components';
+  Input,
+  Section,
+  TextArea,
+} from "../../components/ui/components";
 
 const Home = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    company: '',
-    message: ''
+    name: "",
+    email: "",
+    phone: "",
+    company: "",
+    message: "",
   });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     // Aquí puedes agregar la lógica para enviar el formulario
-    console.log('Formulario enviado:', formData);
+    console.log("Formulario enviado:", formData);
     // Resetear formulario
     setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      company: '',
-      message: ''
+      name: "",
+      email: "",
+      phone: "",
+      company: "",
+      message: "",
     });
-    alert('¡Gracias por tu mensaje! Te contactaremos pronto.');
+    alert("¡Gracias por tu mensaje! Te contactaremos pronto.");
   };
 
   const handleWhatsApp = () => {
-    const message = encodeURIComponent('Hola, me interesa conocer más sobre sus servicios de componentes industriales.');
-    const phone = '1234567890'; // Reemplaza con tu número de WhatsApp
-    window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+    const message = encodeURIComponent(
+      "Hola, me interesa conocer más sobre sus servicios de componentes industriales."
+    );
+    const phone = "1234567890"; // Reemplaza con tu número de WhatsApp
+    window.open(`https://wa.me/${phone}?text=${message}`, "_blank");
   };
 
   const features = [
     {
       icon: <Icon name="FiTool" size="xl" />,
-      title: 'Instalación Profesional',
-      description: 'Equipo técnico especializado en instalación de componentes industriales con años de experiencia.'
+      title: "Instalación Profesional",
+      description:
+        "Equipo técnico especializado en instalación de componentes industriales con años de experiencia.",
     },
     {
       icon: <Icon name="FiUsers" size="xl" />,
-      title: 'Soporte Técnico',
-      description: 'Asistencia técnica 24/7 para resolver cualquier problema con nuestros productos y servicios.'
+      title: "Soporte Técnico",
+      description:
+        "Asistencia técnica 24/7 para resolver cualquier problema con nuestros productos y servicios.",
     },
     {
       icon: <Icon name="FiTruck" size="xl" />,
-      title: 'Entrega Rápida',
-      description: 'Envío rápido y seguro a cualquier parte del país con seguimiento en tiempo real.'
+      title: "Entrega Rápida",
+      description:
+        "Envío rápido y seguro a cualquier parte del país con seguimiento en tiempo real.",
     },
     {
       icon: <Icon name="FiAward" size="xl" />,
-      title: 'Calidad Garantizada',
-      description: 'Todos nuestros productos cuentan con garantía y certificaciones de calidad internacional.'
+      title: "Calidad Garantizada",
+      description:
+        "Todos nuestros productos cuentan con garantía y certificaciones de calidad internacional.",
+    },
+  ];
+
+  const heroSlides = [
+    {
+      title: "Componentes Industriales",
+      subtitle: "de Alta Calidad",
+      description: "Especialistas en instalación y programación de componentes industriales. Soluciones tecnológicas avanzadas para el sector industrial.",
+      backgroundImage: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+      overlay: "bg-gradient-to-r from-primary-600/80 to-primary-700/80",
+      buttons: [
+                 {
+           text: "Ver Productos",
+           variant: "white",
+           size: "lg",
+           link: "/productos"
+         },
+        
+      ]
+    },
+    {
+      title: "Instalación y Programación",
+      subtitle: "Especialistas en Componentes",
+      description: "Instalamos y programamos componentes industriales con precisión técnica. Desde PLCs hasta variadores de frecuencia, garantizamos un funcionamiento óptimo.",
+      backgroundImage: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+      overlay: "bg-gradient-to-r from-blue-600/80 to-blue-800/80",
+      layout: "split", // Layout dividido
+      internalImage: "https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+      imagePosition: "left", // Imagen a la izquierda
+      buttons: [
+        {
+          text: "Servicios Técnicos",
+          variant: "white",
+          size: "lg",
+          link: "/servicios"
+        },
+        {
+          text: "Solicitar Cotización",
+          variant: "outline",
+          size: "lg",
+          link: "/contacto",
+          className: "!border-white !text-white hover:!bg-white hover:!text-blue-600"
+        }
+      ]
+    },
+    {
+      title: "Siemens",
+      subtitle: "Tecnología de Vanguardia",
+      description: "Distribuidor autorizado de productos Siemens. PLCs, variadores de frecuencia, HMI y más componentes industriales de la más alta calidad.",
+      backgroundImage: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+      overlay: "bg-gradient-to-r from-blue-600/80 to-blue-800/80",
+      layout: "split", // Layout dividido
+      internalImage: "https://automaq.pe/w_files/img/producto/6sl3225_0be31_5ua0hd_1595563351.jpg",
+      imagePosition: "left", // Imagen a la izquierda
+      internalImageClassName: "max-h-64 md:max-h-96 lg:max-h-[500px] rounded-lg shadow-2xl",
+      buttons: [
+        {
+          text: "Ver Productos Siemens",
+          variant: "white",
+          size: "lg",
+          link: "/productos/siemens"
+        },
+        {
+          text: "Solicitar Cotización",
+          variant: "outline",
+          size: "lg",
+          link: "/contacto",
+          className: "!border-white !text-white hover:!bg-white hover:!text-blue-600"
+        }
+      ]
     }
   ];
 
-  const testimonials = [
+  const brands = [
     {
-      name: 'Carlos Rodríguez',
-      company: 'Industrias ABC',
-      rating: 5,
-      comment: 'Excelente servicio técnico y productos de alta calidad. Muy recomendados.'
+      name: "Siemens",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Siemens_logo.svg/2560px-Siemens_logo.svg.png",
+      category: "Automatización Industrial",
     },
     {
-      name: 'María González',
-      company: 'Fábrica XYZ',
-      rating: 5,
-      comment: 'La instalación fue perfecta y el soporte post-venta es excepcional.'
+      name: "Allen Bradley",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Rockwell_Automation_logo.svg/2560px-Rockwell_Automation_logo.svg.png",
+      category: "Control Industrial",
     },
     {
-      name: 'Juan Pérez',
-      company: 'Manufactura 123',
-      rating: 5,
-      comment: 'Productos confiables y equipo técnico muy profesional.'
-    }
+      name: "Schneider Electric",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Schneider_Electric_2007.svg/2560px-Schneider_Electric_2007.svg.png",
+      category: "Electrónica Industrial",
+    },
+    {
+      name: "Omron",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Omron_logo.svg/2560px-Omron_logo.svg.png",
+      category: "Sensores y Control",
+    },
+    {
+      name: "Mitsubishi",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Mitsubishi_logo.svg/2560px-Mitsubishi_logo.svg.png",
+      category: "Automatización",
+    },
+    {
+      name: "ABB",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/ABB_logo.svg/2560px-ABB_logo.svg.png",
+      category: "Tecnología Industrial",
+    },
   ];
-
-  const renderStars = (rating) => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <Icon 
-        key={i} 
-        name="FiStar"
-        size="sm"
-        className={i < rating ? 'text-yellow-400 fill-current' : 'text-secondary-300'}
-      />
-    ));
-  };
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <Section 
-        background="primary" 
-        padding="xl"
-        className="bg-gradient-to-r from-primary-600 to-primary-700"
+      {/* Hero Slider Section */}
+      <Section
+        background="primary"
+        padding="none"
+        className="h-[calc(100vh-4rem)] min-h-[536px]"
       >
-        <Container>
-          <div className="text-center">
-            <Heading level={1} className="mb-6 text-white">
-              Componentes Industriales
-              <span className="block text-primary-200">de Alta Calidad</span>
-            </Heading>
-            <p className="text-xl md:text-2xl mb-8 text-primary-100 max-w-3xl mx-auto">
-              Especialistas en instalación y programación de componentes industriales. 
-              Soluciones tecnológicas avanzadas para el sector industrial.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="white" size="lg" as={Link} to="/catalogo">
-                Ver Catálogo
-              </Button>
-              <Button variant="outline" size="lg" as={Link} to="/admin" className="border-white text-white hover:bg-white hover:text-primary-600">
-                Administración
-              </Button>
-            </div>
-          </div>
-        </Container>
+        <HeroSlider 
+          slides={heroSlides}
+          autoPlay={true}
+          interval={6000}
+          showArrows={true}
+          showDots={true}
+          className="h-full justify-center"
+        />
       </Section>
 
       {/* Features Section */}
@@ -142,13 +208,14 @@ const Home = () => {
               ¿Por qué elegirnos?
             </Heading>
             <p className="text-lg text-secondary-600 dark:text-secondary-300 max-w-2xl mx-auto">
-              Ofrecemos soluciones integrales con la más alta calidad y servicio técnico especializado.
+              Ofrecemos soluciones integrales con la más alta calidad y servicio
+              técnico especializado.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
-              <Card 
+              <Card
                 key={index}
                 variant="light"
                 padding="lg"
@@ -170,40 +237,42 @@ const Home = () => {
         </Container>
       </Section>
 
-      {/* Testimonials Section */}
-      <Section background="light">
-        <Container>
-          <div className="text-center mb-12">
-            <Heading level={2} className="mb-4">
-              Lo que dicen nuestros clientes
-            </Heading>
-            <p className="text-lg text-secondary-600 dark:text-secondary-300">
-              Testimonios de empresas que confían en nuestros servicios
-            </p>
-          </div>
+                                                       {/* Brands Section */}
+         <Section background="light">
+           <Container>
+             <div className="text-center mb-12">
+               <Heading level={2} className="mb-4">
+                 Marcas de Confianza
+               </Heading>
+               <p className="text-lg text-secondary-600 dark:text-secondary-300 max-w-3xl mx-auto">
+                 Distribuidores autorizados de las marcas líderes en automatización industrial
+               </p>
+             </div>
+
+                           {/* Simple Brands Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 mb-8">
+                {brands.map((brand, index) => (
+                  <div
+                    key={index}
+                    className="group flex flex-col items-center justify-center p-4 hover:shadow-lg transition-all duration-300"
+                  >
+                    <div className="w-16 h-16 mb-3 flex items-center justify-center">
+                      <img
+                        src={brand.logo}
+                        alt={`${brand.name} logo`}
+                        className="max-w-full max-h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
+                      />
+                    </div>
+                    <h3 className="font-medium text-secondary-900 dark:text-white text-sm text-center">
+                      {brand.name}
+                    </h3>
+                  </div>
+                ))}
+              </div>
+
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} padding="lg">
-                <div className="flex mb-4">
-                  {renderStars(testimonial.rating)}
-                </div>
-                <p className="text-secondary-600 dark:text-secondary-300 mb-4 italic">
-                  "{testimonial.comment}"
-                </p>
-                <div>
-                  <p className="font-semibold text-secondary-900 dark:text-white">
-                    {testimonial.name}
-                  </p>
-                  <p className="text-sm text-secondary-500 dark:text-secondary-400">
-                    {testimonial.company}
-                  </p>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </Container>
-      </Section>
+           </Container>
+         </Section>
 
       {/* CTA Section */}
       <Section background="primary">
@@ -213,16 +282,12 @@ const Home = () => {
               ¿Listo para comenzar?
             </Heading>
             <p className="text-xl mb-8 text-primary-100 max-w-2xl mx-auto">
-              Descubre nuestra amplia gama de componentes industriales y servicios técnicos especializados.
+              Descubre nuestra amplia gama de componentes industriales y
+              servicios técnicos especializados.
             </p>
-            <Button 
-              variant="white" 
-              size="lg" 
-              as={Link} 
-              to="/catalogo"
-            >
-              Explorar Productos
-            </Button>
+                         <Button variant="white" size="lg" as={Link} to="/productos">
+               Explorar Productos
+             </Button>
           </div>
         </Container>
       </Section>
@@ -235,7 +300,8 @@ const Home = () => {
               Contáctanos
             </Heading>
             <p className="text-lg text-secondary-600 dark:text-secondary-300 max-w-2xl mx-auto">
-              ¿Tienes alguna pregunta? Estamos aquí para ayudarte. Envíanos un mensaje o contáctanos directamente.
+              ¿Tienes alguna pregunta? Estamos aquí para ayudarte. Envíanos un
+              mensaje o contáctanos directamente.
             </p>
           </div>
 
@@ -306,8 +372,15 @@ const Home = () => {
             {/* Contact Info & WhatsApp */}
             <div className="space-y-8">
               {/* Contact Information */}
-              <Card variant="light" padding="xl" className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-                <Heading level={3} className="mb-6 text-blue-900 dark:text-blue-100">
+              <Card
+                variant="light"
+                padding="xl"
+                className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800"
+              >
+                <Heading
+                  level={3}
+                  className="mb-6 text-blue-900 dark:text-blue-100"
+                >
                   Información de contacto
                 </Heading>
                 <div className="space-y-4">
@@ -316,8 +389,12 @@ const Home = () => {
                       <Icon name="FiMail" className="text-white" />
                     </div>
                     <div>
-                      <p className="font-medium text-blue-900 dark:text-blue-100">Email</p>
-                      <p className="text-blue-700 dark:text-blue-300">info@aimec.com</p>
+                      <p className="font-medium text-blue-900 dark:text-blue-100">
+                        Email
+                      </p>
+                      <p className="text-blue-700 dark:text-blue-300">
+                        info@aimec.com
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-4">
@@ -325,8 +402,12 @@ const Home = () => {
                       <Icon name="FiPhone" className="text-white" />
                     </div>
                     <div>
-                      <p className="font-medium text-blue-900 dark:text-blue-100">Teléfono</p>
-                      <p className="text-blue-700 dark:text-blue-300">+1 234 567 890</p>
+                      <p className="font-medium text-blue-900 dark:text-blue-100">
+                        Teléfono
+                      </p>
+                      <p className="text-blue-700 dark:text-blue-300">
+                        +1 234 567 890
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-4">
@@ -334,9 +415,12 @@ const Home = () => {
                       <Icon name="FiMapPin" className="text-white" />
                     </div>
                     <div>
-                      <p className="font-medium text-blue-900 dark:text-blue-100">Dirección</p>
+                      <p className="font-medium text-blue-900 dark:text-blue-100">
+                        Dirección
+                      </p>
                       <p className="text-blue-700 dark:text-blue-300">
-                        Ciudad Industrial, País<br />
+                        Ciudad Industrial, País
+                        <br />
                         Zona Industrial Norte
                       </p>
                     </div>
@@ -346,11 +430,15 @@ const Home = () => {
 
               {/* WhatsApp Button */}
               <Card variant="success" padding="xl">
-                <Heading level={3} className="mb-4 text-green-800 dark:text-green-200">
+                <Heading
+                  level={3}
+                  className="mb-4 text-green-800 dark:text-green-200"
+                >
                   ¿Necesitas respuesta rápida?
                 </Heading>
                 <p className="text-green-700 dark:text-green-300 mb-6">
-                  Contáctanos por WhatsApp para obtener una respuesta inmediata a tus consultas.
+                  Contáctanos por WhatsApp para obtener una respuesta inmediata
+                  a tus consultas.
                 </p>
                 <Button
                   variant="whatsapp"
@@ -394,4 +482,4 @@ const Home = () => {
   );
 };
 
-export default Home; 
+export default Home;

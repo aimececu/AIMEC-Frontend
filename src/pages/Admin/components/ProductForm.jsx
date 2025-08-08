@@ -6,6 +6,7 @@ import {
   TextArea,
   Button,
   Heading,
+  Icon,
 } from "../../../components/ui/components";
 
 const ProductForm = ({
@@ -49,6 +50,11 @@ const ProductForm = ({
             {[
               { id: "basic", label: "Básico", icon: "FiFileText" },
               { id: "technical", label: "Técnico", icon: "FiSettings" },
+              {
+                id: "specifications",
+                label: "Especificaciones",
+                icon: "FiList",
+              },
               { id: "media", label: "Multimedia", icon: "FiImage" },
               { id: "seo", label: "SEO", icon: "FiSearch" },
             ].map((tab) => (
@@ -110,6 +116,16 @@ const ProductForm = ({
                     placeholder="0"
                     required
                   />
+
+                  {/* Precio Original */}
+                  <Input
+                    label="Precio Original"
+                    type="number"
+                    step="0.01"
+                    value={productForm.original_price}
+                    onChange={(value) => handleFormChange("original_price", value)}
+                    placeholder="0.00"
+                  />
                   {/* Marca */}
                   <Select
                     label="Marca"
@@ -150,6 +166,24 @@ const ProductForm = ({
                     placeholder="Serie del producto"
                   />
 
+                  {/* Garantía (meses) */}
+                  <Input
+                    label="Garantía (meses)"
+                    type="number"
+                    value={productForm.warranty_months}
+                    onChange={(value) => handleFormChange("warranty_months", value)}
+                    placeholder="0"
+                  />
+
+                  {/* Tiempo de Entrega (días) */}
+                  <Input
+                    label="Tiempo de Entrega (días)"
+                    type="number"
+                    value={productForm.lead_time_days}
+                    onChange={(value) => handleFormChange("lead_time_days", value)}
+                    placeholder="0"
+                  />
+
                   {/* Estado */}
                   <div>
                     <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
@@ -166,16 +200,42 @@ const ProductForm = ({
                       ]}
                     />
                   </div>
+
+                  {/* Destacado */}
+                  <div>
+                    <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                      Destacado
+                    </label>
+                    <Select
+                      value={productForm.is_featured ? "true" : "false"}
+                      onChange={(value) =>
+                        handleFormChange("is_featured", value === "true")
+                      }
+                      options={[
+                        { label: "Sí", value: "true" },
+                        { label: "No", value: "false" },
+                      ]}
+                    />
+                  </div>
                 </div>
 
-                {/* Descripción */}
-                <TextArea
-                  label="Descripción"
-                  value={productForm.description}
-                  onChange={(value) => handleFormChange("description", value)}
-                  placeholder="Descripción detallada del producto..."
-                  rows={4}
-                />
+                                  {/* Descripción */}
+                  <TextArea
+                    label="Descripción"
+                    value={productForm.description}
+                    onChange={(value) => handleFormChange("description", value)}
+                    placeholder="Descripción detallada del producto..."
+                    rows={4}
+                  />
+
+                  {/* Descripción Corta */}
+                  <TextArea
+                    label="Descripción Corta"
+                    value={productForm.short_description}
+                    onChange={(value) => handleFormChange("short_description", value)}
+                    placeholder="Descripción breve del producto..."
+                    rows={2}
+                  />
               </div>
             )}
 
@@ -253,6 +313,111 @@ const ProductForm = ({
                     onChange={(value) => handleFormChange("color", value)}
                     placeholder="Color del producto"
                   />
+
+                  {/* País de Origen */}
+                  <Input
+                    label="País de Origen"
+                    value={productForm.country_of_origin}
+                    onChange={(value) => handleFormChange("country_of_origin", value)}
+                    placeholder="País de origen"
+                  />
+
+                  {/* Cumplimiento */}
+                  <TextArea
+                    label="Cumplimiento y Certificaciones"
+                    value={productForm.compliance}
+                    onChange={(value) => handleFormChange("compliance", value)}
+                    placeholder="Certificaciones y cumplimiento..."
+                    rows={3}
+                  />
+                </div>
+              </div>
+            )}
+
+            {activeFormTab === "specifications" && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold text-secondary-900 dark:text-white">
+                    Especificaciones del Producto
+                  </h3>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                                          onClick={() => {
+                        const newSpecs = [
+                          ...(Array.isArray(productForm.specifications) ? productForm.specifications : []),
+                          { name: "", value: "" },
+                        ];
+                        handleFormChange("specifications", newSpecs);
+                      }}
+                    className="flex items-center gap-2"
+                  >
+                    <Icon name="FiPlus" size="sm" />
+                    Agregar Especificación
+                  </Button>
+                </div>
+
+                <div className="space-y-4">
+                  {(Array.isArray(productForm.specifications) ? productForm.specifications : []).map((spec, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-4 p-4 border border-secondary-200 dark:border-secondary-700 rounded-lg"
+                    >
+                      <div className="flex-1">
+                        <Input
+                          label="Nombre"
+                          value={spec.name}
+                          onChange={(value) => {
+                            const newSpecs = [
+                              ...(Array.isArray(productForm.specifications) ? productForm.specifications : []),
+                            ];
+                            newSpecs[index] = { ...spec, name: value };
+                            handleFormChange("specifications", newSpecs);
+                          }}
+                          placeholder="Ej: Potencia, Voltaje, Dimensiones..."
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <Input
+                          label="Valor"
+                          value={spec.value}
+                          onChange={(value) => {
+                            const newSpecs = [
+                              ...(Array.isArray(productForm.specifications) ? productForm.specifications : []),
+                            ];
+                            newSpecs[index] = { ...spec, value: value };
+                            handleFormChange("specifications", newSpecs);
+                          }}
+                          placeholder="Ej: 100W, 220V, 10x5x2cm..."
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const newSpecs = (
+                            Array.isArray(productForm.specifications) ? productForm.specifications : []
+                          ).filter((_, i) => i !== index);
+                          handleFormChange("specifications", newSpecs);
+                        }}
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                      >
+                        <Icon name="FiTrash2" size="sm" />
+                      </Button>
+                    </div>
+                  ))}
+
+                  {(Array.isArray(productForm.specifications) ? productForm.specifications : []).length === 0 && (
+                    <div className="text-center py-8 text-secondary-500 dark:text-secondary-400">
+                      <Icon name="FiList" className="text-4xl mx-auto mb-4" />
+                      <p>No hay especificaciones configuradas</p>
+                      <p className="text-sm">
+                        Haz clic en "Agregar Especificación" para comenzar
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -277,6 +442,20 @@ const ProductForm = ({
                   }
                   placeholder="https://ejemplo.com/imagen1.jpg, https://ejemplo.com/imagen2.jpg"
                   rows={3}
+                />
+
+                <Input
+                  label="URL del Manual"
+                  value={productForm.manual_url}
+                  onChange={(value) => handleFormChange("manual_url", value)}
+                  placeholder="URL del manual de usuario"
+                />
+
+                <Input
+                  label="URL de la Hoja de Datos"
+                  value={productForm.datasheet_url}
+                  onChange={(value) => handleFormChange("datasheet_url", value)}
+                  placeholder="URL de la hoja de datos técnica"
                 />
               </div>
             )}

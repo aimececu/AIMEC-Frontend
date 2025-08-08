@@ -22,47 +22,6 @@ body {
   padding: 0;
 }
 
-/* Typography */
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 600;
-  line-height: 1.2;
-  margin-bottom: 0.5rem;
-}
-
-h1 { font-size: 1.5rem; }
-h2 { font-size: 1.25rem; }
-h3 { font-size: 1.125rem; }
-
-p {
-  margin-bottom: 0.5rem;
-}
-
-/* Links */
-a {
-  color: #2563eb;
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-a:hover {
-  color: #1d4ed8;
-}
-
-/* Buttons */
-button {
-  font-family: inherit;
-  cursor: pointer;
-  border: none;
-  outline: none;
-  background: transparent;
-}
-
-/* Form elements */
-input, textarea, select {
-  font-family: inherit;
-  font-size: inherit;
-}
-
 /* Lists */
 ul, ol {
   list-style: none;

@@ -14,7 +14,7 @@ const Navbar = () => {
 
   const navItems = [
     { path: '/', label: 'Inicio' },
-    { path: '/catalogo', label: 'Catálogo' },
+    { path: '/productos', label: 'Productos' },
   ];
 
   // Agregar enlace de administración solo si está autenticado

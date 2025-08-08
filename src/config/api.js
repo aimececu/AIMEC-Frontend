@@ -8,7 +8,7 @@ export const API_CONFIG = {
   BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:3750/api',
   
   // Timeout para las peticiones (en milisegundos)
-  TIMEOUT: 10000,
+  TIMEOUT: 30000, // Aumentado el timeout
   
   // Configuración de reintentos
   RETRY_ATTEMPTS: 3,
@@ -25,12 +25,13 @@ export const API_CONFIG = {
 export const ENDPOINTS = {
   // Autenticación
   AUTH: {
-    LOGIN: '/auth/login',
-    LOGOUT: '/auth/logout',
-    VERIFY: '/auth/verify',
-    REGISTER: '/auth/register',
-    REGISTER_INITIAL: '/auth/register-initial',
-    PROFILE: '/auth/profile'
+    LOGIN: '/api/auth/login',
+    LOGOUT: '/api/auth/logout',
+    VERIFY: '/api/auth/verify',
+    CHECK_SESSION: '/api/auth/check-session',
+    PROFILE: '/api/auth/profile',
+    REGISTER: '/api/auth/register',
+    REGISTER_INITIAL: '/api/auth/register-initial'
   },
   
   // Productos

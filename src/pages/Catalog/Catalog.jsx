@@ -21,6 +21,7 @@ const Catalog = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedSubcategory, setSelectedSubcategory] = useState("all");
   const [selectedSeries, setSelectedSeries] = useState("all");
+  const [selectedBrand, setSelectedBrand] = useState("all");
   const [viewMode, setViewMode] = useState("grid"); // 'grid' o 'list'
   const [sortOption, setSortOption] = useState("default");
   const [products, setProducts] = useState([]);
@@ -90,11 +91,12 @@ const Catalog = () => {
         product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.series?.toLowerCase().includes(searchTerm.toLowerCase());
       
-      const matchesCategory = selectedCategory === "all" || product.category_id === parseInt(selectedCategory);
-      const matchesSubcategory = selectedSubcategory === "all" || product.subcategory_id === parseInt(selectedSubcategory);
-      const matchesSeries = selectedSeries === "all" || product.series === selectedSeries;
-      
-      return matchesSearch && matchesCategory && matchesSubcategory && matchesSeries;
+             const matchesCategory = selectedCategory === "all" || product.category_id === parseInt(selectedCategory);
+       const matchesSubcategory = selectedSubcategory === "all" || product.subcategory_id === parseInt(selectedSubcategory);
+       const matchesSeries = selectedSeries === "all" || product.series === selectedSeries;
+       const matchesBrand = selectedBrand === "all" || product.brand_id === parseInt(selectedBrand);
+       
+       return matchesSearch && matchesCategory && matchesSubcategory && matchesSeries && matchesBrand;
     })
     .sort((a, b) => {
       switch (sortOption) {
@@ -119,15 +121,15 @@ const Catalog = () => {
     <div className="min-h-screen bg-secondary-50 dark:bg-secondary-900">
       <Container size="xl">
         <div className="py-8">
-          {/* Header */}
-          <div className="mb-8">
-            <Heading level={1} className="mb-2">
-              Catálogo de Productos Siemens
-            </Heading>
-            <p className="text-secondary-600 dark:text-secondary-300">
-              Soluciones de automatización industrial de alta calidad
-            </p>
-          </div>
+                     {/* Header */}
+           <div className="mb-8">
+             <Heading level={1} className="mb-2">
+               Productos Industriales
+             </Heading>
+             <p className="text-secondary-600 dark:text-secondary-300">
+               Soluciones de automatización industrial de alta calidad de las mejores marcas
+             </p>
+           </div>
 
           {/* Main Content */}
           <div className="flex flex-col xl:flex-row gap-6">
@@ -150,23 +152,41 @@ const Catalog = () => {
                   />
                 </div>
 
-                {/* Category Filter */}
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                    Categoría
-                  </label>
-                  <Select
-                    options={[
-                      { value: "all", label: "Todas las categorías" },
-                      ...categories.map(cat => ({
-                        value: cat.id,
-                        label: cat.name
-                      }))
-                    ]}
-                    value={selectedCategory}
-                    onChange={setSelectedCategory}
-                  />
-                </div>
+                                 {/* Brand Filter */}
+                 <div className="mb-6">
+                   <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                     Marca
+                   </label>
+                   <Select
+                     options={[
+                       { value: "all", label: "Todas las marcas" },
+                       ...brands.map(brand => ({
+                         value: brand.id,
+                         label: brand.name
+                       }))
+                     ]}
+                     value={selectedBrand}
+                     onChange={setSelectedBrand}
+                   />
+                 </div>
+
+                 {/* Category Filter */}
+                 <div className="mb-6">
+                   <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                     Categoría
+                   </label>
+                   <Select
+                     options={[
+                       { value: "all", label: "Todas las categorías" },
+                       ...categories.map(cat => ({
+                         value: cat.id,
+                         label: cat.name
+                       }))
+                     ]}
+                     value={selectedCategory}
+                     onChange={setSelectedCategory}
+                   />
+                 </div>
 
                 {/* Subcategory Filter */}
                 {subcategories.length > 0 && (
@@ -208,22 +228,23 @@ const Catalog = () => {
                   </div>
                 )}
 
-                {/* Clear Filters */}
-                {(selectedCategory !== "all" || selectedSubcategory !== "all" || selectedSeries !== "all" || searchTerm) && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    fullWidth
-                    onClick={() => {
-                      setSelectedCategory("all");
-                      setSelectedSubcategory("all");
-                      setSelectedSeries("all");
-                      setSearchTerm("");
-                    }}
-                  >
-                    <Icon name="FiX" size="sm" className="mr-2" />
-                    Limpiar Filtros
-                  </Button>
+                                 {/* Clear Filters */}
+                 {(selectedCategory !== "all" || selectedSubcategory !== "all" || selectedSeries !== "all" || selectedBrand !== "all" || searchTerm) && (
+                                     <Button
+                     variant="outline"
+                     size="sm"
+                     fullWidth
+                     onClick={() => {
+                       setSelectedCategory("all");
+                       setSelectedSubcategory("all");
+                       setSelectedSeries("all");
+                       setSelectedBrand("all");
+                       setSearchTerm("");
+                     }}
+                   >
+                     <Icon name="FiX" size="sm" className="mr-2" />
+                     Limpiar Filtros
+                   </Button>
                 )}
               </Card>
             </div>
@@ -306,18 +327,19 @@ const Catalog = () => {
                   <p className="text-secondary-600 dark:text-secondary-300 mb-4">
                     Intenta ajustar los filtros o términos de búsqueda
                   </p>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setSelectedCategory("all");
-                      setSelectedSubcategory("all");
-                      setSelectedSeries("all");
-                      setSearchTerm("");
-                    }}
-                  >
-                    <Icon name="FiRefreshCw" size="sm" className="mr-2" />
-                    Limpiar Filtros
-                  </Button>
+                                     <Button
+                     variant="outline"
+                     onClick={() => {
+                       setSelectedCategory("all");
+                       setSelectedSubcategory("all");
+                       setSelectedSeries("all");
+                       setSelectedBrand("all");
+                       setSearchTerm("");
+                     }}
+                   >
+                     <Icon name="FiRefreshCw" size="sm" className="mr-2" />
+                     Limpiar Filtros
+                   </Button>
                 </Card>
               ) : (
                 <div

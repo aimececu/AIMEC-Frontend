@@ -32,12 +32,11 @@ export const AuthProvider = ({ children }) => {
         const sessionId = authUtils.getSessionId();
         const user = authUtils.getCurrentUser();
         
-        
         if (sessionId && user) {
-          // Verificar si el token sigue siendo válido
-          const isValid = await authEndpoints.verifyAuth();
+          // Verificar si el token sigue siendo válido usando la ruta pública
+          const sessionStatus = await authEndpoints.checkSession();
           
-          if (isValid) {
+          if (sessionStatus.success && sessionStatus.hasValidSession) {
             setState({
               isAuthenticated: true,
               user: user,
@@ -45,12 +44,13 @@ export const AuthProvider = ({ children }) => {
             });
             return;
           } else {
-            // Token inválido, limpiar datos
+            // Token inválido, limpiar datos silenciosamente
             authUtils.clearAuth();
           }
-        } else {
         }
+        // Si no hay sesión o es inválida, simplemente establecer como no autenticado
       } catch (error) {
+        // Error en la verificación, limpiar datos silenciosamente
         authUtils.clearAuth();
       }
       

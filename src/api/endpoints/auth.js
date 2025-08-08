@@ -12,6 +12,7 @@ export const authEndpoints = {
       method: 'POST',
       body: JSON.stringify({ email, password })
     });
+    console.log(response);
 
     if (response.success && response.data.sessionId) {
       authUtils.saveAuth(response.data.sessionId, response.data.user);
@@ -37,7 +38,28 @@ export const authEndpoints = {
       const response = await apiRequest(ENDPOINTS.AUTH.VERIFY);
       return response.success;
     } catch (error) {
+      // Si es un error 401 (no autenticado), simplemente retornar false
+      if (error.status === 401) {
+        return false;
+      }
+      // Para otros errores, también retornar false pero loguear el error
+      console.warn('Error verificando autenticación:', error);
       return false;
+    }
+  },
+
+  // Verificar estado de sesión (público)
+  async checkSession() {
+    try {
+      const response = await apiRequest(ENDPOINTS.AUTH.CHECK_SESSION);
+      return response;
+    } catch (error) {
+      console.warn('Error verificando estado de sesión:', error);
+      return {
+        success: false,
+        hasValidSession: false,
+        message: 'Error verificando sesión'
+      };
     }
   },
 

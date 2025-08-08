@@ -90,11 +90,12 @@ export const transformCategory = (category) => {
     id: category.id,
     name: category.name,
     description: category.description,
-    image: category.image,
     icon: category.icon,
     color: category.color,
     sort_order: category.sort_order,
     is_active: category.is_active !== false,
+    created_at: category.created_at,
+    updated_at: category.updated_at,
     
     // Subcategorías transformadas
     subcategories: (category.subcategories || []).map(transformSubcategory),
@@ -110,10 +111,11 @@ export const transformSubcategory = (subcategory) => {
     id: subcategory.id,
     name: subcategory.name,
     description: subcategory.description,
-    image: subcategory.image,
     category_id: subcategory.category_id,
     sort_order: subcategory.sort_order,
-    is_active: subcategory.is_active !== false
+    is_active: subcategory.is_active !== false,
+    created_at: subcategory.created_at,
+    updated_at: subcategory.updated_at
   };
 };
 

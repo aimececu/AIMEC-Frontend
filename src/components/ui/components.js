@@ -10,4 +10,5 @@ export { default as ProductCard } from './ProductCard';
 export { default as Section } from './Section';
 export { default as Select } from './Select';
 export { default as TextArea } from './TextArea';
-export { default as Toast } from './Toast'; 
+export { default as Toast } from './Toast';
+export { default as HeroSlider } from './HeroSlider'; 

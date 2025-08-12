@@ -21,7 +21,7 @@ export const productEndpoints = {
   async createProduct(productData) {
     return await apiRequest(ENDPOINTS.PRODUCTS.CREATE, {
       method: 'POST',
-      body: JSON.stringify(productData)
+      body: productData
     });
   },
 
@@ -29,7 +29,7 @@ export const productEndpoints = {
   async updateProduct(id, productData) {
     return await apiRequest(ENDPOINTS.PRODUCTS.UPDATE(id), {
       method: 'PUT',
-      body: JSON.stringify(productData)
+      body: productData
     });
   },
 
@@ -47,7 +47,7 @@ export const productEndpoints = {
 
   // Buscar productos
   async searchProducts(searchTerm, filters = {}) {
-    const searchFilters = { ...filters, q: searchTerm };
+    const searchFilters = { ...filters, search: searchTerm };
     const endpoint = buildEndpoint(ENDPOINTS.PRODUCTS.SEARCH, searchFilters);
     return await apiRequest(endpoint);
   },
@@ -59,9 +59,8 @@ export const productEndpoints = {
   },
 
   // Obtener productos por marca
-  async getProductsByBrand(brandId, filters = {}) {
-    const endpoint = buildEndpoint(ENDPOINTS.PRODUCTS.BY_BRAND(brandId), filters);
-    return await apiRequest(endpoint);
+  async getProductsByBrand(brandId) {
+    return await apiRequest(ENDPOINTS.PRODUCTS.BY_BRAND(brandId));
   },
 
   // Obtener productos destacados
@@ -83,11 +82,11 @@ export const productEndpoints = {
     return await apiRequest(ENDPOINTS.PRODUCTS.APPLICATIONS(productId));
   },
 
-  // Asignar aplicaciones a un producto
-  async assignApplicationsToProduct(productId, applicationIds) {
+  // Crear aplicación para un producto
+  async createProductApplication(productId, applicationIds) {
     return await apiRequest(ENDPOINTS.PRODUCTS.APPLICATIONS(productId), {
       method: 'POST',
-      body: JSON.stringify({ applicationIds })
+      body: { applicationIds }
     });
   },
 
@@ -100,19 +99,19 @@ export const productEndpoints = {
     return await apiRequest(ENDPOINTS.PRODUCTS.FEATURES(productId));
   },
 
-  // Agregar característica a un producto
-  async addProductFeature(productId, featureData) {
+  // Crear característica para un producto
+  async createProductFeature(productId, featureData) {
     return await apiRequest(ENDPOINTS.PRODUCTS.FEATURES(productId), {
       method: 'POST',
-      body: JSON.stringify(featureData)
+      body: featureData
     });
   },
 
   // Actualizar característica de un producto
   async updateProductFeature(productId, featureId, featureData) {
-    return await apiRequest(`${ENDPOINTS.PRODUCTS.FEATURES(productId)}/${featureId}`, {
+    return await apiRequest(ENDPOINTS.PRODUCTS.FEATURES(productId), {
       method: 'PUT',
-      body: JSON.stringify(featureData)
+      body: featureData
     });
   },
 
@@ -128,23 +127,23 @@ export const productEndpoints = {
   // =====================================================
 
   // Obtener productos relacionados
-  async getProductRelated(productId) {
+  async getRelatedProducts(productId) {
     return await apiRequest(ENDPOINTS.PRODUCTS.RELATED(productId));
   },
 
-  // Agregar producto relacionado
-  async addProductRelated(productId, relatedData) {
+  // Crear relación entre productos
+  async createProductRelation(productId, relatedData) {
     return await apiRequest(ENDPOINTS.PRODUCTS.RELATED(productId), {
       method: 'POST',
-      body: JSON.stringify(relatedData)
+      body: relatedData
     });
   },
 
-  // Actualizar producto relacionado
-  async updateProductRelated(productId, relatedId, relatedData) {
-    return await apiRequest(`${ENDPOINTS.PRODUCTS.RELATED(productId)}/${relatedId}`, {
+  // Actualizar relación entre productos
+  async updateProductRelation(productId, relationId, relatedData) {
+    return await apiRequest(ENDPOINTS.PRODUCTS.RELATED(productId), {
       method: 'PUT',
-      body: JSON.stringify(relatedData)
+      body: relatedData
     });
   },
 

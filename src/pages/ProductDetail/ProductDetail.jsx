@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import {
-  Icon,
-  Container,
-  Heading,
-  Card,
-  Button,
-  Input,
-  ProductCard,
-  ImageWithFallback,
-  Loader,
-} from "../../components/ui/components";
+import Icon from "../../components/ui/Icon";
+import Container from "../../components/ui/Container";
+import Heading from "../../components/ui/Heading";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
+import ProductCard from "../../components/ui/ProductCard";
+import ImageWithFallback from "../../components/ui/ImageWithFallback";
+import Loader from "../../components/ui/Loader";
 import { useCart } from "../../context/CartContext";
 import { productEndpoints } from "../../api/endpoints/products.js";
-import { transformProduct } from "../../services/dataTransform.js";
 import clsx from "clsx";
 
 const ProductDetail = () => {
@@ -32,10 +29,7 @@ const ProductDetail = () => {
         setLoading(true);
         const response = await productEndpoints.getProductById(id);
         if (response.success) {
-          const productResponse = transformProduct(response.data);
-          console.log(productResponse);
-          
-          setProduct(productResponse);
+          setProduct(response.data);
         } else {
           setError("Producto no encontrado");
         }
@@ -100,19 +94,26 @@ const ProductDetail = () => {
     name,
     description,
     price,
-    originalPrice,
-    image,
-    category,
+    main_image,
+    stock_quantity,
     brand,
-    series,
-    stock,
-    specifications,
-    features,
-    applications,
-    certifications,
-    warranty,
-    leadTime,
+    category,
+    subcategory,
+    weight,
+    dimensions
   } = product;
+
+  // Valores por defecto para campos que no existen en el backend
+  const originalPrice = null; // No existe en el modelo
+  const image = main_image;
+  const stock = stock_quantity;
+  const series = null; // No existe en el modelo
+  const specifications = {}; // No existe en el modelo
+  const features = []; // No existe en el modelo
+  const applications = []; // No existe en el modelo
+  const certifications = []; // No existe en el modelo
+  const warranty = null; // No existe en el modelo
+  const leadTime = null; // No existe en el modelo
 
 
   const handleAddToCart = () => {
@@ -174,7 +175,7 @@ const ProductDetail = () => {
               {/* Category and Brand */}
               <div className="flex items-center gap-2">
                 <span className="text-sm text-secondary-500 dark:text-secondary-400 bg-secondary-100 dark:bg-secondary-700 px-3 py-1 rounded-full">
-                  {category}
+                  {category?.name || 'Sin categoría'}
                 </span>
                 {series && (
                   <span className="text-sm text-secondary-500 dark:text-secondary-400 bg-primary-100 dark:bg-primary-900 px-3 py-1 rounded-full">
@@ -182,7 +183,7 @@ const ProductDetail = () => {
                   </span>
                 )}
                 <span className="text-sm text-secondary-500 dark:text-secondary-400">
-                  {brand}
+                  {brand?.name || 'Sin marca'}
                 </span>
               </div>
 
@@ -194,11 +195,11 @@ const ProductDetail = () => {
               {/* Price */}
               <div className="flex items-baseline gap-3">
                 <span className="text-3xl font-bold text-primary-600 dark:text-primary-400">
-                  ${price.toFixed(2)}
+                  ${(parseFloat(price) || 0).toFixed(2)}
                 </span>
-                {originalPrice && originalPrice > price && (
+                {originalPrice && parseFloat(originalPrice) > parseFloat(price) && (
                   <span className="text-xl text-secondary-400 line-through">
-                    ${originalPrice.toFixed(2)}
+                    ${parseFloat(originalPrice).toFixed(2)}
                   </span>
                 )}
               </div>
@@ -285,10 +286,10 @@ const ProductDetail = () => {
                       const body =
                         encodeURIComponent(`Hola, me interesa cotizar el siguiente producto:
                           Producto: ${name}
-                          Marca: ${brand}
-                          Categoría: ${category}
+                          Marca: ${brand?.name || 'Sin marca'}
+                          Categoría: ${category?.name || 'Sin categoría'}
                           ${series ? `Serie: ${series}` : ""}
-                          Precio: $${price.toFixed(2)}
+                          Precio: $${(parseFloat(price) || 0).toFixed(2)}
                           Cantidad: ${quantity}
 
                           Por favor, envíenme más información sobre disponibilidad y condiciones de entrega.
@@ -312,10 +313,10 @@ const ProductDetail = () => {
                       const message =
                         encodeURIComponent(`Hola, me interesa cotizar el siguiente producto:
                           *${name}*
-                          • Marca: ${brand}
-                          • Categoría: ${category}
+                          • Marca: ${brand?.name || 'Sin marca'}
+                          • Categoría: ${category?.name || 'Sin categoría'}
                           ${series ? `• Serie: ${series}` : ""}
-                          • Precio: $${price.toFixed(2)}
+                          • Precio: $${(parseFloat(price) || 0).toFixed(2)}
                           • Cantidad: ${quantity}
 
                           ¿Podrían enviarme más información sobre disponibilidad y condiciones de entrega?
@@ -374,55 +375,30 @@ const ProductDetail = () => {
                 </div>
               )}
 
-              {activeTab === "specifications" && specifications && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {Object.entries(specifications).map(([key, value]) => (
-                    <div
-                      key={key}
-                      className="flex justify-between py-2 border-b border-secondary-100 dark:border-secondary-700"
-                    >
-                      <span className="font-medium text-secondary-700 dark:text-secondary-300 capitalize">
-                        {key.replace(/([A-Z])/g, " $1").trim()}:
-                      </span>
-                      <span className="text-secondary-600 dark:text-secondary-400">
-                        {value}
-                      </span>
-                    </div>
-                  ))}
+              {activeTab === "specifications" && (
+                <div className="text-center py-8">
+                  <Icon name="FiInfo" className="mx-auto text-4xl text-secondary-400 mb-4" />
+                  <p className="text-secondary-600 dark:text-secondary-400">
+                    No hay especificaciones técnicas disponibles para este producto.
+                  </p>
                 </div>
               )}
 
-              {activeTab === "features" && features && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {features.map((feature, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <Icon
-                        name="FiCheck"
-                        className="text-green-600"
-                        size="sm"
-                      />
-                      <span className="text-secondary-700 dark:text-secondary-300">
-                        {feature}
-                      </span>
-                    </div>
-                  ))}
+              {activeTab === "features" && (
+                <div className="text-center py-8">
+                  <Icon name="FiInfo" className="mx-auto text-4xl text-secondary-400 mb-4" />
+                  <p className="text-secondary-600 dark:text-secondary-400">
+                    No hay características especiales disponibles para este producto.
+                  </p>
                 </div>
               )}
 
-              {activeTab === "applications" && applications && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {applications.map((application, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <Icon
-                        name="FiTarget"
-                        className="text-blue-600"
-                        size="sm"
-                      />
-                      <span className="text-secondary-700 dark:text-secondary-300">
-                        {application}
-                      </span>
-                    </div>
-                  ))}
+              {activeTab === "applications" && (
+                <div className="text-center py-8">
+                  <Icon name="FiInfo" className="mx-auto text-4xl text-secondary-400 mb-4" />
+                  <p className="text-secondary-600 dark:text-secondary-400">
+                    No hay aplicaciones específicas disponibles para este producto.
+                  </p>
                 </div>
               )}
             </div>

@@ -1,12 +1,10 @@
 import React from "react";
-import {
-  Card,
-  Input,
-  Select,
-  Button,
-  Icon,
-  ImageWithFallback,
-} from "../../../components/ui/components";
+import Card from "../../../components/ui/Card";
+import Input from "../../../components/ui/Input";
+import Select from "../../../components/ui/Select";
+import Button from "../../../components/ui/Button";
+import Icon from "../../../components/ui/Icon";
+import ImageWithFallback from "../../../components/ui/ImageWithFallback";
 import clsx from "clsx";
 
 const ProductsList = ({
@@ -26,22 +24,20 @@ const ProductsList = ({
       product.name.toLowerCase().includes(filters.search.toLowerCase()) ||
       product.sku?.toLowerCase().includes(filters.search.toLowerCase());
 
-    // Buscar la categoría por ID o nombre
+    // Buscar la categoría por ID
     const matchesCategory =
       !filters.category ||
-      product.category_id === parseInt(filters.category) ||
-      product.category === filters.category;
+      product.category_id === parseInt(filters.category);
 
-    // Buscar la marca por ID o nombre
+    // Buscar la marca por ID
     const matchesBrand =
       !filters.brand ||
-      product.brand_id === parseInt(filters.brand) ||
-      product.brand === filters.brand;
+      product.brand_id === parseInt(filters.brand);
 
     const matchesStock =
       filters.inStock === "" ||
-      (filters.inStock === "true" && product.stock > 0) ||
-      (filters.inStock === "false" && product.stock === 0);
+      (filters.inStock === "true" && (product.stock_quantity || 0) > 0) ||
+      (filters.inStock === "false" && (product.stock_quantity || 0) === 0);
 
     return matchesSearch && matchesCategory && matchesBrand && matchesStock;
   });
@@ -124,7 +120,7 @@ const ProductsList = ({
               <div className="flex items-start gap-4 mb-4">
                 <div className="relative flex-shrink-0">
                   <ImageWithFallback
-                    src={product.image}
+                    src={product.main_image}
                     alt={product.name}
                     className="w-24 h-24 object-cover rounded-lg border border-secondary-200 dark:border-secondary-700"
                     fallbackSrc="/placeholder-product.jpg"
@@ -134,15 +130,15 @@ const ProductsList = ({
                     <span
                       className={clsx(
                         "px-2 py-1 text-xs font-medium rounded-full",
-                        product.stock > 10
+                        product.stock_quantity > 10
                           ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                          : product.stock > 0
+                          : product.stock_quantity > 0
                           ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
                           : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
                       )}
                     >
-                      {product.stock > 0
-                        ? `${product.stock} en stock`
+                      {product.stock_quantity > 0
+                        ? `${product.stock_quantity} en stock`
                         : "Sin stock"}
                     </span>
                   </div>
@@ -159,10 +155,10 @@ const ProductsList = ({
                   {/* Tags de categoría y marca */}
                   <div className="flex flex-wrap gap-2 mb-3">
                     <span className="text-xs text-secondary-500 dark:text-secondary-400 bg-secondary-100 dark:bg-secondary-700 px-2 py-1 rounded-full">
-                      {product.category}
+                      {product.category?.name || 'Sin categoría'}
                     </span>
                     <span className="text-xs text-secondary-500 dark:text-secondary-400 bg-primary-100 dark:bg-primary-900 px-2 py-1 rounded-full">
-                      {product.brand}
+                      {product.brand?.name || 'Sin marca'}
                     </span>
                   </div>
                 </div>
@@ -171,12 +167,12 @@ const ProductsList = ({
               {/* Información de precio */}
               <div className="flex items-baseline gap-2 mb-4">
                 <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
-                  ${product.price?.toFixed(2) || "0.00"}
+                  ${(parseFloat(product.price) || 0).toFixed(2)}
                 </span>
                 {product.originalPrice &&
-                  product.originalPrice > product.price && (
+                  parseFloat(product.originalPrice) > parseFloat(product.price) && (
                     <span className="text-lg text-secondary-400 line-through">
-                      ${product.originalPrice.toFixed(2)}
+                      ${parseFloat(product.originalPrice).toFixed(2)}
                     </span>
                   )}
               </div>
@@ -188,59 +184,62 @@ const ProductsList = ({
                 </p>
               )}
 
-                             {/* Especificaciones */}
-               <div className="mb-4">
-                 <h4 className="text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                   Especificaciones:
-                 </h4>
-                 {product.specifications && Array.isArray(product.specifications) && product.specifications.length > 0 ? (
-                   <div className="space-y-1">
-                     {product.specifications.slice(0, 3).map((spec, index) => (
-                       <div key={index} className="flex justify-between text-xs">
-                         <span className="text-secondary-600 dark:text-secondary-400">
-                           {spec.name}:
-                         </span>
-                         <span className="text-secondary-800 dark:text-secondary-200 font-medium">
-                           {spec.value}
-                         </span>
-                       </div>
-                     ))}
-                     {product.specifications.length > 3 && (
-                       <div className="text-xs text-secondary-500 dark:text-secondary-400">
-                         +{product.specifications.length - 3} más...
-                       </div>
-                     )}
-                   </div>
-                 ) : (
-                   <div className="text-xs text-secondary-500 dark:text-secondary-400 italic">
-                     No hay especificaciones configuradas
-                   </div>
-                 )}
-               </div>
+              {/* Especificaciones */}
+              <div className="mb-4">
+                <h4 className="text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                  Información adicional:
+                </h4>
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-secondary-600 dark:text-secondary-400">
+                      Peso:
+                    </span>
+                    <span className="text-secondary-800 dark:text-secondary-200 font-medium">
+                      {product.weight ? `${product.weight} kg` : 'No especificado'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-secondary-600 dark:text-secondary-400">
+                      Dimensiones:
+                    </span>
+                    <span className="text-secondary-800 dark:text-secondary-200 font-medium">
+                      {product.dimensions || 'No especificado'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-secondary-600 dark:text-secondary-400">
+                      Stock mínimo:
+                    </span>
+                    <span className="text-secondary-800 dark:text-secondary-200 font-medium">
+                      {product.min_stock_level || 0}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
 
-                         {/* Acciones - siempre en la parte inferior */}
-             <div className="flex items-center gap-2 pt-4 border-t border-secondary-200 dark:border-secondary-700 mt-auto">
-               <Button
-                 variant="outline"
-                 size="sm"
-                 onClick={() => onEditProduct(product)}
-                 className="flex items-center gap-2 flex-1 border-blue-600 text-blue-600 hover:bg-blue-50 hover:text-blue-700 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-900/20 dark:hover:text-blue-300"
-               >
-                 <Icon name="FiEdit" size="sm" />
-                 Editar
-               </Button>
+            {/* Acciones - siempre en la parte inferior */}
+            <div className="flex items-center gap-2 pt-4 border-t border-secondary-200 dark:border-secondary-700 mt-auto">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onEditProduct(product)}
+                className="flex items-center gap-2 flex-1 border-blue-600 text-blue-600 hover:bg-blue-50 hover:text-blue-700 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-900/20 dark:hover:text-blue-300"
+              >
+                <Icon name="FiEdit" size="sm" />
+                Editar
+              </Button>
 
-               <Button
-                 variant="outline"
-                 size="sm"
-                 onClick={() => onDeleteProduct(product.id)}
-                 className="flex items-center gap-2 border-red-600 text-red-600 hover:bg-red-50 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-300"
-               >
-                 <Icon name="FiTrash2" size="sm" />
-                 Eliminar
-               </Button>
-             </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onDeleteProduct(product.id)}
+                className="flex items-center gap-2 border-red-600 text-red-600 hover:bg-red-50 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-300"
+              >
+                <Icon name="FiTrash2" size="sm" />
+                Eliminar
+              </Button>
+            </div>
           </Card>
         ))}
       </div>

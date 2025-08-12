@@ -20,6 +20,17 @@ const Input = ({
 
   const classes = clsx(baseClasses, stateClasses, className);
 
+  // Manejar onChange de manera diferente para inputs de archivo
+  const handleChange = (e) => {
+    if (props.type === 'file') {
+      // Para inputs de archivo, pasar el evento completo
+      onChange(e);
+    } else {
+      // Para otros inputs, pasar solo el valor
+      onChange(e.target.value);
+    }
+  };
+
   return (
     <div className="w-full">
       {label && (
@@ -37,7 +48,7 @@ const Input = ({
 
         <input
           className={clsx(classes, leftIcon && "pl-10", rightIcon && "pr-10")}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={handleChange}
           {...props}
         />
 

@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Container,
-  Heading,
-  Button,
-  Icon,
-  Loader,
-  Toast,
-} from "../../components/ui/components";
+import Container from "../../components/ui/Container";
+import Heading from "../../components/ui/Heading";
+import Button from "../../components/ui/Button";
+import Icon from "../../components/ui/Icon";
+import Loader from "../../components/ui/Loader";
+import Toast from "../../components/ui/Toast";
 import { useAuth } from "../../context/AuthContext";
 import AdminDashboard from "./components/AdminDashboard";
 import ProductsList from "./components/ProductsList";
 import ProductForm from "./components/ProductForm";
+import AdminManager from "./components/AdminManager";
+import ImportData from "./components/ImportData";
 import { useAdminData } from "../../hooks/useAdminData";
 import { useProducts } from "../../hooks/useProducts";
 import clsx from "clsx";
@@ -30,7 +30,7 @@ const Admin = () => {
   });
 
   // Hooks personalizados
-  const { products, categories, brands, loading, stats, loadInitialData } =
+  const { products, categories, brands, subcategories, loading, stats, loadInitialData } =
     useAdminData();
   const {
     editingProduct,
@@ -45,6 +45,11 @@ const Admin = () => {
     toast,
     hideToast,
   } = useProducts(loadInitialData);
+
+  // Función para cambiar a la pestaña de importación
+  const handleImportClick = () => {
+    setActiveTab("import");
+  };
 
   // Manejar logout
   const handleLogout = () => {
@@ -114,10 +119,12 @@ const Admin = () => {
           {/* Tabs de navegación */}
           <div className="mb-6">
             <nav className="flex space-x-8">
-              {[
-                { id: "dashboard", label: "Dashboard", icon: "FiHome" },
-                { id: "products", label: "Productos", icon: "FiPackage" },
-              ].map((tab) => (
+                      {[
+          { id: "dashboard", label: "Dashboard", icon: "FiHome" },
+          { id: "administration", label: "Administración", icon: "FiSettings" },
+          { id: "products", label: "Productos", icon: "FiPackage" },
+          { id: "import", label: "Importar", icon: "FiUpload" },
+        ].map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
@@ -138,8 +145,17 @@ const Admin = () => {
           {/* Contenido de tabs */}
           <div className="space-y-6">
             {activeTab === "dashboard" && (
-              <AdminDashboard stats={stats} onAddProduct={handleAddProduct} />
+              <AdminDashboard stats={stats} onImportClick={handleImportClick} />
             )}
+
+                    {activeTab === "administration" && (
+          <AdminManager
+            categories={categories}
+            subcategories={subcategories}
+            brands={brands}
+            onRefresh={loadInitialData}
+          />
+        )}
 
             {activeTab === "products" && (
               <ProductsList
@@ -151,6 +167,12 @@ const Admin = () => {
                 onEditProduct={(product) => handleEditProduct(product, categories, brands)}
                 onDeleteProduct={handleDeleteProduct}
                 onAddProduct={handleAddProduct}
+              />
+            )}
+
+            {activeTab === "import" && (
+              <ImportData
+                onRefresh={loadInitialData}
               />
             )}
           </div>

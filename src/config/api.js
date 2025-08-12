@@ -25,13 +25,13 @@ export const API_CONFIG = {
 export const ENDPOINTS = {
   // Autenticación
   AUTH: {
-    LOGIN: '/api/auth/login',
-    LOGOUT: '/api/auth/logout',
-    VERIFY: '/api/auth/verify',
-    CHECK_SESSION: '/api/auth/check-session',
-    PROFILE: '/api/auth/profile',
-    REGISTER: '/api/auth/register',
-    REGISTER_INITIAL: '/api/auth/register-initial'
+    LOGIN: '/auth/login',
+    LOGOUT: '/auth/logout',
+    VERIFY: '/auth/verify',
+    CHECK_SESSION: '/auth/check-session',
+    PROFILE: '/auth/profile',
+    REGISTER: '/auth/register',
+    REGISTER_INITIAL: '/auth/register-initial'
   },
   
   // Productos
@@ -61,16 +61,36 @@ export const ENDPOINTS = {
     DETAIL: (id) => `/categories/${id}`,
     CREATE: '/categories',
     UPDATE: (id) => `/categories/${id}`,
-    DELETE: (id) => `/categories/${id}`
+    DELETE: (id) => `/categories/${id}`,
+    // Subcategorías
+    SUBCATEGORIES: {
+      LIST: '/categories/subcategories',
+      DETAIL: (id) => `/categories/subcategories/${id}`,
+      CREATE: '/categories/subcategories',
+      UPDATE: (id) => `/categories/subcategories/${id}`,
+      DELETE: (id) => `/categories/subcategories/${id}`,
+      BY_CATEGORY: (categoryId) => `/categories/${categoryId}/subcategories`
+    }
   },
   
-  // Especificaciones
-  SPECIFICATIONS: {
-    LIST: '/specifications',
-    DETAIL: (id) => `/specifications/${id}`,
-    CREATE: '/specifications',
-    UPDATE: (id) => `/specifications/${id}`,
-    DELETE: (id) => `/specifications/${id}`
+  // Marcas
+  BRANDS: {
+    LIST: '/brands',
+    DETAIL: (id) => `/brands/${id}`,
+    CREATE: '/brands',
+    UPDATE: (id) => `/brands/${id}`,
+    DELETE: (id) => `/brands/${id}`
+  },
+  
+  // Información del sistema
+  INFO: {
+    STATS: '/info/stats'
+  },
+  
+  // Importación de datos
+  IMPORT: {
+    PREVIEW: '/import/preview',
+    SYSTEM: '/import/system'
   },
   
   // Aplicaciones

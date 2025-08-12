@@ -10,7 +10,7 @@ export const authEndpoints = {
   async login(email, password) {
     const response = await apiRequest(ENDPOINTS.AUTH.LOGIN, {
       method: 'POST',
-      body: JSON.stringify({ email, password })
+      body: { email, password }
     });
     console.log(response);
 
@@ -72,7 +72,7 @@ export const authEndpoints = {
   async updateProfile(profileData) {
     return await apiRequest(ENDPOINTS.AUTH.PROFILE, {
       method: 'PUT',
-      body: JSON.stringify(profileData)
+      body: profileData
     });
   },
 
@@ -80,7 +80,7 @@ export const authEndpoints = {
   async register(userData) {
     return await apiRequest(ENDPOINTS.AUTH.REGISTER, {
       method: 'POST',
-      body: JSON.stringify(userData)
+      body: userData
     });
   },
 
@@ -88,7 +88,7 @@ export const authEndpoints = {
   async registerInitial(userData) {
     return await apiRequest(ENDPOINTS.AUTH.REGISTER_INITIAL, {
       method: 'POST',
-      body: JSON.stringify(userData)
+      body: userData
     });
   }
 };

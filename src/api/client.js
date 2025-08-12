@@ -31,6 +31,11 @@ export const apiRequest = async (endpoint, options = {}) => {
     config.headers['Content-Type'] = 'application/json';
   }
 
+  // Serializar body a JSON si no es FormData y existe
+  if (options.body && !(options.body instanceof FormData)) {
+    config.body = JSON.stringify(options.body);
+  }
+
   // Agregar sessionID si existe
   const sessionId = localStorage.getItem(AUTH_CONFIG.SESSION_KEY);
   if (sessionId) {

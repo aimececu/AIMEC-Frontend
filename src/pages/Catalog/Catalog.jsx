@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from "react";
-import {
-  Icon,
-  Container,
-  Heading,
-  Card,
-  Button,
-  Input,
-  Select,
-  ProductCard,
-  Loader
-} from "../../components/ui/components";
+import Icon from "../../components/ui/Icon";
+import Container from "../../components/ui/Container";
+import Heading from "../../components/ui/Heading";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
+import Select from "../../components/ui/Select";
+import ProductCard from "../../components/ui/ProductCard";
+import Loader from "../../components/ui/Loader";
 import { productEndpoints } from "../../api/endpoints/products.js";
 import { categoryEndpoints } from "../../api/endpoints/categories.js";
 import { brandEndpoints } from "../../api/endpoints/brands.js";
-import { transformProductsList, transformCategoriesList, transformBrandsList } from "../../services/dataTransform.js";
 import clsx from "clsx";
 
 const Catalog = () => {
@@ -46,21 +43,25 @@ const Catalog = () => {
 
       console.log({productsResponse, categoriesResponse, brandsResponse});
       
-      // Transformar productos
-      const transformedProducts = transformProductsList(productsResponse);
-      setProducts(transformedProducts.products);
+      // Usar directamente los datos del backend sin transformaciones
+      if (productsResponse.success) {
+        const productsData = productsResponse.data.products || productsResponse.data || [];
+        setProducts(productsData);
+        
+        // Extraer series únicas de los productos (si existen)
+        const uniqueSeries = [...new Set(productsData.map(product => product.series).filter(Boolean))];
+        setSeries(uniqueSeries);
+      }
       
-      // Extraer series únicas de los productos
-      const uniqueSeries = [...new Set(transformedProducts.products.map(product => product.series).filter(Boolean))];
-      setSeries(uniqueSeries);
+      if (categoriesResponse.success) {
+        const categoriesData = categoriesResponse.data || [];
+        setCategories(categoriesData);
+      }
       
-      // Transformar categorías
-      const transformedCategories = transformCategoriesList(categoriesResponse);
-      setCategories(transformedCategories);
-      
-      // Transformar marcas
-      const transformedBrands = transformBrandsList(brandsResponse);
-      setBrands(transformedBrands);
+      if (brandsResponse.success) {
+        const brandsData = brandsResponse.data || [];
+        setBrands(brandsData);
+      }
     } catch (error) {
       console.error('Error cargando datos:', error);
     } finally {
@@ -72,13 +73,15 @@ const Catalog = () => {
   const getSubcategories = () => {
     if (selectedCategory === "all") return [];
     const category = categories.find(cat => cat.id === parseInt(selectedCategory));
-    return category ? category.subcategories : [];
+    // Las subcategorías vienen directamente del backend, no anidadas
+    return category ? (category.subcategories || []) : [];
   };
 
   // Obtener series de la categoría seleccionada
   const getSeries = () => {
     if (selectedCategory === "all") return series;
-    return series.filter(seriesItem => seriesItem.category === selectedCategory);
+    // Las series no están anidadas por categoría en el modelo del backend
+    return series;
   };
 
   const subcategories = getSubcategories();
@@ -89,27 +92,28 @@ const Catalog = () => {
       const matchesSearch = 
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.series?.toLowerCase().includes(searchTerm.toLowerCase());
+        (product.series && product.series.toLowerCase().includes(searchTerm.toLowerCase()));
       
-             const matchesCategory = selectedCategory === "all" || product.category_id === parseInt(selectedCategory);
-       const matchesSubcategory = selectedSubcategory === "all" || product.subcategory_id === parseInt(selectedSubcategory);
-       const matchesSeries = selectedSeries === "all" || product.series === selectedSeries;
-       const matchesBrand = selectedBrand === "all" || product.brand_id === parseInt(selectedBrand);
-       
-       return matchesSearch && matchesCategory && matchesSubcategory && matchesSeries && matchesBrand;
+      const matchesCategory = selectedCategory === "all" || product.category_id === parseInt(selectedCategory);
+      const matchesSubcategory = selectedSubcategory === "all" || product.subcategory_id === parseInt(selectedSubcategory);
+      const matchesSeries = selectedSeries === "all" || product.series === selectedSeries;
+      const matchesBrand = selectedBrand === "all" || product.brand_id === parseInt(selectedBrand);
+      
+      return matchesSearch && matchesCategory && matchesSubcategory && matchesSeries && matchesBrand;
     })
     .sort((a, b) => {
       switch (sortOption) {
         case "price-low":
-          return a.price - b.price;
+          return parseFloat(a.price) - parseFloat(b.price);
         case "price-high":
-          return b.price - a.price;
+          return parseFloat(b.price) - parseFloat(a.price);
         case "name":
           return a.name.localeCompare(b.name);
         case "rating":
-          return b.rating - a.rating;
+          // Rating no existe en el modelo del backend, usar stock como alternativa
+          return (b.stock_quantity || 0) - (a.stock_quantity || 0);
         case "stock":
-          return b.stock - a.stock;
+          return (b.stock_quantity || 0) - (a.stock_quantity || 0);
         default:
           return 0;
       }

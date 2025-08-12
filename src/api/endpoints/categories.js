@@ -1,62 +1,71 @@
-// =====================================================
 // ENDPOINTS DE CATEGORÍAS
-// =====================================================
-
 import { apiRequest } from '../client';
 import { ENDPOINTS } from '../../config/api';
 
 export const categoryEndpoints = {
-  // Obtener todas las categorías
+  // Categorías
   async getCategories() {
     return await apiRequest(ENDPOINTS.CATEGORIES.LIST);
   },
 
-  // Obtener categoría por ID
   async getCategoryById(id) {
     return await apiRequest(ENDPOINTS.CATEGORIES.DETAIL(id));
   },
 
-  // Crear categoría
   async createCategory(categoryData) {
     return await apiRequest(ENDPOINTS.CATEGORIES.CREATE, {
       method: 'POST',
-      body: JSON.stringify(categoryData)
+      body: categoryData
     });
   },
 
-  // Actualizar categoría
   async updateCategory(id, categoryData) {
     return await apiRequest(ENDPOINTS.CATEGORIES.UPDATE(id), {
       method: 'PUT',
-      body: JSON.stringify(categoryData)
+      body: categoryData
     });
   },
 
-  // Eliminar categoría
   async deleteCategory(id) {
     return await apiRequest(ENDPOINTS.CATEGORIES.DELETE(id), {
       method: 'DELETE'
     });
   },
 
-  // Obtener subcategorías de una categoría
+  // Subcategorías
   async getSubcategories(categoryId) {
-    return await apiRequest(`/categories/${categoryId}/subcategories`);
+    if (categoryId) {
+      return await apiRequest(ENDPOINTS.CATEGORIES.SUBCATEGORIES.BY_CATEGORY(categoryId));
+    }
+    return await apiRequest(ENDPOINTS.CATEGORIES.SUBCATEGORIES.LIST);
   },
 
-  // Obtener categorías principales (sin padre)
-  async getMainCategories() {
-    return await apiRequest('/categories/main');
+  async getAllSubcategories() {
+    return await apiRequest(ENDPOINTS.CATEGORIES.SUBCATEGORIES.LIST);
   },
 
-  // Obtener árbol de categorías
-  async getCategoryTree() {
-    return await apiRequest('/categories/tree');
+  async getSubcategoryById(id) {
+    return await apiRequest(ENDPOINTS.CATEGORIES.SUBCATEGORIES.DETAIL(id));
   },
 
-  // Buscar categorías por nombre
-  async searchCategories(searchTerm) {
-    return await apiRequest(`/categories/search?q=${encodeURIComponent(searchTerm)}`);
+  async createSubcategory(subcategoryData) {
+    return await apiRequest(ENDPOINTS.CATEGORIES.SUBCATEGORIES.CREATE, {
+      method: 'POST',
+      body: subcategoryData
+    });
+  },
+
+  async updateSubcategory(id, subcategoryData) {
+    return await apiRequest(ENDPOINTS.CATEGORIES.SUBCATEGORIES.UPDATE(id), {
+      method: 'PUT',
+      body: subcategoryData
+    });
+  },
+
+  async deleteSubcategory(id) {
+    return await apiRequest(ENDPOINTS.CATEGORIES.SUBCATEGORIES.DELETE(id), {
+      method: 'DELETE'
+    });
   }
 };
 

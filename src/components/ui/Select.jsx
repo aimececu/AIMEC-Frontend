@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Icon } from './components';
+import Icon from './Icon';
 import clsx from 'clsx';
 
 const Select = ({ 

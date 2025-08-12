@@ -1,46 +1,34 @@
-// =====================================================
 // ENDPOINTS DE MARCAS
-// =====================================================
-
 import { apiRequest } from '../client';
+import { ENDPOINTS } from '../../config/api';
 
 export const brandEndpoints = {
-  // Obtener todas las marcas
   async getBrands() {
-    return await apiRequest('/categories/brands');
+    return await apiRequest(ENDPOINTS.BRANDS.LIST);
   },
 
-  // Obtener marca por ID
   async getBrandById(id) {
-    return await apiRequest(`/categories/brands/${id}`);
+    return await apiRequest(ENDPOINTS.BRANDS.DETAIL(id));
   },
 
-  // Crear marca
   async createBrand(brandData) {
-    return await apiRequest('/categories/brands', {
+    return await apiRequest(ENDPOINTS.BRANDS.CREATE, {
       method: 'POST',
-      body: JSON.stringify(brandData)
+      body: brandData
     });
   },
 
-  // Actualizar marca
   async updateBrand(id, brandData) {
-    return await apiRequest(`/categories/brands/${id}`, {
+    return await apiRequest(ENDPOINTS.BRANDS.UPDATE(id), {
       method: 'PUT',
-      body: JSON.stringify(brandData)
+      body: brandData
     });
   },
 
-  // Eliminar marca
   async deleteBrand(id) {
-    return await apiRequest(`/categories/brands/${id}`, {
+    return await apiRequest(ENDPOINTS.BRANDS.DELETE(id), {
       method: 'DELETE'
     });
-  },
-
-  // Obtener productos por marca
-  async getProductsByBrand(brandId) {
-    return await apiRequest(`/categories/brands/${brandId}/products`);
   }
 };
 

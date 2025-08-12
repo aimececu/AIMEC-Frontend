@@ -1,43 +1,61 @@
-import { useState, useEffect } from 'react';
-import { productEndpoints } from '../api/endpoints/products.js';
-import { categoryEndpoints } from '../api/endpoints/categories.js';
-import { brandEndpoints } from '../api/endpoints/brands.js';
-import { transformProductsList, transformCategoriesList, transformBrandsList } from '../services/dataTransform.js';
+import { useState, useEffect } from "react";
+import { productEndpoints } from "../api/endpoints/products.js";
+import { categoryEndpoints } from "../api/endpoints/categories.js";
+import { brandEndpoints } from "../api/endpoints/brands.js";
+import { infoEndpoints } from "../api/endpoints/info.js";
 
 export const useAdminData = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({});
 
   const loadInitialData = async () => {
     try {
       setLoading(true);
-      
-      const [productsResponse, categoriesResponse, brandsResponse, statsResponse] = await Promise.all([
+
+      const [
+        productsResponse,
+        categoriesResponse,
+        brandsResponse,
+        subcategoriesResponse,
+        statsResponse,
+      ] = await Promise.all([
         productEndpoints.getProducts(),
         categoryEndpoints.getCategories(),
         brandEndpoints.getBrands(),
-        productEndpoints.getProductStats()
+        categoryEndpoints.getAllSubcategories(),
+        infoEndpoints.getSystemStats(),
       ]);
 
-      // Transformar productos
-      const transformedProducts = transformProductsList(productsResponse);
-      setProducts(transformedProducts.products);
+      console.log("productStats", statsResponse);
 
-      // Transformar categorías
-      const transformedCategories = transformCategoriesList(categoriesResponse);
-      setCategories(transformedCategories);
+      // Usar directamente los datos del backend sin transformaciones
+      if (productsResponse.success) {
+        setProducts(
+          productsResponse.data.products || productsResponse.data || []
+        );
+      }
 
-      // Transformar marcas
-      const transformedBrands = transformBrandsList(brandsResponse);
-      setBrands(transformedBrands);
+      if (categoriesResponse.success) {
+        setCategories(categoriesResponse.data || []);
+      }
+
+      if (brandsResponse.success) {
+        setBrands(brandsResponse.data || []);
+      }
+
+      if (subcategoriesResponse.success) {
+        setSubcategories(subcategoriesResponse.data || []);
+      }
 
       if (statsResponse.success) {
-        setStats(statsResponse.data);
+        setStats(statsResponse.data || {});
       }
     } catch (error) {
+      console.error("Error cargando datos iniciales:", error);
     } finally {
       setLoading(false);
     }
@@ -51,8 +69,9 @@ export const useAdminData = () => {
     products,
     categories,
     brands,
+    subcategories,
     loading,
     stats,
-    loadInitialData
+    loadInitialData,
   };
-}; 
+};

@@ -13,38 +13,16 @@ export const useProducts = (loadInitialData) => {
     sku: '',
     name: '',
     description: '',
-    short_description: '',
     price: '',
-    original_price: '',
-    cost_price: '',
     stock_quantity: '',
     min_stock_level: '',
-    brand: '',
-    category: '',
-    subcategory: '',
-    series: '',
-    main_image: '',
-    additional_images: [],
-    specifications: [],
-    is_active: true,
-    is_featured: false,
+    brand_id: '',
+    category_id: '',
+    subcategory_id: '',
     weight: '',
     dimensions: '',
-    voltage: '',
-    power: '',
-    temperature_range: '',
-    ip_rating: '',
-    material: '',
-    color: '',
-    country_of_origin: '',
-    compliance: '',
-    warranty_months: '',
-    lead_time_days: '',
-    manual_url: '',
-    datasheet_url: '',
-    meta_title: '',
-    meta_description: '',
-    meta_keywords: ''
+    main_image: '',
+    is_active: true
   });
 
   const showToast = (message, type = 'success') => {
@@ -71,14 +49,10 @@ export const useProducts = (loadInitialData) => {
         ...productForm,
         price: parseFloat(productForm.price) || 0,
         stock_quantity: parseInt(productForm.stock_quantity) || 0,
-        weight: parseFloat(productForm.weight) || 0,
-        voltage: parseFloat(productForm.voltage) || 0,
-        power: parseFloat(productForm.power) || 0,
-        original_price: parseFloat(productForm.original_price) || null,
-        warranty_months: parseInt(productForm.warranty_months) || null,
-        lead_time_days: parseInt(productForm.lead_time_days) || null,
-        specifications: productForm.specifications || []
+        weight: parseFloat(productForm.weight) || 0
       };
+
+      console.log('🚀 Enviando datos al backend:', productData);
 
       if (editingProduct) {
         const response = await productEndpoints.updateProduct(editingProduct.id, productData);
@@ -115,62 +89,46 @@ export const useProducts = (loadInitialData) => {
   };
 
   const handleEditProduct = (product, categories = [], brands = []) => {
+    console.log('🔍 handleEditProduct - Producto recibido del backend:', product);
+    console.log('🔍 handleEditProduct - Estructura del producto:', {
+      'product.brand_id': product.brand_id,
+      'product.category_id': product.category_id,
+      'product.subcategory_id': product.subcategory_id,
+      'product.brand': product.brand,
+      'product.category': product.category,
+      'product.subcategory': product.subcategory,
+      'Tipo de brand_id': typeof product.brand_id,
+      'Tipo de category_id': typeof product.category_id,
+      'Tipo de subcategory_id': typeof product.subcategory_id
+    });
+    console.log('🔍 handleEditProduct - Categorías disponibles:', categories);
+    console.log('🔍 handleEditProduct - Marcas disponibles:', brands);
+    
     setEditingProduct(product);
     
-    // Función para mapear nombre a ID
-    const getCategoryId = (categoryName) => {
-      const category = categories.find(cat => cat.name === categoryName);
-      return category ? category.id : '';
-    };
-
-    const getBrandId = (brandName) => {
-      const brand = brands.find(b => b.name === brandName);
-      return brand ? brand.id : '';
-    };
-
+    // Usar directamente los datos del backend sin transformaciones
     setProductForm({
       sku: product.sku || '',
       name: product.name || '',
       description: product.description || '',
-      short_description: product.short_description || '',
       price: product.price?.toString() || '',
-      original_price: product.original_price?.toString() || '',
-      cost_price: product.cost_price?.toString() || '',
-      stock_quantity: product.stock_quantity?.toString() || product.stock?.toString() || '',
+      stock_quantity: product.stock_quantity?.toString() || '',
       min_stock_level: product.min_stock_level?.toString() || '',
-      brand: getBrandId(product.brand),
-      category: getCategoryId(product.category),
-      subcategory: product.subcategory || '',
-      series: product.series || '',
-      main_image: product.main_image || '',
-      additional_images: product.additional_images || [],
-      specifications: Array.isArray(product.productSpecifications) 
-        ? product.productSpecifications.map(spec => ({
-            name: spec.specificationType?.name || spec.name,
-            value: spec.value_text || spec.value_number || spec.value_boolean || spec.value_json || spec.value,
-            unit: spec.specificationType?.unit || spec.unit
-          }))
-        : [],
-      is_active: product.is_active !== false,
-      is_featured: product.is_featured || false,
+      brand_id: product.brand_id || '',
+      category_id: product.category_id || '',
+      subcategory_id: product.subcategory_id || '',
       weight: product.weight?.toString() || '',
       dimensions: product.dimensions || '',
-      voltage: product.voltage?.toString() || '',
-      power: product.power?.toString() || '',
-      temperature_range: product.temperature_range || '',
-      ip_rating: product.ip_rating || '',
-      material: product.material || '',
-      color: product.color || '',
-      country_of_origin: product.country_of_origin || '',
-      compliance: product.compliance || '',
-      warranty_months: product.warranty_months?.toString() || '',
-      lead_time_days: product.lead_time_days?.toString() || '',
-      manual_url: product.manual_url || '',
-      datasheet_url: product.datasheet_url || '',
-      meta_title: product.meta_title || '',
-      meta_description: product.meta_description || '',
-      meta_keywords: product.meta_keywords || ''
+      main_image: product.main_image || '',
+      is_active: product.is_active !== false
     });
+    
+    console.log('🔍 handleEditProduct - Formulario establecido:', {
+      brand_id: product.brand_id,
+      category_id: product.category_id,
+      subcategory_id: product.subcategory_id
+    });
+    
     setShowProductForm(true);
   };
 
@@ -206,38 +164,16 @@ export const useProducts = (loadInitialData) => {
       sku: '',
       name: '',
       description: '',
-      short_description: '',
       price: '',
-      original_price: '',
-      cost_price: '',
       stock_quantity: '',
       min_stock_level: '',
-      brand: '',
-      category: '',
-      subcategory: '',
-      series: '',
-      main_image: '',
-      additional_images: [],
-      specifications: [],
-      is_active: true,
-      is_featured: false,
+      brand_id: '',
+      category_id: '',
+      subcategory_id: '',
       weight: '',
       dimensions: '',
-      voltage: '',
-      power: '',
-      temperature_range: '',
-      ip_rating: '',
-      material: '',
-      color: '',
-      country_of_origin: '',
-      compliance: '',
-      warranty_months: '',
-      lead_time_days: '',
-      manual_url: '',
-      datasheet_url: '',
-      meta_title: '',
-      meta_description: '',
-      meta_keywords: ''
+      main_image: '',
+      is_active: true
     });
   };
 

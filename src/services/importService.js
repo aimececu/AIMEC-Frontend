@@ -4,7 +4,7 @@
 // Esta es una versión temporal que simula la importación
 // hasta que se configuren las dependencias de Excel/CSV
 
-// Removido import de database.js ya que ahora usamos los endpoints del backend
+import { productEndpoints } from '../api/endpoints/products.js';
 
 // Simular delay de red
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -106,104 +106,80 @@ export class ProductImportService {
     if (row.stock_quantity) {
       const stock = parseInt(row.stock_quantity);
       if (isNaN(stock) || stock < 0) {
-        errors.push('Stock debe ser un número entero mayor o igual a 0');
+        errors.push('Stock debe ser un número entero válido mayor o igual a 0');
       }
     }
 
     return { errors, warnings };
   }
 
-  // Convertir fila de datos a objeto de producto
+  // Convertir fila a datos de producto
   convertRowToProduct(row, templateConfig) {
-    const product = {
+    const productData = {
       sku: row.sku?.toString().trim(),
       name: row.name?.toString().trim(),
       description: row.description?.toString().trim(),
-      price: parseFloat(row.price) || 0,
-      stock_quantity: parseInt(row.stock_quantity) || 0,
+      price: row.price ? parseFloat(row.price) : 0,
+      stock_quantity: row.stock_quantity ? parseInt(row.stock_quantity) : 0,
       brand: row.brand?.toString().trim(),
       category: row.category?.toString().trim(),
-      main_image: row.main_image?.toString().trim() || 'producto-default.jpg',
-      is_active: row.is_active !== 'false'
+      main_image: row.main_image?.toString().trim() || null,
+      is_active: row.is_active === 'true' || row.is_active === true
     };
 
-    // Procesar especificaciones dinámicas
+    // Agregar especificaciones si existen
     if (templateConfig.specificationFields) {
-      product.specifications = [];
-      for (const specField of templateConfig.specificationFields) {
-        if (row[specField.name] && row[specField.name].toString().trim() !== '') {
-          const specValue = {
-            specification_type_id: specField.specification_type_id || 1,
-            value_text: row[specField.name].toString().trim(),
-            value_number: null,
-            value_boolean: null,
-            value_json: null
-          };
-
-          // Determinar el tipo de valor basado en el tipo de especificación
-          switch (specField.data_type) {
-            case 'number':
-              specValue.value_number = parseFloat(row[specField.name]);
-              specValue.value_text = null;
-              break;
-            case 'boolean':
-              specValue.value_boolean = row[specField.name].toLowerCase() === 'true';
-              specValue.value_text = null;
-              break;
-            case 'text':
-            default:
-              specValue.value_text = row[specField.name].toString().trim();
-              break;
-          }
-
-          product.specifications.push(specValue);
+      const specifications = {};
+      templateConfig.specificationFields.forEach(field => {
+        if (row[field.name]) {
+          specifications[field.name] = row[field.name].toString().trim();
         }
+      });
+      
+      if (Object.keys(specifications).length > 0) {
+        productData.specifications = specifications;
       }
     }
 
-    return product;
+    return productData;
   }
 
   // Procesar importación completa
-  async processImport(file, templateId, userId) {
+  async processImport(file, templateId = null) {
     try {
-      // 1. Crear registro de importación
-      const importRecord = await dbImportService.createImportHistory({
-        template_id: templateId,
-        filename: file.name,
-        total_rows: 0,
-        status: 'processing',
-        created_by: userId
-      });
-
-      // 2. Leer archivo
-      const rawData = await this.readFile(file);
-      
-      // 3. Obtener configuración de plantilla
-      const templates = await dbImportService.getImportTemplates();
-      const template = templates.find(t => t.id === templateId);
-      
-      if (!template) {
-        throw new Error('Plantilla de importación no encontrada');
+      // 1. Validar archivo
+      const fileValidation = this.validateFile(file);
+      if (!fileValidation.isValid) {
+        throw new Error(`Archivo inválido: ${fileValidation.errors.join(', ')}`);
       }
 
-      const templateConfig = template.template_config;
+      // 2. Leer archivo
+      const rows = await this.readFile(file);
+
+      // 3. Obtener plantilla (simulado)
+      const template = {
+        id: templateId || 1,
+        name: 'Plantilla Básica',
+        requiredFields: ['sku', 'name', 'description', 'price'],
+        specificationFields: [
+          { name: 'cpu', display_name: 'CPU', data_type: 'text' },
+          { name: 'memory', display_name: 'Memoria', data_type: 'text' },
+          { name: 'power', display_name: 'Potencia', data_type: 'text' }
+        ]
+      };
 
       // 4. Procesar cada fila
       const results = {
         successful: [],
-        failed: [],
-        total: rawData.length
+        failed: []
       };
 
-      for (let i = 0; i < rawData.length; i++) {
-        const row = rawData[i];
-        const rowNumber = i + 2; // +2 porque Excel/CSV empieza en 1 y tiene headers
+      for (let rowNumber = 1; rowNumber <= rows.length; rowNumber++) {
+        const row = rows[rowNumber - 1];
 
         try {
           // Validar datos
-          const validation = this.validateProductData(row, templateConfig);
-          
+          const validation = this.validateProductData(row, template);
           if (validation.errors.length > 0) {
             results.failed.push({
               row: rowNumber,
@@ -215,17 +191,26 @@ export class ProductImportService {
           }
 
           // Convertir a producto
-          const productData = this.convertRowToProduct(row, templateConfig);
+          const productData = this.convertRowToProduct(row, template);
 
-          // Crear producto en base de datos
-          const productId = await productService.createProduct(productData);
-
-          results.successful.push({
-            row: rowNumber,
-            product_id: productId,
-            data: productData,
-            warnings: validation.warnings
-          });
+          // Crear producto en base de datos usando endpoints del backend
+          const response = await productEndpoints.createProduct(productData);
+          
+          if (response.success) {
+            results.successful.push({
+              row: rowNumber,
+              product_id: response.data.id,
+              data: productData,
+              warnings: validation.warnings
+            });
+          } else {
+            results.failed.push({
+              row: rowNumber,
+              data: row,
+              errors: [response.error || 'Error al crear producto'],
+              warnings: validation.warnings
+            });
+          }
 
         } catch (error) {
           results.failed.push({
@@ -237,16 +222,7 @@ export class ProductImportService {
         }
       }
 
-      // 5. Actualizar registro de importación
-      await dbImportService.updateImportHistory(importRecord.id, {
-        successful_rows: results.successful.length,
-        failed_rows: results.failed.length,
-        error_log: results.failed.length > 0 ? results.failed : null,
-        status: results.failed.length === 0 ? 'completed' : 'completed_with_errors'
-      });
-
       return {
-        import_id: importRecord.id,
         results,
         template: template
       };

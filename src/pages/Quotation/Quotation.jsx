@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Icon, 
-  Container, 
-  Heading, 
-  Card, 
-  Button, 
-  Input,
-  ImageWithFallback
-} from '../../components/ui/components';
+import Icon from '../../components/ui/Icon';
+import Container from '../../components/ui/Container';
+import Heading from '../../components/ui/Heading';
+import Card from '../../components/ui/Card';
+import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
+import ImageWithFallback from '../../components/ui/ImageWithFallback';
 import { useCart } from '../../context/CartContext';
 import clsx from 'clsx';
 

@@ -1,16 +1,14 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  Button,
-  Card,
-  Container,
-  Heading,
-  HeroSlider,
-  Icon,
-  Input,
-  Section,
-  TextArea,
-} from "../../components/ui/components";
+import Button from "../../components/ui/Button";
+import Card from "../../components/ui/Card";
+import Container from "../../components/ui/Container";
+import Heading from "../../components/ui/Heading";
+import HeroSlider from "../../components/ui/HeroSlider";
+import Icon from "../../components/ui/Icon";
+import Input from "../../components/ui/Input";
+import Section from "../../components/ui/Section";
+import TextArea from "../../components/ui/TextArea";
 
 const Home = () => {
   const [formData, setFormData] = useState({

@@ -1,6 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Container, Heading, Icon } from "../ui/components";
+import Container from "../ui/Container";
+import Heading from "../ui/Heading";
+import Icon from "../ui/Icon";
 
 const Footer = () => {
   return (

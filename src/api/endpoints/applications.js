@@ -21,7 +21,7 @@ export const applicationEndpoints = {
   async createApplication(applicationData) {
     return await apiRequest(ENDPOINTS.APPLICATIONS.CREATE, {
       method: 'POST',
-      body: JSON.stringify(applicationData)
+      body: applicationData
     });
   },
 
@@ -29,7 +29,7 @@ export const applicationEndpoints = {
   async updateApplication(id, applicationData) {
     return await apiRequest(ENDPOINTS.APPLICATIONS.UPDATE(id), {
       method: 'PUT',
-      body: JSON.stringify(applicationData)
+      body: applicationData
     });
   },
 

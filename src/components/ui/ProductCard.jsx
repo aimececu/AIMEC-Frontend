@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Icon, ImageWithFallback } from "./components";
+import Icon from "./Icon";
+import ImageWithFallback from "./ImageWithFallback";
 import { useCart } from "../../context/CartContext";
 import clsx from "clsx";
 
@@ -16,12 +17,10 @@ const ProductCard = ({
     name,
     description,
     price,
-    image,
+    main_image,
     category,
     brand,
-    series,
-    stock,
-    specifications,
+    stock_quantity,
   } = product;
   const { addToCart, isInCart } = useCart();
 
@@ -47,7 +46,7 @@ const ProductCard = ({
                      {/* Product Image - Más pequeña en vista lista */}
            <div className="relative w-40 h-40 flex-shrink-0 bg-secondary-100 dark:bg-secondary-700">
              <ImageWithFallback
-               src={image}
+               src={main_image}
                alt={name}
                className="w-full h-full object-contain p-2"
              />
@@ -88,16 +87,15 @@ const ProductCard = ({
               <div className="flex flex-col gap-2 mb-2">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-xs text-secondary-500 dark:text-secondary-400 bg-secondary-100 dark:bg-secondary-700 px-2 py-1 rounded-full">
-                    {category}
+                    {category?.name || 'Sin categoría'}
                   </span>
-                  {series && (
-                    <span className="text-xs text-secondary-500 dark:text-secondary-400 bg-primary-100 dark:bg-primary-900 px-2 py-1 rounded-full">
-                      {series}
-                    </span>
-                  )}
+                  {/* series and brand are not directly available in the new product structure */}
+                  {/* <span className="text-xs text-secondary-500 dark:text-secondary-400 bg-primary-100 dark:bg-primary-900 px-2 py-1 rounded-full">
+                    {series}
+                  </span> */}
                 </div>
                 <span className="text-xs text-secondary-500 dark:text-secondary-400">
-                  {brand}
+                  {brand?.name || 'Sin marca'}
                 </span>
               </div>
 
@@ -120,19 +118,20 @@ const ProductCard = ({
                 <span
                   className={clsx(
                     "text-xs px-2 py-1 rounded-full whitespace-nowrap",
-                    stock > 10
+                    stock_quantity > 10
                       ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                      : stock > 0
+                      : stock_quantity > 0
                       ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
                       : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
                   )}
                 >
-                  {stock > 0 ? `${stock} en stock` : "Sin stock"}
+                  {stock_quantity > 0 ? `${stock_quantity} en stock` : "Sin stock"}
                 </span>
               </div>
 
               {/* Quick Specs (if available) */}
-              {showSpecs &&
+              {/* showSpecs and specifications are not directly available in the new product structure */}
+              {/* {showSpecs &&
                 specifications && Array.isArray(specifications) && specifications.length > 0 && (
                   <div className="mt-2 text-xs text-secondary-500 dark:text-secondary-400">
                     {specifications.slice(0, 3).map((spec, index) => (
@@ -146,19 +145,18 @@ const ProductCard = ({
                       </div>
                     )}
                   </div>
-                )}
+                )} */}
             </div>
 
             {/* Price and Actions */}
             <div className="flex items-center justify-between mt-2">
               <div className="flex gap-2">
-                {product.originalPrice && product.originalPrice > price && (
-                  <span className="text-base text-secondary-400 line-through">
-                    ${product.originalPrice.toFixed(2)}
-                  </span>
-                )}
+                {/* product.originalPrice and product.originalPrice are not directly available in the new product structure */}
+                {/* <span className="text-base text-secondary-400 line-through">
+                  ${product.originalPrice.toFixed(2)}
+                </span> */}
                 <span className="text-xl font-bold text-primary-600 dark:text-primary-400">
-                  ${price.toFixed(2)}
+                  ${(parseFloat(price) || 0).toFixed(2)}
                 </span>
               </div>
 
@@ -200,10 +198,10 @@ const ProductCard = ({
       {/* Product Image */}
       <div className="relative aspect-square bg-secondary-100 dark:bg-secondary-700">
         <span className="text-xs text-secondary-400 dark:text-secondary-400 absolute top-1 left-1 bg-secondary-200 dark:bg-secondary-800 px-2 py-1 rounded-full">
-          {brand}
+          {brand?.name || 'Sin marca'}
         </span>
         <ImageWithFallback
-          src={image}
+          src={main_image}
           alt={name}
           className="w-full h-full object-cover"
         />
@@ -243,13 +241,12 @@ const ProductCard = ({
         <div className="flex flex-col gap-2 mb-2">
           <div className="flex items-center gap-1 flex-wrap">
             <span className="text-xs text-secondary-500 dark:text-secondary-400 bg-secondary-100 dark:bg-secondary-700 px-2 py-1 rounded-full">
-              {category}
+              {category?.name || 'Sin categoría'}
             </span>
-            {series && (
-              <span className="text-xs text-secondary-500 dark:text-secondary-400 bg-primary-100 dark:bg-primary-900 px-2 py-1 rounded-full">
-                {series}
-              </span>
-            )}
+            {/* series and brand are not directly available in the new product structure */}
+            {/* <span className="text-xs text-secondary-500 dark:text-secondary-400 bg-primary-100 dark:bg-primary-900 px-2 py-1 rounded-full">
+              {series}
+            </span> */}
           </div>
         </div>
 
@@ -272,27 +269,26 @@ const ProductCard = ({
           <span
             className={clsx(
               "text-xs px-2 py-1 rounded-full whitespace-nowrap",
-              stock > 10
+              stock_quantity > 10
                 ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                : stock > 0
+                : stock_quantity > 0
                 ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
                 : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
             )}
           >
-            {stock > 0 ? `${stock} en stock` : "Sin stock"}
+            {stock_quantity > 0 ? `${stock_quantity} en stock` : "Sin stock"}
           </span>
         </div>
 
         {/* Price and Actions */}
         <div className="flex items-center justify-between gap-2">
           <div className="flex flex-col items-baseline gap-0 flex-shrink-0">
-            {product.originalPrice && product.originalPrice > price && (
-              <span className="text-sm text-secondary-400 line-through">
-                ${product.originalPrice.toFixed(2)}
-              </span>
-            )}
+            {/* product.originalPrice and product.originalPrice are not directly available in the new product structure */}
+            {/* <span className="text-sm text-secondary-400 line-through">
+              ${product.originalPrice.toFixed(2)}
+            </span> */}
             <span className="text-lg font-bold text-primary-600 dark:text-primary-400">
-              ${price.toFixed(2)}
+              ${(parseFloat(price) || 0).toFixed(2)}
             </span>
           </div>
 

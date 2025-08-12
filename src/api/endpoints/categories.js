@@ -33,39 +33,40 @@ export const categoryEndpoints = {
   },
 
   // Subcategorías
-  async getSubcategories(categoryId) {
-    if (categoryId) {
-      return await apiRequest(ENDPOINTS.CATEGORIES.SUBCATEGORIES.BY_CATEGORY(categoryId));
-    }
-    return await apiRequest(ENDPOINTS.CATEGORIES.SUBCATEGORIES.LIST);
+  // Obtener todas las subcategorías
+  getAllSubcategories() {
+    return apiRequest(ENDPOINTS.SUBCATEGORIES.LIST, { method: 'GET' });
   },
 
-  async getAllSubcategories() {
-    return await apiRequest(ENDPOINTS.CATEGORIES.SUBCATEGORIES.LIST);
+  // Obtener subcategorías por categoría
+  getSubcategoriesByCategory(categoryId) {
+    return apiRequest(ENDPOINTS.SUBCATEGORIES.BY_CATEGORY(categoryId), { method: 'GET' });
   },
 
-  async getSubcategoryById(id) {
-    return await apiRequest(ENDPOINTS.CATEGORIES.SUBCATEGORIES.DETAIL(id));
+  // Obtener subcategoría por ID
+  getSubcategoryById(id) {
+    return apiRequest(ENDPOINTS.SUBCATEGORIES.DETAIL(id), { method: 'GET' });
   },
 
-  async createSubcategory(subcategoryData) {
-    return await apiRequest(ENDPOINTS.CATEGORIES.SUBCATEGORIES.CREATE, {
+  // Crear subcategoría
+  createSubcategory(data) {
+    return apiRequest(ENDPOINTS.SUBCATEGORIES.CREATE, {
       method: 'POST',
-      body: subcategoryData
+      body: data
     });
   },
 
-  async updateSubcategory(id, subcategoryData) {
-    return await apiRequest(ENDPOINTS.CATEGORIES.SUBCATEGORIES.UPDATE(id), {
+  // Actualizar subcategoría
+  updateSubcategory(id, data) {
+    return apiRequest(ENDPOINTS.SUBCATEGORIES.UPDATE(id), {
       method: 'PUT',
-      body: subcategoryData
+      body: data
     });
   },
 
-  async deleteSubcategory(id) {
-    return await apiRequest(ENDPOINTS.CATEGORIES.SUBCATEGORIES.DELETE(id), {
-      method: 'DELETE'
-    });
+  // Eliminar subcategoría
+  deleteSubcategory(id) {
+    return apiRequest(ENDPOINTS.SUBCATEGORIES.DELETE(id), { method: 'DELETE' });
   }
 };
 

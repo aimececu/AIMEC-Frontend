@@ -62,15 +62,17 @@ export const ENDPOINTS = {
     CREATE: '/categories',
     UPDATE: (id) => `/categories/${id}`,
     DELETE: (id) => `/categories/${id}`,
-    // Subcategorías
-    SUBCATEGORIES: {
-      LIST: '/categories/subcategories',
-      DETAIL: (id) => `/categories/subcategories/${id}`,
-      CREATE: '/categories/subcategories',
-      UPDATE: (id) => `/categories/subcategories/${id}`,
-      DELETE: (id) => `/categories/subcategories/${id}`,
-      BY_CATEGORY: (categoryId) => `/categories/${categoryId}/subcategories`
-    }
+    SUBCATEGORIES: (categoryId) => `/categories/${categoryId}/subcategories`
+  },
+
+  // Subcategorías
+  SUBCATEGORIES: {
+    LIST: '/subcategories',
+    DETAIL: (id) => `/subcategories/${id}`,
+    CREATE: '/subcategories',
+    UPDATE: (id) => `/subcategories/${id}`,
+    DELETE: (id) => `/subcategories/${id}`,
+    BY_CATEGORY: (categoryId) => `/subcategories?category_id=${categoryId}`
   },
   
   // Marcas

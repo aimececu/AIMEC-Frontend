@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { productEndpoints } from '../api/endpoints/products.js';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { categoryEndpoints } from '../api/endpoints/categories.js';
 
 export const useProducts = (loadInitialData) => {
   const { isAuthenticated, logout } = useAuth();
@@ -24,6 +25,28 @@ export const useProducts = (loadInitialData) => {
     main_image: '',
     is_active: true
   });
+  const [subcategories, setSubcategories] = useState([]);
+
+  // Cargar subcategorías cuando cambie la categoría
+  useEffect(() => {
+    if (productForm.category_id) {
+      loadSubcategories(productForm.category_id);
+    } else {
+      setSubcategories([]);
+    }
+  }, [productForm.category_id]);
+
+  const loadSubcategories = async (categoryId) => {
+    try {
+      const response = await categoryEndpoints.getSubcategoriesByCategory(categoryId);
+      if (response.success) {
+        setSubcategories(response.data || []);
+      }
+    } catch (error) {
+      console.error('Error cargando subcategorías:', error);
+      setSubcategories([]);
+    }
+  };
 
   const showToast = (message, type = 'success') => {
     setToast({ isVisible: true, message, type });
@@ -189,6 +212,8 @@ export const useProducts = (loadInitialData) => {
     handleCancelForm,
     toast,
     showToast,
-    hideToast
+    hideToast,
+    subcategories,
+    setSubcategories
   };
 }; 

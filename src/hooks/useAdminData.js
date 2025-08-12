@@ -16,43 +16,38 @@ export const useAdminData = () => {
     try {
       setLoading(true);
 
-      const [
-        productsResponse,
-        categoriesResponse,
-        brandsResponse,
-        subcategoriesResponse,
-        statsResponse,
-      ] = await Promise.all([
-        productEndpoints.getProducts(),
-        categoryEndpoints.getCategories(),
-        brandEndpoints.getBrands(),
+      // Cargar datos iniciales
+      const [products, categories, brands, subcategories, stats] = await Promise.all([
+        productEndpoints.getAllProducts(),
+        categoryEndpoints.getAllCategories(),
+        brandEndpoints.getAllBrands(),
         categoryEndpoints.getAllSubcategories(),
-        infoEndpoints.getSystemStats(),
+        infoEndpoints.getSystemStats()
       ]);
 
-      console.log("productStats", statsResponse);
+      console.log("productStats", stats);
 
       // Usar directamente los datos del backend sin transformaciones
-      if (productsResponse.success) {
+      if (products.success) {
         setProducts(
-          productsResponse.data.products || productsResponse.data || []
+          products.data.products || products.data || []
         );
       }
 
-      if (categoriesResponse.success) {
-        setCategories(categoriesResponse.data || []);
+      if (categories.success) {
+        setCategories(categories.data || []);
       }
 
-      if (brandsResponse.success) {
-        setBrands(brandsResponse.data || []);
+      if (brands.success) {
+        setBrands(brands.data || []);
       }
 
-      if (subcategoriesResponse.success) {
-        setSubcategories(subcategoriesResponse.data || []);
+      if (subcategories.success) {
+        setSubcategories(subcategories.data || []);
       }
 
-      if (statsResponse.success) {
-        setStats(statsResponse.data || {});
+      if (stats.success) {
+        setStats(stats.data || {});
       }
     } catch (error) {
       console.error("Error cargando datos iniciales:", error);

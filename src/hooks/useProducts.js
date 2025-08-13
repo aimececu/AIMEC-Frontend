@@ -75,7 +75,6 @@ export const useProducts = (loadInitialData) => {
         weight: parseFloat(productForm.weight) || 0
       };
 
-      console.log('🚀 Enviando datos al backend:', productData);
 
       if (editingProduct) {
         const response = await productEndpoints.updateProduct(editingProduct.id, productData);
@@ -112,20 +111,6 @@ export const useProducts = (loadInitialData) => {
   };
 
   const handleEditProduct = (product, categories = [], brands = []) => {
-    console.log('🔍 handleEditProduct - Producto recibido del backend:', product);
-    console.log('🔍 handleEditProduct - Estructura del producto:', {
-      'product.brand_id': product.brand_id,
-      'product.category_id': product.category_id,
-      'product.subcategory_id': product.subcategory_id,
-      'product.brand': product.brand,
-      'product.category': product.category,
-      'product.subcategory': product.subcategory,
-      'Tipo de brand_id': typeof product.brand_id,
-      'Tipo de category_id': typeof product.category_id,
-      'Tipo de subcategory_id': typeof product.subcategory_id
-    });
-    console.log('🔍 handleEditProduct - Categorías disponibles:', categories);
-    console.log('🔍 handleEditProduct - Marcas disponibles:', brands);
     
     setEditingProduct(product);
     
@@ -144,12 +129,6 @@ export const useProducts = (loadInitialData) => {
       dimensions: product.dimensions || '',
       main_image: product.main_image || '',
       is_active: product.is_active !== false
-    });
-    
-    console.log('🔍 handleEditProduct - Formulario establecido:', {
-      brand_id: product.brand_id,
-      category_id: product.category_id,
-      subcategory_id: product.subcategory_id
     });
     
     setShowProductForm(true);

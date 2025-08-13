@@ -3,17 +3,17 @@ import Card from '../../../components/ui/Card';
 import Heading from '../../../components/ui/Heading';
 import Icon from '../../../components/ui/Icon';
 
-const AdminDashboard = ({ stats, onImportClick }) => {
+const AdminDashboard = ({ stats, onImportClick, onNavigate, loading = false }) => {
   return (
     <div className="space-y-6">
       {/* Estadísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-secondary-600 dark:text-secondary-400">Total Productos</p>
               <p className="text-2xl font-bold text-primary-600 dark:text-primary-400">
-                {stats.total_products || 0}
+                {loading ? '...' : (stats.total_products || 0)}
               </p>
             </div>
             <Icon name="FiPackage" className="text-3xl text-primary-500" />
@@ -43,35 +43,92 @@ const AdminDashboard = ({ stats, onImportClick }) => {
             <Icon name="FiGrid" className="text-3xl text-green-500" />
           </div>
         </Card>
+
+        <Card className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-secondary-600 dark:text-secondary-400">Total Subcategorías</p>
+              <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                {stats.total_subcategories || 0}
+              </p>
+            </div>
+            <Icon name="FiLayers" className="text-3xl text-purple-500" />
+          </div>
+        </Card>
       </div>
 
       {/* Acciones rápidas */}
       <Card className="p-6">
         <Heading level={3} className="mb-4">Acciones Rápidas</Heading>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <button 
-            onClick={() => window.location.href = '/admin/products'}
-            className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+            onClick={() => onNavigate('products')}
+            className="flex flex-col items-center gap-3 p-4 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-all duration-200 hover:shadow-lg"
           >
-            <Icon name="FiPlus" />
-            Agregar Producto
+            <Icon name="FiPlus" className="text-2xl" />
+            <span className="text-sm font-medium text-center">Agregar Producto</span>
           </button>
           
           <button 
-            onClick={() => window.location.href = '/admin/administration'}
-            className="flex items-center gap-2 px-4 py-2 border border-secondary-300 text-secondary-700 rounded-lg hover:bg-secondary-50 transition-colors"
+            onClick={() => onNavigate('administration')}
+            className="flex flex-col items-center gap-3 p-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 hover:shadow-lg"
           >
-            <Icon name="FiSettings" />
-            Gestionar Datos
+            <Icon name="FiSettings" className="text-2xl" />
+            <span className="text-sm font-medium text-center">Gestionar Datos</span>
           </button>
           
           <button 
             onClick={onImportClick}
-            className="flex items-center gap-2 px-4 py-2 border border-secondary-300 text-secondary-700 rounded-lg hover:bg-secondary-50 transition-colors"
+            className="flex flex-col items-center gap-3 p-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 hover:shadow-lg"
           >
-            <Icon name="FiUpload" />
-            Importar Productos
+            <Icon name="FiUpload" className="text-2xl" />
+            <span className="text-sm font-medium text-center">Importar Productos</span>
           </button>
+
+          <button 
+            onClick={() => onNavigate('products')}
+            className="flex flex-col items-center gap-3 p-4 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-all duration-200 hover:shadow-lg"
+          >
+            <Icon name="FiList" className="text-2xl" />
+            <span className="text-sm font-medium text-center">Ver Productos</span>
+          </button>
+        </div>
+      </Card>
+
+      {/* Resumen del Sistema */}
+      <Card className="p-6">
+        <Heading level={3} className="mb-4">Resumen del Sistema</Heading>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-3">
+            <h4 className="font-medium text-secondary-900 dark:text-white">Estado del Sistema</h4>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="text-sm text-secondary-600 dark:text-secondary-400">Sistema operativo</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <span className="text-sm text-secondary-600 dark:text-secondary-400">Base de datos conectada</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="text-sm text-secondary-600 dark:text-secondary-400">API funcionando</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="space-y-3">
+            <h4 className="font-medium text-secondary-900 dark:text-white">Última Actualización</h4>
+            <div className="text-sm text-secondary-600 dark:text-secondary-400">
+              {new Date().toLocaleDateString('es-ES', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              })}
+            </div>
+          </div>
         </div>
       </Card>
     </div>

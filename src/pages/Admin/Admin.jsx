@@ -51,6 +51,11 @@ const Admin = () => {
     setActiveTab("import");
   };
 
+  // Función para navegar entre pestañas
+  const handleNavigate = (tab) => {
+    setActiveTab(tab);
+  };
+
   // Manejar logout
   const handleLogout = () => {
     logout();
@@ -145,7 +150,12 @@ const Admin = () => {
           {/* Contenido de tabs */}
           <div className="space-y-6">
             {activeTab === "dashboard" && (
-              <AdminDashboard stats={stats} onImportClick={handleImportClick} />
+                              <AdminDashboard 
+                  stats={stats} 
+                  onImportClick={handleImportClick} 
+                  onNavigate={handleNavigate}
+                  loading={loading}
+                />
             )}
 
                     {activeTab === "administration" && (

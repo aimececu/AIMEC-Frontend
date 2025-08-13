@@ -18,9 +18,9 @@ export const useAdminData = () => {
 
       // Cargar datos iniciales
       const [products, categories, brands, subcategories, stats] = await Promise.all([
-        productEndpoints.getAllProducts(),
-        categoryEndpoints.getAllCategories(),
-        brandEndpoints.getAllBrands(),
+        productEndpoints.getProducts(),
+        categoryEndpoints.getCategories(),
+        brandEndpoints.getBrands(),
         categoryEndpoints.getAllSubcategories(),
         infoEndpoints.getSystemStats()
       ]);

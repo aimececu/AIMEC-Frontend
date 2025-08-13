@@ -36,9 +36,9 @@ const ProductFeaturesManager = ({
   const loadFeatures = async () => {
     try {
       setLoading(true);
-      const response = await productFeatureEndpoints.getFeaturesByProduct(
-        productId
-      );
+      const response = await productFeatureEndpoints.getFeatures({
+        product_id: productId
+      });
       if (response.success) {
         setFeatures(response.data);
       }
@@ -132,7 +132,11 @@ const ProductFeaturesManager = ({
           Características del Producto
         </h3>
         <Button
-          onClick={openCreateModal}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            openCreateModal();
+          }}
           className="bg-primary-600 hover:bg-primary-700"
         >
           <Icon name="FiPlus" className="mr-2" />
@@ -151,12 +155,16 @@ const ProductFeaturesManager = ({
           <p className="text-gray-500 dark:text-gray-400">
             No hay características definidas para este producto
           </p>
-          <Button
-            onClick={openCreateModal}
-            className="mt-4 bg-primary-600 hover:bg-primary-700"
-          >
-            Agregar Primera Característica
-          </Button>
+                      <Button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                openCreateModal();
+              }}
+              className="mt-4 bg-primary-600 hover:bg-primary-700"
+            >
+              Agregar Primera Característica
+            </Button>
         </Card>
       ) : (
         <div className="space-y-3">
@@ -175,7 +183,11 @@ const ProductFeaturesManager = ({
                 </div>
                 <div className="flex gap-2">
                   <Button
-                    onClick={() => handleEdit(feature)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleEdit(feature);
+                    }}
                     size="sm"
                     variant="outline"
                     className="text-blue-600 border-blue-600 hover:bg-blue-50"
@@ -183,7 +195,11 @@ const ProductFeaturesManager = ({
                     <Icon name="FiEdit" className="w-4 h-4" />
                   </Button>
                   <Button
-                    onClick={() => handleDelete(feature.id)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleDelete(feature.id);
+                    }}
                     size="sm"
                     variant="outline"
                     className="text-red-600 border-red-600 hover:bg-red-50"
@@ -198,13 +214,19 @@ const ProductFeaturesManager = ({
       )}
 
       {/* Modal para crear/editar características */}
-      <Modal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        title={
-          editingFeature ? "Editar Característica" : "Nueva Característica"
-        }
-      >
+              <Modal
+          isOpen={showModal}
+          onClose={(e) => {
+            if (e) {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+            setShowModal(false);
+          }}
+          title={
+            editingFeature ? "Editar Característica" : "Nueva Característica"
+          }
+        >
         <div className="space-y-4">
           <div>
             <TextArea
@@ -236,13 +258,21 @@ const ProductFeaturesManager = ({
             <Button
               type="button"
               variant="outline"
-              onClick={() => setShowModal(false)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setShowModal(false);
+              }}
             >
               Cancelar
             </Button>
             <Button
               type="button"
-              onClick={handleSubmit}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleSubmit();
+              }}
               disabled={loading || !formData.feature_text.trim()}
               className="bg-primary-600 hover:bg-primary-700"
             >

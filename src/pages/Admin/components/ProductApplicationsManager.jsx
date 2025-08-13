@@ -36,8 +36,9 @@ const ProductApplicationsManager = ({
   const loadApplications = async () => {
     try {
       setLoading(true);
-      const response =
-        await productApplicationEndpoints.getApplicationsByProduct(productId);
+      const response = await productApplicationEndpoints.getApplications({
+        product_id: productId
+      });
       if (response.success) {
         setApplications(response.data);
       }
@@ -131,7 +132,11 @@ const ProductApplicationsManager = ({
           Aplicaciones del Producto
         </h3>
         <Button
-          onClick={openCreateModal}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            openCreateModal();
+          }}
           className="bg-green-600 hover:bg-green-700"
         >
           <Icon name="FiPlus" className="mr-2" />
@@ -153,12 +158,16 @@ const ProductApplicationsManager = ({
           <p className="text-gray-500 dark:text-gray-400">
             No hay aplicaciones definidas para este producto
           </p>
-          <Button
-            onClick={openCreateModal}
-            className="mt-4 bg-green-600 hover:bg-green-700"
-          >
-            Agregar Primera Aplicación
-          </Button>
+                      <Button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                openCreateModal();
+              }}
+              className="mt-4 bg-green-600 hover:bg-green-700"
+            >
+              Agregar Primera Aplicación
+            </Button>
         </Card>
       ) : (
         <div className="space-y-3">
@@ -177,7 +186,11 @@ const ProductApplicationsManager = ({
                 </div>
                 <div className="flex gap-2">
                   <Button
-                    onClick={() => handleEdit(application)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleEdit(application);
+                    }}
                     size="sm"
                     variant="outline"
                     className="text-blue-600 border-blue-600 hover:bg-blue-50"
@@ -185,7 +198,11 @@ const ProductApplicationsManager = ({
                     <Icon name="FiEdit" className="w-4 h-4" />
                   </Button>
                   <Button
-                    onClick={() => handleDelete(application.id)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleDelete(application.id);
+                    }}
                     size="sm"
                     variant="outline"
                     className="text-red-600 border-red-600 hover:bg-red-50"
@@ -200,11 +217,17 @@ const ProductApplicationsManager = ({
       )}
 
       {/* Modal para crear/editar aplicaciones */}
-      <Modal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        title={editingApplication ? "Editar Aplicación" : "Nueva Aplicación"}
-      >
+              <Modal
+          isOpen={showModal}
+          onClose={(e) => {
+            if (e) {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+            setShowModal(false);
+          }}
+          title={editingApplication ? "Editar Aplicación" : "Nueva Aplicación"}
+        >
         <div className="space-y-4">
           <div>
             <TextArea
@@ -236,13 +259,21 @@ const ProductApplicationsManager = ({
             <Button
               type="button"
               variant="outline"
-              onClick={() => setShowModal(false)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setShowModal(false);
+              }}
             >
               Cancelar
             </Button>
             <Button
               type="button"
-              onClick={handleSubmit}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleSubmit();
+              }}
               disabled={loading || !formData.application_text.trim()}
               className="bg-green-600 hover:bg-green-700"
             >

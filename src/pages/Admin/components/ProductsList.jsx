@@ -216,6 +216,31 @@ const ProductsList = ({
                   </div>
                 </div>
               </div>
+
+              {/* Resumen de características y aplicaciones */}
+              <div className="mb-4">
+                <h4 className="text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                  Detalles del producto:
+                </h4>
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-secondary-600 dark:text-secondary-400">
+                      Características:
+                    </span>
+                    <span className="text-secondary-800 dark:text-secondary-200 font-medium">
+                      {product.features_count || 0} definidas
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-secondary-600 dark:text-secondary-400">
+                      Aplicaciones:
+                    </span>
+                    <span className="text-secondary-800 dark:text-secondary-200 font-medium">
+                      {product.applications_count || 0} definidas
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Acciones - siempre en la parte inferior */}

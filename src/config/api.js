@@ -115,6 +115,26 @@ export const ENDPOINTS = {
   SYSTEM: {
     HEALTH: '/health',
     INFO: '/'
+  },
+
+  // Características de productos
+  PRODUCT_FEATURES: {
+    LIST: '/productFeatures',
+    DETAIL: (id) => `/productFeatures/${id}`,
+    CREATE: '/productFeatures',
+    UPDATE: (id) => `/productFeatures/${id}`,
+    DELETE: (id) => `/productFeatures/${id}`,
+    BY_PRODUCT: (productId) => `/productFeatures?product_id=${productId}`
+  },
+
+  // Aplicaciones de productos
+  PRODUCT_APPLICATIONS: {
+    LIST: '/productApplications',
+    DETAIL: (id) => `/productApplications/${id}`,
+    CREATE: '/productApplications',
+    UPDATE: (id) => `/productApplications/${id}`,
+    DELETE: (id) => `/productApplications/${id}`,
+    BY_PRODUCT: (productId) => `/productApplications?product_id=${productId}`
   }
 };
 

@@ -6,21 +6,25 @@ import Heading from "../../components/ui/Heading";
 import Card from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
-import ProductCard from "../../components/ui/ProductCard";
 import ImageWithFallback from "../../components/ui/ImageWithFallback";
 import Loader from "../../components/ui/Loader";
 import { useCart } from "../../context/CartContext";
 import { productEndpoints } from "../../api/endpoints/products.js";
+import { productFeatureEndpoints } from "../../api/endpoints/productFeatures";
+import { productApplicationEndpoints } from "../../api/endpoints/productApplications";
 import clsx from "clsx";
 
 const ProductDetail = () => {
   const { id } = useParams();
   const { addToCart, isInCart } = useCart();
   const [quantity, setQuantity] = useState(1);
-  const [activeTab, setActiveTab] = useState("description");
+  const [activeTab, setActiveTab] = useState("specifications");
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [features, setFeatures] = useState([]);
+  const [applications, setApplications] = useState([]);
+  const [loadingDetails, setLoadingDetails] = useState(false);
 
   // Cargar el producto desde la API
   useEffect(() => {
@@ -45,6 +49,35 @@ const ProductDetail = () => {
       loadProduct();
     }
   }, [id]);
+
+  // Cargar características y aplicaciones del producto
+  useEffect(() => {
+    const loadProductDetails = async () => {
+      if (!product?.id) return;
+      
+      try {
+        setLoadingDetails(true);
+        const [featuresResponse, applicationsResponse] = await Promise.all([
+          productFeatureEndpoints.getFeaturesByProduct(product.id),
+          productApplicationEndpoints.getApplicationsByProduct(product.id)
+        ]);
+
+        if (featuresResponse.success) {
+          setFeatures(featuresResponse.data);
+        }
+
+        if (applicationsResponse.success) {
+          setApplications(applicationsResponse.data);
+        }
+      } catch (error) {
+        console.error('Error loading product details:', error);
+      } finally {
+        setLoadingDetails(false);
+      }
+    };
+
+    loadProductDetails();
+  }, [product?.id]);
 
   if (loading) {
     return (
@@ -100,27 +133,16 @@ const ProductDetail = () => {
     category,
     subcategory,
     weight,
-    dimensions
+    dimensions,
   } = product;
 
-  // Valores por defecto para campos que no existen en el backend
-  const originalPrice = null; // No existe en el modelo
+  // Simplificar variables usando solo los campos que existen
   const image = main_image;
   const stock = stock_quantity;
-  const series = null; // No existe en el modelo
-  const specifications = {}; // No existe en el modelo
-  const features = []; // No existe en el modelo
-  const applications = []; // No existe en el modelo
-  const certifications = []; // No existe en el modelo
-  const warranty = null; // No existe en el modelo
-  const leadTime = null; // No existe en el modelo
-
 
   const handleAddToCart = () => {
     addToCart(product, quantity);
   };
-
-
 
   return (
     <div className="min-h-screen bg-secondary-50 dark:bg-secondary-900">
@@ -175,15 +197,10 @@ const ProductDetail = () => {
               {/* Category and Brand */}
               <div className="flex items-center gap-2">
                 <span className="text-sm text-secondary-500 dark:text-secondary-400 bg-secondary-100 dark:bg-secondary-700 px-3 py-1 rounded-full">
-                  {category?.name || 'Sin categoría'}
+                  {category?.name || "Sin categoría"}
                 </span>
-                {series && (
-                  <span className="text-sm text-secondary-500 dark:text-secondary-400 bg-primary-100 dark:bg-primary-900 px-3 py-1 rounded-full">
-                    {series}
-                  </span>
-                )}
-                <span className="text-sm text-secondary-500 dark:text-secondary-400">
-                  {brand?.name || 'Sin marca'}
+                <span className="text-sm text-secondary-500 dark:text-secondary-400 bg-primary-100 dark:bg-primary-900 px-3 py-1 rounded-full">
+                  {brand?.name || "Sin marca"}
                 </span>
               </div>
 
@@ -197,11 +214,6 @@ const ProductDetail = () => {
                 <span className="text-3xl font-bold text-primary-600 dark:text-primary-400">
                   ${(parseFloat(price) || 0).toFixed(2)}
                 </span>
-                {originalPrice && parseFloat(originalPrice) > parseFloat(price) && (
-                  <span className="text-xl text-secondary-400 line-through">
-                    ${parseFloat(originalPrice).toFixed(2)}
-                  </span>
-                )}
               </div>
 
               {/* Stock Status */}
@@ -218,11 +230,6 @@ const ProductDetail = () => {
                 >
                   {stock > 0 ? `${stock} unidades en stock` : "Sin stock"}
                 </span>
-                {leadTime && (
-                  <span className="text-sm text-secondary-600 dark:text-secondary-400">
-                    Tiempo de entrega: {leadTime}
-                  </span>
-                )}
               </div>
 
               {/* Description */}
@@ -286,9 +293,8 @@ const ProductDetail = () => {
                       const body =
                         encodeURIComponent(`Hola, me interesa cotizar el siguiente producto:
                           Producto: ${name}
-                          Marca: ${brand?.name || 'Sin marca'}
-                          Categoría: ${category?.name || 'Sin categoría'}
-                          ${series ? `Serie: ${series}` : ""}
+                          Marca: ${brand?.name || "Sin marca"}
+                          Categoría: ${category?.name || "Sin categoría"}
                           Precio: $${(parseFloat(price) || 0).toFixed(2)}
                           Cantidad: ${quantity}
 
@@ -313,9 +319,8 @@ const ProductDetail = () => {
                       const message =
                         encodeURIComponent(`Hola, me interesa cotizar el siguiente producto:
                           *${name}*
-                          • Marca: ${brand?.name || 'Sin marca'}
-                          • Categoría: ${category?.name || 'Sin categoría'}
-                          ${series ? `• Serie: ${series}` : ""}
+                          • Marca: ${brand?.name || "Sin marca"}
+                          • Categoría: ${category?.name || "Sin categoría"}
                           • Precio: $${(parseFloat(price) || 0).toFixed(2)}
                           • Cantidad: ${quantity}
 
@@ -342,7 +347,6 @@ const ProductDetail = () => {
             <div className="border-b border-secondary-200 dark:border-secondary-700">
               <nav className="flex space-x-8">
                 {[
-                  "description",
                   "specifications",
                   "features",
                   "applications",
@@ -357,54 +361,241 @@ const ProductDetail = () => {
                         : "border-transparent text-secondary-500 dark:text-secondary-400 hover:text-secondary-700 dark:hover:text-secondary-300"
                     )}
                   >
-                    {tab === "description" && "Descripción"}
                     {tab === "specifications" && "Especificaciones"}
-                    {tab === "features" && "Características"}
-                    {tab === "applications" && "Aplicaciones"}
+                    {tab === "features" &&
+                      `Características ${
+                        features.length > 0 ? `(${features.length})` : ""
+                      }`}
+                    {tab === "applications" &&
+                      `Aplicaciones ${
+                        applications.length > 0
+                          ? `(${applications.length})`
+                          : ""
+                      }`}
                   </button>
                 ))}
               </nav>
             </div>
 
             <div className="p-6">
-              {activeTab === "description" && (
-                <div className="prose dark:prose-invert max-w-none">
-                  <p className="text-secondary-600 dark:text-secondary-300 leading-relaxed">
-                    {description}
-                  </p>
-                </div>
-              )}
-
               {activeTab === "specifications" && (
-                <div className="text-center py-8">
-                  <Icon name="FiInfo" className="mx-auto text-4xl text-secondary-400 mb-4" />
-                  <p className="text-secondary-600 dark:text-secondary-400">
-                    No hay especificaciones técnicas disponibles para este producto.
-                  </p>
+                <div className="space-y-6">
+                  <h3 className="text-xl font-semibold text-secondary-900 dark:text-white mb-4">
+                    Especificaciones Técnicas
+                  </h3>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Información básica */}
+                    <div className="space-y-4">
+                      <h4 className="text-lg font-medium text-secondary-800 dark:text-secondary-200">
+                        Información General
+                      </h4>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center py-2 border-b border-secondary-200 dark:border-secondary-700">
+                          <span className="text-secondary-600 dark:text-secondary-400">
+                            Marca:
+                          </span>
+                          <span className="font-medium text-secondary-900 dark:text-white">
+                            {brand?.name || "No especificado"}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center py-2 border-b border-secondary-200 dark:border-secondary-700">
+                          <span className="text-secondary-600 dark:text-secondary-400">
+                            Categoría:
+                          </span>
+                          <span className="font-medium text-secondary-900 dark:text-white">
+                            {category?.name || "No especificado"}
+                          </span>
+                        </div>
+                        {subcategory && (
+                          <div className="flex justify-between items-center py-2 border-b border-secondary-200 dark:border-secondary-700">
+                            <span className="text-secondary-600 dark:text-secondary-400">
+                              Subcategoría:
+                            </span>
+                            <span className="font-medium text-secondary-900 dark:text-white">
+                              {subcategory.name}
+                            </span>
+                          </div>
+                        )}
+                        <div className="flex justify-between items-center py-2 border-b border-secondary-200 dark:border-secondary-700">
+                          <span className="text-secondary-600 dark:text-secondary-400">
+                            SKU:
+                          </span>
+                          <span className="font-medium text-secondary-900 dark:text-white font-mono">
+                            {product.sku || "No especificado"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Especificaciones físicas */}
+                    <div className="space-y-4">
+                      <h4 className="text-lg font-medium text-secondary-800 dark:text-secondary-200">
+                        Especificaciones Físicas
+                      </h4>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center py-2 border-b border-secondary-200 dark:border-secondary-700">
+                          <span className="text-secondary-600 dark:text-secondary-400">
+                            Peso:
+                          </span>
+                          <span className="font-medium text-secondary-900 dark:text-white">
+                            {weight ? `${weight} kg` : "No especificado"}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center py-2 border-b border-secondary-200 dark:border-secondary-700">
+                          <span className="text-secondary-600 dark:text-secondary-400">
+                            Dimensiones:
+                          </span>
+                          <span className="font-medium text-secondary-900 dark:text-white">
+                            {dimensions || "No especificado"}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center py-2 border-b border-secondary-200 dark:border-secondary-700">
+                          <span className="text-secondary-600 dark:text-secondary-400">
+                            Stock disponible:
+                          </span>
+                          <span className="font-medium text-secondary-900 dark:text-white">
+                            {stock} unidades
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Resumen de características y aplicaciones */}
+                  <div className="mt-8 pt-6 border-t border-secondary-200 dark:border-secondary-700">
+                    <h4 className="text-lg font-medium text-secondary-800 dark:text-secondary-200 mb-4">
+                      Resumen del Producto
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                        <Icon
+                          name="FiList"
+                          className="text-blue-600 dark:text-blue-400"
+                        />
+                        <div>
+                          <p className="font-medium text-blue-900 dark:text-blue-100">
+                            {features.length} Características
+                          </p>
+                          <p className="text-sm text-blue-700 dark:text-blue-300">
+                            Especificaciones técnicas del producto
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                        <Icon
+                          name="FiTarget"
+                          className="text-green-600 dark:text-green-400"
+                        />
+                        <div>
+                          <p className="font-medium text-green-900 dark:text-green-100">
+                            {applications.length} Aplicaciones
+                          </p>
+                          <p className="text-sm text-green-700 dark:text-green-300">
+                            Usos y aplicaciones del producto
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
 
               {activeTab === "features" && (
-                <div className="text-center py-8">
-                  <Icon name="FiInfo" className="mx-auto text-4xl text-secondary-400 mb-4" />
-                  <p className="text-secondary-600 dark:text-secondary-400">
-                    No hay características especiales disponibles para este producto.
-                  </p>
+                <div className="space-y-4">
+                  {loadingDetails ? (
+                    <div className="text-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-4"></div>
+                      <p className="text-secondary-600 dark:text-secondary-400">
+                        Cargando características...
+                      </p>
+                    </div>
+                  ) : features.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Icon
+                        name="FiInfo"
+                        className="mx-auto text-4xl text-secondary-400 mb-4"
+                      />
+                      <p className="text-secondary-600 dark:text-secondary-400">
+                        No hay características especiales disponibles para este
+                        producto.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <h3 className="text-xl font-semibold text-secondary-900 dark:text-white mb-4">
+                        Características del Producto
+                      </h3>
+                      <div className="grid gap-4">
+                        {features
+                          .sort((a, b) => a.sort_order - b.sort_order)
+                          .map((feature, index) => (
+                            <div
+                              key={feature.id}
+                              className="flex items-start gap-3 p-4 bg-secondary-50 dark:bg-secondary-800 rounded-lg"
+                            >
+                              <div className="flex-shrink-0 w-6 h-6 bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 rounded-full flex items-center justify-center text-sm font-medium">
+                                {index + 1}
+                              </div>
+                              <p className="text-secondary-700 dark:text-secondary-300 leading-relaxed">
+                                {feature.feature_text}
+                              </p>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
               {activeTab === "applications" && (
-                <div className="text-center py-8">
-                  <Icon name="FiInfo" className="mx-auto text-4xl text-secondary-400 mb-4" />
-                  <p className="text-secondary-600 dark:text-secondary-400">
-                    No hay aplicaciones específicas disponibles para este producto.
-                  </p>
+                <div className="space-y-4">
+                  {loadingDetails ? (
+                    <div className="text-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-4"></div>
+                      <p className="text-secondary-600 dark:text-secondary-400">
+                        Cargando aplicaciones...
+                      </p>
+                    </div>
+                  ) : applications.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Icon
+                        name="FiInfo"
+                        className="mx-auto text-4xl text-secondary-400 mb-4"
+                      />
+                      <p className="text-secondary-600 dark:text-secondary-400">
+                        No hay aplicaciones específicas disponibles para este
+                        producto.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <h3 className="text-xl font-semibold text-secondary-900 dark:text-white mb-4">
+                        Aplicaciones del Producto
+                      </h3>
+                      <div className="grid gap-4">
+                        {applications
+                          .sort((a, b) => a.sort_order - b.sort_order)
+                          .map((application, index) => (
+                            <div
+                              key={application.id}
+                              className="flex items-start gap-3 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800"
+                            >
+                              <div className="flex-shrink-0 w-6 h-6 bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center text-sm font-medium">
+                                {index + 1}
+                              </div>
+                              <p className="text-secondary-700 dark:text-secondary-300 leading-relaxed">
+                                {application.application_text}
+                              </p>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
           </Card>
-
-
         </div>
       </Container>
     </div>

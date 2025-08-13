@@ -1,9 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Input from "../../../components/ui/Input";
 import Select from "../../../components/ui/Select";
 import TextArea from "../../../components/ui/TextArea";
 import Button from "../../../components/ui/Button";
 import Modal from "../../../components/ui/Modal";
+import ProductFeaturesManager from "./ProductFeaturesManager";
+import ProductApplicationsManager from "./ProductApplicationsManager";
 
 const ProductForm = ({
   productForm,
@@ -15,6 +17,8 @@ const ProductForm = ({
   editingProduct,
 }) => {
   console.log(productForm);
+  
+  const [activeTab, setActiveTab] = useState('general');
   
   const handleFormChange = (field, value) => {
     setProductForm((prev) => ({
@@ -67,7 +71,49 @@ const ProductForm = ({
       size="max-w-4xl"
     >
       <form id="product-form" onSubmit={onSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Pestañas */}
+        <div className="border-b border-gray-200 dark:border-gray-700">
+          <nav className="-mb-px flex space-x-8">
+            <button
+              type="button"
+              onClick={() => setActiveTab('general')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'general'
+                  ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+              }`}
+            >
+              Información General
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('features')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'features'
+                  ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+              }`}
+            >
+              Características
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('applications')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'applications'
+                  ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+              }`}
+            >
+              Aplicaciones
+            </button>
+          </nav>
+        </div>
+
+        {/* Contenido de las pestañas */}
+        {activeTab === 'general' && (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* SKU */}
           <Input
             label="SKU"
@@ -210,6 +256,39 @@ const ProductForm = ({
           onChange={(value) => handleFormChange("main_image", value)}
           placeholder="URL de la imagen principal"
         />
+          </>
+        )}
+
+        {/* Pestaña de Características */}
+        {activeTab === 'features' && editingProduct && (
+          <div className="py-4">
+            <ProductFeaturesManager 
+              productId={editingProduct.id} 
+              productName={editingProduct.name} 
+              isInsideForm={true}
+            />
+          </div>
+        )}
+
+        {/* Pestaña de Aplicaciones */}
+        {activeTab === 'applications' && editingProduct && (
+          <div className="py-4">
+            <ProductApplicationsManager 
+              productId={editingProduct.id} 
+              productName={editingProduct.name} 
+              isInsideForm={true}
+            />
+          </div>
+        )}
+
+        {/* Mensaje cuando no hay producto seleccionado */}
+        {(activeTab === 'features' || activeTab === 'applications') && !editingProduct && (
+          <div className="text-center py-8">
+            <p className="text-gray-500 dark:text-gray-400">
+              Guarda el producto primero para poder gestionar sus características y aplicaciones
+            </p>
+          </div>
+        )}
       </form>
     </Modal>
   );

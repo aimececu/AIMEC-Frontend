@@ -12,6 +12,7 @@ import { useCart } from "../../context/CartContext";
 import { productEndpoints } from "../../api/endpoints/products.js";
 import { productFeatureEndpoints } from "../../api/endpoints/productFeatures";
 import { productApplicationEndpoints } from "../../api/endpoints/productApplications";
+import AccessoriesSection from "../../components/ProductDetail/AccessoriesSection";
 import clsx from "clsx";
 
 const ProductDetail = () => {
@@ -350,6 +351,7 @@ const ProductDetail = () => {
                   "specifications",
                   "features",
                   "applications",
+                  "accessories",
                 ].map((tab) => (
                   <button
                     key={tab}
@@ -372,6 +374,7 @@ const ProductDetail = () => {
                           ? `(${applications.length})`
                           : ""
                       }`}
+                    {tab === "accessories" && "Accesorios"}
                   </button>
                 ))}
               </nav>
@@ -593,6 +596,10 @@ const ProductDetail = () => {
                     </div>
                   )}
                 </div>
+              )}
+
+              {activeTab === "accessories" && (
+                <AccessoriesSection productId={product.id} />
               )}
             </div>
           </Card>

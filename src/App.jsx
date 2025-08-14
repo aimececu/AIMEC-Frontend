@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider as CustomThemeProvider } from './context/ThemeContext';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
+import { ToastProvider } from './context/ToastContext';
 import Navbar from './components/Navigation/Navbar';
 import Footer from './components/Navigation/Footer';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
@@ -45,7 +46,9 @@ const App = () => {
     <CustomThemeProvider>
       <AuthProvider>
         <CartProvider>
-          <AppContent />
+          <ToastProvider>
+            <AppContent />
+          </ToastProvider>
         </CartProvider>
       </AuthProvider>
     </CustomThemeProvider>

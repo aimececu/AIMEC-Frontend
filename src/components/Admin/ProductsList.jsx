@@ -5,6 +5,7 @@ import Select from "../ui/Select";
 import Button from "../ui/Button";
 import Icon from "../ui/Icon";
 import ImageWithFallback from "../ui/ImageWithFallback";
+import ConfirmDialog from "../ui/ConfirmDialog";
 
 const ProductsList = ({
   products,
@@ -18,6 +19,35 @@ const ProductsList = ({
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(12); // Productos por página
+
+  // Estado para el ConfirmDialog
+  const [deleteConfirm, setDeleteConfirm] = useState({
+    isOpen: false,
+    productId: null,
+    productName: "",
+  });
+
+  // Función para abrir el confirm dialog de eliminación
+  const handleDeleteClick = (product) => {
+    setDeleteConfirm({
+      isOpen: true,
+      productId: product.id,
+      productName: product.name,
+    });
+  };
+
+  // Función para confirmar la eliminación
+  const handleConfirmDelete = () => {
+    if (deleteConfirm.productId) {
+      onDeleteProduct(deleteConfirm.productId);
+      setDeleteConfirm({ isOpen: false, productId: null, productName: "" });
+    }
+  };
+
+  // Función para cerrar el confirm dialog
+  const handleCloseDeleteConfirm = () => {
+    setDeleteConfirm({ isOpen: false, productId: null, productName: "" });
+  };
 
   // Filtrar productos
   const filteredProducts = products.filter((product) => {
@@ -270,7 +300,7 @@ const ProductsList = ({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => onDeleteProduct(product.id)}
+                onClick={() => handleDeleteClick(product)}
                 className="flex items-center gap-2 border-red-600 text-red-600 hover:bg-red-50 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-300"
               >
                 <Icon name="FiTrash2" size="sm" />
@@ -385,6 +415,18 @@ const ProductsList = ({
           </Button>
         </Card>
       )}
+
+      {/* ConfirmDialog de eliminación */}
+      <ConfirmDialog
+        isOpen={deleteConfirm.isOpen}
+        onClose={handleCloseDeleteConfirm}
+        onConfirm={handleConfirmDelete}
+        title="Confirmar eliminación"
+        message={`¿Estás seguro de que quieres eliminar el producto "${deleteConfirm.productName}"? Esta acción no se puede deshacer.`}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        waitTime={10}
+      />
     </div>
   );
 };

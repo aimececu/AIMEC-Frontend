@@ -25,8 +25,6 @@ export const useAdminData = () => {
         infoEndpoints.getSystemStats()
       ]);
 
-      console.log("productStats", stats);
-
       // Usar directamente los datos del backend sin transformaciones
       if (products.success) {
         setProducts(

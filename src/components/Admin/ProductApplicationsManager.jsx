@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { productFeatureEndpoints } from "../../../api/endpoints/productFeatures";
-import Card from "../../../components/ui/Card";
-import Button from "../../../components/ui/Button";
-import Input from "../../../components/ui/Input";
-import TextArea from "../../../components/ui/TextArea";
-import Modal from "../../../components/ui/Modal";
-import Icon from "../../../components/ui/Icon";
-import Toast from "../../../components/ui/Toast";
+import { productApplicationEndpoints } from "../../api/endpoints/productApplications";
+import Card from "../ui/Card";
+import Button from "../ui/Button";
+import Input from "../ui/Input";
+import TextArea from "../ui/TextArea";
+import Modal from "../ui/Modal";
+import Icon from "../ui/Icon";
+import Toast from "../ui/Toast";
 
-const ProductFeaturesManager = ({
+const ProductApplicationsManager = ({
   productId,
   productName,
   isInsideForm = false,
 }) => {
-  const [features, setFeatures] = useState([]);
+  const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [editingFeature, setEditingFeature] = useState(null);
+  const [editingApplication, setEditingApplication] = useState(null);
   const [formData, setFormData] = useState({
-    feature_text: "",
+    application_text: "",
     sort_order: 0,
   });
   const [toast, setToast] = useState({
@@ -29,28 +29,27 @@ const ProductFeaturesManager = ({
 
   useEffect(() => {
     if (productId) {
-      loadFeatures();
+      loadApplications();
     }
   }, [productId]);
 
-  const loadFeatures = async () => {
+  const loadApplications = async () => {
     try {
       setLoading(true);
-      const response = await productFeatureEndpoints.getFeatures({
-        product_id: productId
+      const response = await productApplicationEndpoints.getApplications({
+        product_id: productId,
       });
       if (response.success) {
-        setFeatures(response.data);
+        setApplications(response.data);
       }
     } catch (error) {
-      showToast("Error al cargar características", "error");
+      showToast("Error al cargar aplicaciones", "error");
     } finally {
       setLoading(false);
     }
   };
 
   const handleSubmit = async () => {
-    console.log("handleSubmit", formData);
     try {
       setLoading(true);
       const data = {
@@ -58,46 +57,47 @@ const ProductFeaturesManager = ({
         ...formData,
       };
 
-      if (editingFeature) {
-        await productFeatureEndpoints.updateFeature(editingFeature.id, data);
-        showToast("Característica actualizada correctamente");
+      if (editingApplication) {
+        await productApplicationEndpoints.updateApplication(
+          editingApplication.id,
+          data
+        );
+        showToast("Aplicación actualizada correctamente");
       } else {
-        await productFeatureEndpoints.createFeature(data);
-        showToast("Característica creada correctamente");
+        await productApplicationEndpoints.createApplication(data);
+        showToast("Aplicación creada correctamente");
       }
 
       setShowModal(false);
       resetForm();
-      loadFeatures();
+      loadApplications();
     } catch (error) {
-      showToast("Error al guardar característica", "error");
+      showToast("Error al guardar aplicación", "error");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleEdit = (feature) => {
-    setEditingFeature(feature);
+  const handleEdit = (application) => {
+    setEditingApplication(application);
     setFormData({
-      feature_text: feature.feature_text,
-      sort_order: feature.sort_order,
+      application_text: application.application_text,
+      sort_order: application.sort_order,
     });
     setShowModal(true);
   };
 
-  const handleDelete = async (featureId) => {
+  const handleDelete = async (applicationId) => {
     if (
-      window.confirm(
-        "¿Estás seguro de que quieres eliminar esta característica?"
-      )
+      window.confirm("¿Estás seguro de que quieres eliminar esta aplicación?")
     ) {
       try {
         setLoading(true);
-        await productFeatureEndpoints.deleteFeature(featureId);
-        showToast("Característica eliminada correctamente");
-        loadFeatures();
+        await productApplicationEndpoints.deleteApplication(applicationId);
+        showToast("Aplicación eliminada correctamente");
+        loadApplications();
       } catch (error) {
-        showToast("Error al eliminar característica", "error");
+        showToast("Error al eliminar aplicación", "error");
       } finally {
         setLoading(false);
       }
@@ -105,9 +105,9 @@ const ProductFeaturesManager = ({
   };
 
   const resetForm = () => {
-    setEditingFeature(null);
+    setEditingApplication(null);
     setFormData({
-      feature_text: "",
+      application_text: "",
       sort_order: 0,
     });
   };
@@ -129,7 +129,7 @@ const ProductFeaturesManager = ({
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-          Características del Producto
+          Aplicaciones del Producto
         </h3>
         <Button
           onClick={(e) => {
@@ -137,75 +137,73 @@ const ProductFeaturesManager = ({
             e.stopPropagation();
             openCreateModal();
           }}
-          className="bg-primary-600 hover:bg-primary-700"
+          className="bg-green-600 hover:bg-green-700"
+          icon={<Icon name="FiPlus" />}
         >
-          <Icon name="FiPlus" className="mr-2" />
-          Agregar Característica
+          Agregar Aplicación
         </Button>
       </div>
 
       {loading ? (
         <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
           <p className="mt-2 text-gray-600 dark:text-gray-400">Cargando...</p>
         </div>
-      ) : features.length === 0 ? (
+      ) : applications.length === 0 ? (
         <Card className="p-8 text-center">
-          <Icon name="FiList" className="text-4xl text-gray-400 mx-auto mb-4" />
+          <Icon
+            name="FiTarget"
+            className="text-4xl text-gray-400 mx-auto mb-4"
+          />
           <p className="text-gray-500 dark:text-gray-400">
-            No hay características definidas para este producto
+            No hay aplicaciones definidas para este producto
           </p>
-                      <Button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                openCreateModal();
-              }}
-              className="mt-4 bg-primary-600 hover:bg-primary-700"
-            >
-              Agregar Primera Característica
-            </Button>
+          <Button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              openCreateModal();
+            }}
+            className="mt-4 bg-green-600 hover:bg-green-700"
+          >
+            Agregar Primera Aplicación
+          </Button>
         </Card>
       ) : (
         <div className="space-y-3">
-          {features.map((feature) => (
-            <Card key={feature.id} className="p-4">
-              <div className="flex justify-between items-start">
+          {applications.map((application) => (
+            <Card key={application.id} className="p-4">
+              <div className="flex justify-between items-center">
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                      Orden: {feature.sort_order}
-                    </span>
-                  </div>
-                  <p className="text-gray-900 dark:text-white">
-                    {feature.feature_text}
-                  </p>
+                  <span className="text-gray-900 dark:text-white">
+                    {application.sort_order}. {application.application_text}
+                  </span>
                 </div>
                 <div className="flex gap-2">
                   <Button
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      handleEdit(feature);
+                      handleEdit(application);
                     }}
+                    icon={<Icon name="FiEdit" />}
+                    iconOnly
                     size="sm"
                     variant="outline"
                     className="text-blue-600 border-blue-600 hover:bg-blue-50"
-                  >
-                    <Icon name="FiEdit" className="w-4 h-4" />
-                  </Button>
+                  />
                   <Button
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      handleDelete(feature.id);
+                      handleDelete(application.id);
                     }}
+                    icon={<Icon name="FiTrash2" />}
+                    iconOnly
                     size="sm"
                     variant="outline"
                     className="text-red-600 border-red-600 hover:bg-red-50"
-                  >
-                    <Icon name="FiTrash2" className="w-4 h-4" />
-                  </Button>
+                  />
                 </div>
               </div>
             </Card>
@@ -213,29 +211,27 @@ const ProductFeaturesManager = ({
         </div>
       )}
 
-      {/* Modal para crear/editar características */}
-              <Modal
-          isOpen={showModal}
-          onClose={(e) => {
-            if (e) {
-              e.preventDefault();
-              e.stopPropagation();
-            }
-            setShowModal(false);
-          }}
-          title={
-            editingFeature ? "Editar Característica" : "Nueva Característica"
+      {/* Modal para crear/editar aplicaciones */}
+      <Modal
+        isOpen={showModal}
+        onClose={(e) => {
+          if (e) {
+            e.preventDefault();
+            e.stopPropagation();
           }
-        >
+          setShowModal(false);
+        }}
+        title={editingApplication ? "Editar Aplicación" : "Nueva Aplicación"}
+      >
         <div className="space-y-4">
           <div>
             <TextArea
-              label="Característica"
-              value={formData.feature_text}
+              label="Aplicación"
+              value={formData.application_text}
               onChange={(value) =>
-                setFormData({ ...formData, feature_text: value })
+                setFormData({ ...formData, application_text: value })
               }
-              placeholder="Describe la característica del producto..."
+              placeholder="Describe la aplicación del producto..."
               required
               rows={3}
             />
@@ -273,12 +269,12 @@ const ProductFeaturesManager = ({
                 e.stopPropagation();
                 handleSubmit();
               }}
-              disabled={loading || !formData.feature_text.trim()}
-              className="bg-primary-600 hover:bg-primary-700"
+              disabled={loading || !formData.application_text.trim()}
+              className="bg-green-600 hover:bg-green-700"
             >
               {loading
                 ? "Guardando..."
-                : editingFeature
+                : editingApplication
                 ? "Actualizar"
                 : "Crear"}
             </Button>
@@ -297,4 +293,4 @@ const ProductFeaturesManager = ({
   );
 };
 
-export default ProductFeaturesManager;
+export default ProductApplicationsManager;

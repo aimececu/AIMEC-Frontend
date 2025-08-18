@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import Card from "../../../components/ui/Card";
-import Heading from "../../../components/ui/Heading";
-import Button from "../../../components/ui/Button";
-import Icon from "../../../components/ui/Icon";
-import Input from "../../../components/ui/Input";
-import Loader from "../../../components/ui/Loader";
-import { importEndpoints } from "../../../api/endpoints/import";
+import Card from "../ui/Card";
+import Heading from "../ui/Heading";
+import Button from "../ui/Button";
+import Icon from "../ui/Icon";
+import Input from "../ui/Input";
+import Loader from "../ui/Loader";
+import { importEndpoints } from "../../api/endpoints/import";
 
 const ImportData = ({ onRefresh }) => {
   const [file, setFile] = useState(null);

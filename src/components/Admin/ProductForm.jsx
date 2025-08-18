@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
-import Input from "../../../components/ui/Input";
-import Select from "../../../components/ui/Select";
-import TextArea from "../../../components/ui/TextArea";
-import Button from "../../../components/ui/Button";
-import Modal from "../../../components/ui/Modal";
+import React, { useEffect, useState, useRef } from "react";
+import Input from "../ui/Input";
+import Select from "../ui/Select";
+import TextArea from "../ui/TextArea";
+import Button from "../ui/Button";
+import Modal from "../ui/Modal";
 import ProductFeaturesManager from "./ProductFeaturesManager";
 import ProductApplicationsManager from "./ProductApplicationsManager";
-import AccessoriesManager from "../../../components/Admin/AccessoriesManager";
+import AccessoriesManager from "./ProductAccessoriesManager";
 
 const ProductForm = ({
   productForm,
@@ -18,6 +18,7 @@ const ProductForm = ({
   editingProduct,
 }) => {
   const [activeTab, setActiveTab] = useState("general");
+  const accessoriesManagerRef = useRef(null);
 
   const handleFormChange = (field, value) => {
     setProductForm((prev) => ({
@@ -36,6 +37,12 @@ const ProductForm = ({
     }
   }, [productForm.category_id, setProductForm]);
 
+  const handleSaveAccessories = async () => {
+    if (accessoriesManagerRef.current && accessoriesManagerRef.current.handleSaveAccessories) {
+      await accessoriesManagerRef.current.handleSaveAccessories();
+    }
+  };
+
   const modalTitle = editingProduct
     ? "Editar Producto"
     : "Agregar Nuevo Producto";
@@ -45,9 +52,25 @@ const ProductForm = ({
       <Button type="button" variant="outline" onClick={onCancel}>
         Cancelar
       </Button>
-      <Button type="submit" form="product-form">
-        {editingProduct ? "Actualizar Producto" : "Crear Producto"}
-      </Button>
+      
+      {/* Botón dinámico según la pestaña activa */}
+      {activeTab === "general" && (
+        <Button type="submit" form="product-form">
+          {editingProduct ? "Actualizar Producto" : "Crear Producto"}
+        </Button>
+      )}
+      
+      {activeTab === "accessories" && editingProduct && (
+        <Button 
+          type="button" 
+          onClick={handleSaveAccessories}
+          className="bg-primary-600 hover:bg-primary-700"
+        >
+          Guardar Accesorios
+        </Button>
+      )}
+      
+      {/* En features y applications no hay botones de acción */}
     </div>
   );
 
@@ -289,6 +312,7 @@ const ProductForm = ({
             onKeyDown={(e) => e.stopPropagation()}
           >
             <AccessoriesManager
+              ref={accessoriesManagerRef}
               productId={editingProduct.id}
               productName={editingProduct.name}
             />

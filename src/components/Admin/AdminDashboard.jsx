@@ -1,7 +1,7 @@
 import React from 'react';
-import Card from '../../../components/ui/Card';
-import Heading from '../../../components/ui/Heading';
-import Icon from '../../../components/ui/Icon';
+import Card from '../ui/Card';
+import Heading from '../ui/Heading';
+import Icon from '../ui/Icon';
 
 const AdminDashboard = ({ stats, onImportClick, onNavigate, loading = false }) => {
   return (

@@ -1,10 +1,10 @@
 import React from "react";
-import Card from "../../../components/ui/Card";
-import Input from "../../../components/ui/Input";
-import Select from "../../../components/ui/Select";
-import Button from "../../../components/ui/Button";
-import Icon from "../../../components/ui/Icon";
-import ImageWithFallback from "../../../components/ui/ImageWithFallback";
+import Card from "../ui/Card";
+import Input from "../ui/Input";
+import Select from "../ui/Select";
+import Button from "../ui/Button";
+import Icon from "../ui/Icon";
+import ImageWithFallback from "../ui/ImageWithFallback";
 import clsx from "clsx";
 
 const ProductsList = ({

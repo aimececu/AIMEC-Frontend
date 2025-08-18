@@ -7,11 +7,11 @@ import Icon from "../../components/ui/Icon";
 import Loader from "../../components/ui/Loader";
 import Toast from "../../components/ui/Toast";
 import { useAuth } from "../../context/AuthContext";
-import AdminDashboard from "./components/AdminDashboard";
-import ProductsList from "./components/ProductsList";
-import ProductForm from "./components/ProductForm";
-import AdminManager from "./components/AdminManager";
-import ImportData from "./components/ImportData";
+import AdminDashboard from "../../components/Admin/AdminDashboard";
+import ProductsList from "../../components/Admin/ProductsList";
+import ProductForm from "../../components/Admin/ProductForm";
+import AdminManager from "../../components/Admin/AdminManager";
+import ImportData from "../../components/Admin/ImportData";
 import { useAdminData } from "../../hooks/useAdminData";
 import { useProducts } from "../../hooks/useProducts";
 import clsx from "clsx";
@@ -30,8 +30,15 @@ const Admin = () => {
   });
 
   // Hooks personalizados
-  const { products, categories, brands, subcategories, loading, stats, loadInitialData } =
-    useAdminData();
+  const {
+    products,
+    categories,
+    brands,
+    subcategories,
+    loading,
+    stats,
+    loadInitialData,
+  } = useAdminData();
   const {
     editingProduct,
     showProductForm,
@@ -124,12 +131,16 @@ const Admin = () => {
           {/* Tabs de navegación */}
           <div className="mb-6">
             <nav className="flex space-x-8">
-                      {[
-          { id: "dashboard", label: "Dashboard", icon: "FiHome" },
-          { id: "administration", label: "Administración", icon: "FiSettings" },
-          { id: "products", label: "Productos", icon: "FiPackage" },
-          { id: "import", label: "Importar", icon: "FiUpload" },
-        ].map((tab) => (
+              {[
+                { id: "dashboard", label: "Dashboard", icon: "FiHome" },
+                {
+                  id: "administration",
+                  label: "Administración",
+                  icon: "FiSettings",
+                },
+                { id: "products", label: "Productos", icon: "FiPackage" },
+                { id: "import", label: "Importar", icon: "FiUpload" },
+              ].map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
@@ -150,22 +161,22 @@ const Admin = () => {
           {/* Contenido de tabs */}
           <div className="space-y-6">
             {activeTab === "dashboard" && (
-                              <AdminDashboard 
-                  stats={stats} 
-                  onImportClick={handleImportClick} 
-                  onNavigate={handleNavigate}
-                  loading={loading}
-                />
+              <AdminDashboard
+                stats={stats}
+                onImportClick={handleImportClick}
+                onNavigate={handleNavigate}
+                loading={loading}
+              />
             )}
 
-                    {activeTab === "administration" && (
-          <AdminManager
-            categories={categories}
-            subcategories={subcategories}
-            brands={brands}
-            onRefresh={loadInitialData}
-          />
-        )}
+            {activeTab === "administration" && (
+              <AdminManager
+                categories={categories}
+                subcategories={subcategories}
+                brands={brands}
+                onRefresh={loadInitialData}
+              />
+            )}
 
             {activeTab === "products" && (
               <ProductsList
@@ -174,16 +185,16 @@ const Admin = () => {
                 brands={brands}
                 filters={filters}
                 setFilters={setFilters}
-                onEditProduct={(product) => handleEditProduct(product, categories, brands)}
+                onEditProduct={(product) =>
+                  handleEditProduct(product, categories, brands)
+                }
                 onDeleteProduct={handleDeleteProduct}
                 onAddProduct={handleAddProduct}
               />
             )}
 
             {activeTab === "import" && (
-              <ImportData
-                onRefresh={loadInitialData}
-              />
+              <ImportData onRefresh={loadInitialData} />
             )}
           </div>
 

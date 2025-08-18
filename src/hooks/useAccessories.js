@@ -46,30 +46,54 @@ export const useAccessories = (productId) => {
     }
   }, [productId]);
 
-  // Agregar nuevo accesorio
-  const addAccessory = async (accessoryProductId) => {
-    if (!productId || !accessoryProductId) {
+  // Agregar nuevo accesorio (ahora puede ser uno o varios)
+  const addAccessory = async (accessoryProductIds) => {
+    if (!productId || !accessoryProductIds) {
       showToast('Datos incompletos para agregar accesorio', 'error');
+      return false;
+    }
+
+    // Convertir a array si es un solo ID
+    const ids = Array.isArray(accessoryProductIds) ? accessoryProductIds : [accessoryProductIds];
+    
+    if (ids.length === 0) {
+      showToast('Selecciona al menos un producto para agregar como accesorio', 'error');
       return false;
     }
 
     setLoading(true);
     try {
-      const response = await createAccessory({
-        main_product_id: productId,
-        accessory_product_id: accessoryProductId
-      });
+      // Crear todos los accesorios en paralelo
+      const promises = ids.map(accessoryProductId => 
+        createAccessory({
+          main_product_id: productId,
+          accessory_product_id: accessoryProductId
+        })
+      );
 
-      if (response.success) {
-        showToast('Accesorio agregado exitosamente', 'success');
+      const results = await Promise.all(promises);
+      const successCount = results.filter(r => r.success).length;
+      const errorCount = results.length - successCount;
+
+      if (successCount > 0) {
+        if (successCount === 1) {
+          showToast('Accesorio agregado exitosamente', 'success');
+        } else {
+          showToast(`${successCount} accesorios agregados exitosamente`, 'success');
+        }
+        
+        if (errorCount > 0) {
+          showToast(`${errorCount} accesorios no se pudieron agregar`, 'warning');
+        }
+        
         await fetchAccessories(); // Recargar lista
         return true;
       } else {
-        showToast(response.message || 'Error al agregar accesorio', 'error');
+        showToast('No se pudo agregar ningún accesorio', 'error');
         return false;
       }
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Error al agregar accesorio';
+      const errorMessage = err.response?.data?.message || 'Error al agregar accesorios';
       showToast(errorMessage, 'error');
       return false;
     } finally {

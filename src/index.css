@@ -29,6 +29,174 @@ ul, ol {
   margin: 0;
 }
 
+/* =====================================================
+   ESTILOS PERSONALIZADOS PARA SCROLLBARS
+   ===================================================== */
+
+/* Scrollbar personalizado para Webkit (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+::-webkit-scrollbar-corner {
+  background: #f1f5f9;
+}
+
+/* Scrollbar personalizado para Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+/* =====================================================
+   SCROLLBARS PARA DARK MODE
+   ===================================================== */
+
+/* Dark mode scrollbars */
+.dark ::-webkit-scrollbar-track {
+  background: #334155;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #64748b;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.dark ::-webkit-scrollbar-corner {
+  background: #334155;
+}
+
+/* Dark mode para Firefox */
+.dark * {
+  scrollbar-color: #64748b #334155;
+}
+
+/* =====================================================
+   SCROLLBARS ESPECÍFICOS PARA COMPONENTES
+   ===================================================== */
+
+/* Scrollbar para modales y listas */
+.modal-scrollbar::-webkit-scrollbar,
+.list-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-scrollbar::-webkit-scrollbar-track,
+.list-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-scrollbar::-webkit-scrollbar-thumb,
+.list-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.modal-scrollbar::-webkit-scrollbar-thumb:hover,
+.list-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Dark mode para scrollbars específicos */
+.dark .modal-scrollbar::-webkit-scrollbar-thumb,
+.dark .list-scrollbar::-webkit-scrollbar-thumb {
+  background: #64748b;
+}
+
+.dark .modal-scrollbar::-webkit-scrollbar-thumb:hover,
+.dark .list-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* =====================================================
+   UTILIDADES ADICIONALES PARA SCROLLBARS
+   ===================================================== */
+
+/* Scrollbar fino para elementos pequeños */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 2px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Scrollbar invisible (solo funcional) */
+.scrollbar-invisible::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.scrollbar-invisible::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-invisible::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+/* Scrollbar personalizado para tablas */
+.table-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.table-scrollbar::-webkit-scrollbar-track {
+  background: #f8fafc;
+  border-radius: 4px;
+}
+
+.table-scrollbar::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 4px;
+}
+
+.table-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #cbd5e1;
+}
+
+/* Dark mode para scrollbars de tablas */
+.dark .table-scrollbar::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+.dark .table-scrollbar::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+
+.dark .table-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
 /* Utility classes */
 
 /* Dark mode support */

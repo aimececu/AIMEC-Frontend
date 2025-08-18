@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import Modal from "../../../components/ui/Modal";
-import Button from "../../../components/ui/Button";
-import Input from "../../../components/ui/Input";
-import TextArea from "../../../components/ui/TextArea";
-import Icon from "../../../components/ui/Icon";
-import Loader from "../../../components/ui/Loader";
-import Select from "../../../components/ui/Select";
-import { categoryEndpoints } from "../../../api/endpoints/categories";
-import { brandEndpoints } from "../../../api/endpoints/brands";
+import Modal from "../ui/Modal";
+import Button from "../ui/Button";
+import Input from "../ui/Input";
+import TextArea from "../ui/TextArea";
+import Icon from "../ui/Icon";
+import Loader from "../ui/Loader";
+import Select from "../ui/Select";
+import { categoryEndpoints } from "../../api/endpoints/categories";
+import { brandEndpoints } from "../../api/endpoints/brands";
 
 const AdminManager = ({
   categories,

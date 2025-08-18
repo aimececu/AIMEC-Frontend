@@ -1,11 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import Card from "../ui/Card";
 import Input from "../ui/Input";
 import Select from "../ui/Select";
 import Button from "../ui/Button";
 import Icon from "../ui/Icon";
 import ImageWithFallback from "../ui/ImageWithFallback";
-import clsx from "clsx";
 
 const ProductsList = ({
   products,
@@ -17,6 +16,9 @@ const ProductsList = ({
   onDeleteProduct,
   onAddProduct,
 }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(12); // Productos por página
+
   // Filtrar productos
   const filteredProducts = products.filter((product) => {
     const matchesSearch =
@@ -26,13 +28,11 @@ const ProductsList = ({
 
     // Buscar la categoría por ID
     const matchesCategory =
-      !filters.category ||
-      product.category_id === parseInt(filters.category);
+      !filters.category || product.category_id === parseInt(filters.category);
 
     // Buscar la marca por ID
     const matchesBrand =
-      !filters.brand ||
-      product.brand_id === parseInt(filters.brand);
+      !filters.brand || product.brand_id === parseInt(filters.brand);
 
     const matchesStock =
       filters.inStock === "" ||
@@ -41,6 +41,36 @@ const ProductsList = ({
 
     return matchesSearch && matchesCategory && matchesBrand && matchesStock;
   });
+
+  // Calcular paginación
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentProducts = filteredProducts.slice(startIndex, endIndex);
+
+  // Cambiar página
+  const goToPage = (page) => {
+    setCurrentPage(page);
+  };
+
+  // Ir a la página anterior
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  // Ir a la página siguiente
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  // Resetear a la primera página cuando cambien los filtros
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [filters]);
 
   // Debug log para filtros
   // console.log("🔍 Filtros aplicados:", {
@@ -109,7 +139,7 @@ const ProductsList = ({
 
       {/* Lista de productos */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {filteredProducts.map((product) => (
+        {currentProducts.map((product) => (
           <Card
             key={product.id}
             className="p-6 hover:shadow-lg transition-all duration-200 hover:-translate-y-1 flex flex-col h-full"
@@ -126,7 +156,7 @@ const ProductsList = ({
                     fallbackSrc="/placeholder-product.jpg"
                   />
                   {/* Badge de stock */}
-                  <div className="absolute -top-2 -right-2">
+                  {/* <div className="absolute -top-2 -right-2">
                     <span
                       className={clsx(
                         "px-2 py-1 text-xs font-medium rounded-full",
@@ -141,26 +171,21 @@ const ProductsList = ({
                         ? `${product.stock_quantity} en stock`
                         : "Sin stock"}
                     </span>
-                  </div>
+                  </div> */}
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-secondary-900 dark:text-white text-lg mb-1 line-clamp-2">
+                  <h3 className="font-semibold text-secondary-900 dark:text-white text-base mb-1">
                     {product.name}
                   </h3>
-                  <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-2">
+                  <p className="text-xs text-secondary-600 dark:text-secondary-400 mb-2">
                     SKU: {product.sku}
                   </p>
-
-                  {/* Tags de categoría y marca */}
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    <span className="text-xs text-secondary-500 dark:text-secondary-400 bg-secondary-100 dark:bg-secondary-700 px-2 py-1 rounded-full">
-                      {product.category?.name || 'Sin categoría'}
+                  {product.accessories_count > 0 && (
+                    <span className="text-xs text-secondary-500 dark:text-secondary-400 bg-green-100 dark:bg-green-900  px-2 py-1 rounded-full">
+                      {product.accessories_count} accesorios
                     </span>
-                    <span className="text-xs text-secondary-500 dark:text-secondary-400 bg-primary-100 dark:bg-primary-900 px-2 py-1 rounded-full">
-                      {product.brand?.name || 'Sin marca'}
-                    </span>
-                  </div>
+                  )}
                 </div>
               </div>
 
@@ -169,12 +194,24 @@ const ProductsList = ({
                 <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
                   ${(parseFloat(product.price) || 0).toFixed(2)}
                 </span>
+
                 {product.originalPrice &&
-                  parseFloat(product.originalPrice) > parseFloat(product.price) && (
+                  parseFloat(product.originalPrice) >
+                    parseFloat(product.price) && (
                     <span className="text-lg text-secondary-400 line-through">
                       ${parseFloat(product.originalPrice).toFixed(2)}
                     </span>
                   )}
+              </div>
+
+              {/* Tags de categoría y marca */}
+              <div className="flex flex-wrap gap-2 mb-3">
+                <span className="text-xs text-secondary-500 dark:text-secondary-400 bg-primary-100 dark:bg-primary-900 px-2 py-1 rounded-full">
+                  {product.brand?.name || "Sin marca"}
+                </span>
+                <span className="text-xs text-secondary-500 dark:text-secondary-400 bg-secondary-100 dark:bg-secondary-700 px-2 py-1 rounded-full">
+                  {product.category?.name || "Sin categoría"}
+                </span>
               </div>
 
               {/* Descripción */}
@@ -184,43 +221,10 @@ const ProductsList = ({
                 </p>
               )}
 
-              {/* Especificaciones */}
-              <div className="mb-4">
+              {/* Resumen de características, aplicaciones y accesorios */}
+              {/* <div className="mb-4">
                 <h4 className="text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                  Información adicional:
-                </h4>
-                <div className="space-y-1">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-secondary-600 dark:text-secondary-400">
-                      Peso:
-                    </span>
-                    <span className="text-secondary-800 dark:text-secondary-200 font-medium">
-                      {product.weight ? `${product.weight} kg` : 'No especificado'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-secondary-600 dark:text-secondary-400">
-                      Dimensiones:
-                    </span>
-                    <span className="text-secondary-800 dark:text-secondary-200 font-medium">
-                      {product.dimensions || 'No especificado'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-secondary-600 dark:text-secondary-400">
-                      Stock mínimo:
-                    </span>
-                    <span className="text-secondary-800 dark:text-secondary-200 font-medium">
-                      {product.min_stock_level || 0}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Resumen de características y aplicaciones */}
-              <div className="mb-4">
-                <h4 className="text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                  Detalles del producto:
+                  Resumen del producto:
                 </h4>
                 <div className="space-y-1">
                   <div className="flex justify-between text-xs">
@@ -239,8 +243,16 @@ const ProductsList = ({
                       {product.applications_count || 0} definidas
                     </span>
                   </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-secondary-600 dark:text-secondary-400">
+                      Accesorios:
+                    </span>
+                    <span className="text-secondary-800 dark:text-secondary-200 font-medium">
+                      {product.accessories_count || 0} asignados
+                    </span>
+                  </div>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             {/* Acciones - siempre en la parte inferior */}
@@ -268,6 +280,88 @@ const ProductsList = ({
           </Card>
         ))}
       </div>
+
+      {/* Paginación */}
+      {totalPages > 1 && (
+        <Card className="p-4">
+          <div className="flex items-center justify-between">
+            {/* Información de página */}
+            <div className="text-sm text-secondary-600 dark:text-secondary-400">
+              Mostrando {startIndex + 1} a{" "}
+              {Math.min(endIndex, filteredProducts.length)} de{" "}
+              {filteredProducts.length} productos
+            </div>
+
+            {/* Controles de paginación */}
+            <div className="flex items-center gap-2">
+              {/* Botón anterior */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={goToPreviousPage}
+                disabled={currentPage === 1}
+                className="px-3 py-1"
+              >
+                <Icon name="FiChevronLeft" size="sm" />
+                Anterior
+              </Button>
+
+              {/* Números de página */}
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, index) => {
+                  const pageNumber = index + 1;
+                  // Mostrar solo algunas páginas para evitar demasiados botones
+                  if (
+                    pageNumber === 1 ||
+                    pageNumber === totalPages ||
+                    (pageNumber >= currentPage - 1 &&
+                      pageNumber <= currentPage + 1)
+                  ) {
+                    return (
+                      <Button
+                        key={pageNumber}
+                        variant={
+                          pageNumber === currentPage ? "primary" : "outline"
+                        }
+                        size="sm"
+                        onClick={() => goToPage(pageNumber)}
+                        className="px-3 py-1 min-w-[40px]"
+                      >
+                        {pageNumber}
+                      </Button>
+                    );
+                  } else if (
+                    pageNumber === currentPage - 2 ||
+                    pageNumber === currentPage + 2
+                  ) {
+                    return (
+                      <span
+                        key={pageNumber}
+                        className="px-2 text-secondary-400"
+                      >
+                        ...
+                      </span>
+                    );
+                  }
+                  return null;
+                })}
+              </div>
+
+              {/* Botón siguiente */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={goToNextPage}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1"
+              >
+                Siguiente
+                <Icon name="FiChevronRight" size="sm" />
+              </Button>
+            </div>
+          </div>
+        </Card>
+      )}
 
       {filteredProducts.length === 0 && (
         <Card className="p-12 text-center">

@@ -44,7 +44,7 @@ const ProductForm = ({
   };
 
   const modalTitle = editingProduct
-    ? "Editar Producto"
+    ? `Editar Producto: ${editingProduct.name}`
     : "Agregar Nuevo Producto";
 
   const modalFooter = (

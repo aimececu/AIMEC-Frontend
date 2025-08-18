@@ -30,6 +30,23 @@ const AccessoriesManager = forwardRef(({ productId, productName }, ref) => {
     return isNotMainProduct && isNotAlreadyAccessory;
   });
 
+  // Filtrar productos disponibles según el término de búsqueda
+  const filteredAvailableProducts = availableProducts.filter(
+    (product) =>
+      product.name
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      (product.sku &&
+        product.sku
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()))
+  );
+
+  // Mostrar solo los primeros 30 productos si no hay búsqueda activa
+  const displayedAvailableProducts = searchTerm.trim() === "" 
+    ? filteredAvailableProducts.slice(0, 30)
+    : filteredAvailableProducts;
+
   const handleSaveAccessories = async () => {
     console.log(
       "🔵 Handler handleSaveAccessories ejecutado - Click en botón Guardar Accesorios"
@@ -124,9 +141,6 @@ const AccessoriesManager = forwardRef(({ productId, productName }, ref) => {
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
             Gestión de Accesorios
           </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Producto: {productName}
-          </p>
           {!isAuthenticated && (
             <p className="text-sm text-red-600 dark:text-red-400 mt-1">
               ⚠️ Debes estar autenticado para gestionar accesorios
@@ -156,40 +170,26 @@ const AccessoriesManager = forwardRef(({ productId, productName }, ref) => {
                 className="w-full"
                 icon={<Icon name="FiSearch" />}
               />
-            </div>
-
-            {/* Botones de selección masiva */}
-            <div className="flex gap-2 mb-4">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  const allProductIds = [
-                    ...accessories.map(acc => acc.accessoryProduct.id),
-                    ...availableProducts.map(p => p.id)
-                  ];
-                  setSelectedAccessoryIds(allProductIds);
-                }}
-                className="text-xs"
-              >
-                Seleccionar Todos
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => setSelectedAccessoryIds([])}
-                className="text-xs"
-              >
-                Deseleccionar Todos
-              </Button>
+              {searchTerm.trim() === "" && availableProducts.length > 30 && (
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                  💡 Mostrando los primeros 30 productos. Escribe en el buscador para ver más productos.
+                </p>
+              )}
             </div>
 
             {/* Lista de productos con checkboxes */}
             <div className="space-y-2">
               <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Productos Disponibles:
+                {searchTerm.trim() === "" && availableProducts.length > 30 ? (
+                  <span className="text-xs font-normal text-gray-500 ml-2">
+                    (Mostrando 30 de {availableProducts.length})
+                  </span>
+                ) : (
+                  <span className="text-xs font-normal text-gray-500 ml-2">
+                    ({filteredAvailableProducts.length} productos)
+                  </span>
+                )}
               </div>
               
               {/* Mostrar productos ya asignados como accesorios */}
@@ -241,17 +241,7 @@ const AccessoriesManager = forwardRef(({ productId, productName }, ref) => {
                 ))}
 
               {/* Mostrar productos disponibles para agregar */}
-              {availableProducts
-                .filter(
-                  (product) =>
-                    product.name
-                      .toLowerCase()
-                      .includes(searchTerm.toLowerCase()) ||
-                    (product.sku &&
-                      product.sku
-                        .toLowerCase()
-                        .includes(searchTerm.toLowerCase()))
-                )
+              {displayedAvailableProducts
                 .map((product) => (
                   <Checkbox
                     key={`available-${product.id}`}

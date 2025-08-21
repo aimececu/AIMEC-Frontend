@@ -14,7 +14,7 @@ const Modal = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className={`bg-white dark:bg-secondary-800 rounded-lg ${size} w-full max-h-[90vh] flex flex-col`}>
+      <div className={`bg-white dark:bg-secondary-800 rounded-lg ${size} max-h-[90vh] flex flex-col`}>
         <Card className="flex flex-col h-full p-0 overflow-y-auto scrollbar-thin scrollbar-thumb-secondary-300 dark:scrollbar-thumb-secondary-600 scrollbar-track-secondary-100 dark:scrollbar-track-secondary-800 hover:scrollbar-thumb-secondary-400 dark:hover:scrollbar-thumb-secondary-500">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-secondary-200 dark:border-secondary-700">

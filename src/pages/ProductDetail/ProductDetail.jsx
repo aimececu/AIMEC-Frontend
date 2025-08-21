@@ -531,7 +531,7 @@ const ProductDetail = () => {
                       </h3>
                       <div className="grid gap-4">
                         {features
-                          .sort((a, b) => a.sort_order - b.sort_order)
+                          .sort((a, b) => a.id - b.id)
                           .map((feature, index) => (
                             <div
                               key={feature.id}
@@ -578,7 +578,7 @@ const ProductDetail = () => {
                       </h3>
                       <div className="grid gap-4">
                         {applications
-                          .sort((a, b) => a.sort_order - b.sort_order)
+                          .sort((a, b) => a.id - b.id)
                           .map((application, index) => (
                             <div
                               key={application.id}

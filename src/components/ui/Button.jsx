@@ -11,6 +11,8 @@ const Button = ({
   fullWidth = false,
   loading = false,
   className = "",
+  mainColor,
+  textColor,
   ...props
 }) => {
   const baseClasses =
@@ -22,47 +24,70 @@ const Button = ({
     secondary:
       "bg-secondary-200 text-secondary-800 hover:bg-secondary-300 focus:ring-secondary-500 dark:bg-secondary-700 dark:text-white dark:hover:bg-secondary-600",
     outline:
-      "border border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white focus:ring-primary-500",
+      "bg-transparent border border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-gray-500 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700",
     ghost:
-      "text-secondary-600 hover:bg-secondary-100 focus:ring-secondary-500 dark:text-secondary-300 dark:hover:bg-secondary-700",
-    danger: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500",
-    success: "bg-green-600 text-white hover:bg-green-700 focus:ring-green-500",
+      "bg-transparent text-gray-700 hover:bg-gray-100 focus:ring-gray-500 dark:text-gray-300 dark:hover:bg-gray-700",
+    danger:
+      "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500",
+    success:
+      "bg-green-600 text-white hover:bg-green-700 focus:ring-green-500",
     warning:
       "bg-yellow-600 text-white hover:bg-yellow-700 focus:ring-yellow-500",
-    white:
-      "bg-white text-primary-600 hover:bg-primary-50 focus:ring-primary-500",
-    whatsapp: "bg-green-600 text-white hover:bg-green-700 focus:ring-green-500",
   };
 
   const sizeClasses = {
-    xs: "px-2 py-1 text-xs rounded",
     sm: "px-3 py-1.5 text-sm rounded-md",
-    md: "px-4 py-2 text-sm rounded-lg",
+    md: "px-4 py-2 text-sm rounded-md",
     lg: "px-6 py-3 text-base rounded-lg",
     xl: "px-8 py-4 text-lg rounded-lg",
   };
 
-  const iconOnlyClasses = {
-    xs: "p-1 rounded",
-    sm: "p-1.5 rounded-md",
-    md: "p-2 rounded-lg",
-    lg: "p-3 rounded-lg",
-    xl: "p-4 rounded-lg",
-  };
+  const widthClasses = fullWidth ? "w-full" : "";
 
-  const classes = clsx(
-    baseClasses,
-    variantClasses[variant],
-    iconOnly ? iconOnlyClasses[size] : sizeClasses[size],
-    fullWidth && "w-full",
-    className
-  );
+  // Si se proporcionan colores personalizados, usar estilos inline
+  const shouldUseCustomColors = mainColor || textColor;
+  
+  let customStyles = {};
+  let buttonClasses = "";
+  
+  if (shouldUseCustomColors) {
+    // Usar estilos inline para colores personalizados
+    customStyles = {
+      backgroundColor: mainColor || undefined,
+      color: textColor || undefined,
+      borderColor: mainColor || undefined,
+    };
+    
+    // Clases base sin variantes de color
+    buttonClasses = clsx(
+      baseClasses,
+      sizeClasses[size],
+      widthClasses,
+      "border",
+      className
+    );
+  } else {
+    // Usar variantes predefinidas de Tailwind
+    buttonClasses = clsx(
+      baseClasses,
+      variantClasses[variant],
+      sizeClasses[size],
+      widthClasses,
+      className
+    );
+  }
 
   return (
-    <button className={classes} disabled={disabled || loading} {...props}>
+    <button
+      className={buttonClasses}
+      style={customStyles}
+      disabled={disabled || loading}
+      {...props}
+    >
       {loading && (
         <svg
           className="animate-spin -ml-1 mr-2 h-4 w-4"
+          xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
         >
@@ -81,9 +106,7 @@ const Button = ({
           ></path>
         </svg>
       )}
-      {icon && !iconOnly && !loading && (
-        <span className={clsx("mr-2", iconOnly && "mr-0")}>{icon}</span>
-      )}
+      {icon && !iconOnly && <span className="mr-2">{icon}</span>}
       {iconOnly ? icon : children}
     </button>
   );

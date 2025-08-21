@@ -135,6 +135,17 @@ export const ENDPOINTS = {
     UPDATE: (id) => `/productApplications/${id}`,
     DELETE: (id) => `/productApplications/${id}`,
     BY_PRODUCT: (productId) => `/productApplications?product_id=${productId}`
+  },
+
+  // Productos relacionados
+  RELATED_PRODUCTS: {
+    LIST: '/relatedProducts',
+    DETAIL: (id) => `/relatedProducts/${id}`,
+    CREATE: '/relatedProducts',
+    CREATE_MULTIPLE: '/relatedProducts/multiple',
+    UPDATE: (id) => `/relatedProducts/${id}`,
+    DELETE: (id) => `/relatedProducts/${id}`,
+    BY_PRODUCT: (productId) => `/relatedProducts/product/${productId}`
   }
 };
 

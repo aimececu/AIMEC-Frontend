@@ -7,6 +7,8 @@ import { categoryEndpoints } from '../api/endpoints/categories.js';
 export const useProducts = (loadInitialData) => {
   const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [showProductForm, setShowProductForm] = useState(false);
   const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
@@ -27,6 +29,11 @@ export const useProducts = (loadInitialData) => {
   });
   const [subcategories, setSubcategories] = useState([]);
 
+  // Cargar productos al inicializar
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
   // Cargar subcategorías cuando cambie la categoría
   useEffect(() => {
     if (productForm.category_id) {
@@ -35,6 +42,23 @@ export const useProducts = (loadInitialData) => {
       setSubcategories([]);
     }
   }, [productForm.category_id]);
+
+  const loadProducts = async () => {
+    try {
+      setLoading(true);
+      const response = await productEndpoints.getProducts();
+      if (response.success) {
+        setProducts(response.data || []);
+      } else {
+        setProducts([]);
+      }
+    } catch (error) {
+      console.error('Error cargando productos:', error);
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const loadSubcategories = async (categoryId) => {
     try {
@@ -180,18 +204,30 @@ export const useProducts = (loadInitialData) => {
   };
 
   return {
+    // Estado de productos
+    products,
+    loading,
+    
+    // Estado del formulario
     editingProduct,
     showProductForm,
     productForm,
     setProductForm,
+    
+    // Funciones
     handleProductFormSubmit,
     handleEditProduct,
     handleDeleteProduct,
     handleAddProduct,
     handleCancelForm,
+    loadProducts,
+    
+    // Toast
     toast,
     showToast,
     hideToast,
+    
+    // Subcategorías
     subcategories,
     setSubcategories
   };

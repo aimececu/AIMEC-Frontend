@@ -7,6 +7,7 @@ import Modal from "../ui/Modal";
 import ProductFeaturesManager from "./ProductFeaturesManager";
 import ProductApplicationsManager from "./ProductApplicationsManager";
 import AccessoriesManager from "./ProductAccessoriesManager";
+import ProductRelatedManager from "./ProductRelatedManager";
 
 const ProductForm = ({
   productForm,
@@ -82,7 +83,7 @@ const ProductForm = ({
       footer={modalFooter}
       size="max-w-4xl"
     >
-      <form id="product-form" onSubmit={onSubmit} className="space-y-6">
+      <div className="space-y-6">
         {/* Pestañas */}
         <div className="border-b border-gray-200 dark:border-gray-700">
           <nav className="-mb-px flex space-x-8">
@@ -130,12 +131,23 @@ const ProductForm = ({
             >
               Accesorios
             </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab("related")}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === "related"
+                  ? "border-primary-500 text-primary-600 dark:text-primary-400"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
+              }`}
+            >
+              Productos Relacionados
+            </button>
           </nav>
         </div>
 
         {/* Contenido de las pestañas */}
         {activeTab === "general" && (
-          <>
+          <form id="product-form" onSubmit={onSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* SKU */}
               <Input
@@ -279,7 +291,7 @@ const ProductForm = ({
               onChange={(value) => handleFormChange("main_image", value)}
               placeholder="URL de la imagen principal"
             />
-          </>
+          </form>
         )}
 
         {/* Pestaña de Características */}
@@ -319,17 +331,27 @@ const ProductForm = ({
           </div>
         )}
 
+        {/* Pestaña de Productos Relacionados */}
+        {activeTab === "related" && editingProduct && (
+          <div className="py-4">
+            <ProductRelatedManager
+              productId={editingProduct.id}
+              productName={editingProduct.name}
+            />
+          </div>
+        )}
+
         {/* Mensaje cuando no hay producto seleccionado */}
-        {(activeTab === "features" || activeTab === "applications" || activeTab === "accessories") &&
+        {(activeTab === "features" || activeTab === "applications" || activeTab === "accessories" || activeTab === "related") &&
           !editingProduct && (
             <div className="text-center py-8">
               <p className="text-gray-500 dark:text-gray-400">
                 Guarda el producto primero para poder gestionar sus
-                características, aplicaciones y accesorios
+                características, aplicaciones, accesorios y productos relacionados
               </p>
             </div>
           )}
-      </form>
+      </div>
     </Modal>
   );
 };

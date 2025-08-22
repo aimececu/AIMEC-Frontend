@@ -152,6 +152,21 @@ export const productEndpoints = {
     return await apiRequest(`${ENDPOINTS.PRODUCTS.RELATED(productId)}/${relatedId}`, {
       method: 'DELETE'
     });
+  },
+
+  // =====================================================
+  // EXPORT
+  // =====================================================
+
+  // Exportar productos con todas sus relaciones
+  async exportProductsWithRelations() {
+    try {
+      const response = await apiRequest('/products/export');
+      return response;
+    } catch (error) {
+      console.error('Error al exportar productos con relaciones:', error);
+      throw error;
+    }
   }
 };
 

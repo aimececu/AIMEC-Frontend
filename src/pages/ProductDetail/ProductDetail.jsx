@@ -13,6 +13,7 @@ import { productEndpoints } from "../../api/endpoints/products.js";
 import { productFeatureEndpoints } from "../../api/endpoints/productFeatures";
 import { productApplicationEndpoints } from "../../api/endpoints/productApplications";
 import AccessoriesSection from "../../components/ProductDetail/AccessoriesSection";
+import RelatedProductsSection from "../../components/ProductDetail/RelatedProductsSection";
 import clsx from "clsx";
 
 const ProductDetail = () => {
@@ -343,6 +344,24 @@ const ProductDetail = () => {
             </div>
           </div>
 
+          {/* Sección de Accesorios */}
+          <div className="mb-8">
+            <Card>
+              <div className="p-6">
+                <AccessoriesSection productId={product.id} />
+              </div>
+            </Card>
+          </div>
+
+          {/* Sección de Productos Relacionados */}
+          <div className="mb-8">
+            <Card>
+              <div className="p-6">
+                <RelatedProductsSection productId={product.id} />
+              </div>
+            </Card>
+          </div>
+
           {/* Product Tabs */}
           <Card className="mb-8">
             <div className="border-b border-secondary-200 dark:border-secondary-700">
@@ -351,7 +370,6 @@ const ProductDetail = () => {
                   "specifications",
                   "features",
                   "applications",
-                  "accessories",
                 ].map((tab) => (
                   <button
                     key={tab}
@@ -374,7 +392,6 @@ const ProductDetail = () => {
                           ? `(${applications.length})`
                           : ""
                       }`}
-                    {tab === "accessories" && "Accesorios"}
                   </button>
                 ))}
               </nav>
@@ -465,42 +482,7 @@ const ProductDetail = () => {
                     </div>
                   </div>
 
-                  {/* Resumen de características y aplicaciones */}
-                  <div className="mt-8 pt-6 border-t border-secondary-200 dark:border-secondary-700">
-                    <h4 className="text-lg font-medium text-secondary-800 dark:text-secondary-200 mb-4">
-                      Resumen del Producto
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                        <Icon
-                          name="FiList"
-                          className="text-blue-600 dark:text-blue-400"
-                        />
-                        <div>
-                          <p className="font-medium text-blue-900 dark:text-blue-100">
-                            {features.length} Características
-                          </p>
-                          <p className="text-sm text-blue-700 dark:text-blue-300">
-                            Especificaciones técnicas del producto
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                        <Icon
-                          name="FiTarget"
-                          className="text-green-600 dark:text-green-400"
-                        />
-                        <div>
-                          <p className="font-medium text-green-900 dark:text-green-100">
-                            {applications.length} Aplicaciones
-                          </p>
-                          <p className="text-sm text-green-700 dark:text-green-300">
-                            Usos y aplicaciones del producto
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  
                 </div>
               )}
 
@@ -596,10 +578,6 @@ const ProductDetail = () => {
                     </div>
                   )}
                 </div>
-              )}
-
-              {activeTab === "accessories" && (
-                <AccessoriesSection productId={product.id} />
               )}
             </div>
           </Card>

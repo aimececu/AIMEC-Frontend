@@ -24,6 +24,9 @@ export const importEndpoints = {
 
   // Importar datos del sistema
   async importSystemData(file) {
+    console.log('Importando datos del sistema');
+    console.log('File:', file);
+
     try {
       const formData = new FormData();
       formData.append('file', file);

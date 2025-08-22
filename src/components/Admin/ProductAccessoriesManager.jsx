@@ -224,14 +224,14 @@ const AccessoriesManager = forwardRef(({ productId, productName }, ref) => {
                     }}
                     label={accessory.accessoryProduct.name}
                     description={
-                      <>
+                      <div className="flex items-center gap-2 relative">
                         {accessory.accessoryProduct.sku && `SKU: ${accessory.accessoryProduct.sku}`}
                         {accessory.accessoryProduct.sku && accessory.accessoryProduct.brand && " • "}
                         {accessory.accessoryProduct.brand && `Marca: ${accessory.accessoryProduct.brand.name}`}
                         <span className="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
                           ✓ Ya asignado
                         </span>
-                      </>
+                      </div>
                     }
                     variant="success"
                     size="md"

@@ -42,7 +42,8 @@ const ProductRelatedManager = ({ productId, productName }) => {
   const [showEditGroupModal, setShowEditGroupModal] = useState(false);
   const [selectedRelationshipType, setSelectedRelationshipType] = useState("");
   const [selectedProductIds, setSelectedProductIds] = useState([]);
-  const [showNewRelationshipInput, setShowNewRelationshipInput] = useState(false);
+  const [showNewRelationshipInput, setShowNewRelationshipInput] =
+    useState(false);
   const [newRelationshipType, setNewRelationshipType] = useState("");
 
   const [editingGroupData, setEditingGroupData] = useState({
@@ -64,16 +65,16 @@ const ProductRelatedManager = ({ productId, productName }) => {
     }
   }, [products.length, loadProducts]);
 
-     // Limpiar estados cuando se cierre la sección de agregar
-   useEffect(() => {
-     if (!showAddSection) {
-       setSelectedRelationshipType("");
-       setSelectedProductIds([]);
-       setSearchTerm("");
-       setShowNewRelationshipInput(false);
-       setNewRelationshipType("");
-     }
-   }, [showAddSection]);
+  // Limpiar estados cuando se cierre la sección de agregar
+  useEffect(() => {
+    if (!showAddSection) {
+      setSelectedRelationshipType("");
+      setSelectedProductIds([]);
+      setSearchTerm("");
+      setShowNewRelationshipInput(false);
+      setNewRelationshipType("");
+    }
+  }, [showAddSection]);
 
   // Limpiar estados cuando se cierre el modal de editar grupo
   useEffect(() => {
@@ -164,8 +165,10 @@ const ProductRelatedManager = ({ productId, productName }) => {
    * Guarda los productos seleccionados con el tipo de relación
    */
   const handleSaveSelected = async () => {
-    const relationshipType = showNewRelationshipInput ? newRelationshipType : selectedRelationshipType;
-    
+    const relationshipType = showNewRelationshipInput
+      ? newRelationshipType
+      : selectedRelationshipType;
+
     if (!relationshipType || selectedProductIds.length === 0) {
       showToast(
         "Selecciona un tipo de relación y al menos un producto",
@@ -271,23 +274,21 @@ const ProductRelatedManager = ({ productId, productName }) => {
 
       // Productos que fueron eliminados del grupo
       const removedProducts = originalProducts.filter(
-        (original) => !editingGroupData.products.some(
-          (current) => current.id === original.id
-        )
+        (original) =>
+          !editingGroupData.products.some(
+            (current) => current.id === original.id
+          )
       );
 
       // Productos que permanecen en el grupo (para actualizar tipo si es necesario)
-      const remainingProducts = editingGroupData.products.filter(
-        (current) => originalProducts.some(
-          (original) => original.id === current.id
-        )
+      const remainingProducts = editingGroupData.products.filter((current) =>
+        originalProducts.some((original) => original.id === current.id)
       );
 
       // Productos nuevos que se agregaron al grupo
       const newProducts = editingGroupData.products.filter(
-        (current) => !originalProducts.some(
-          (original) => original.id === current.id
-        )
+        (current) =>
+          !originalProducts.some((original) => original.id === current.id)
       );
 
       const operations = [];
@@ -316,8 +317,8 @@ const ProductRelatedManager = ({ productId, productName }) => {
       if (newProducts.length > 0) {
         const addPromises = newProducts.map((product) =>
           addRelatedProduct({
-            relationship_type: showChangeNameInput 
-              ? editingGroupData.newRelationshipType 
+            relationship_type: showChangeNameInput
+              ? editingGroupData.newRelationshipType
               : editingGroupData.relationshipType,
             related_product_id: product.relatedProduct.id,
           })
@@ -389,23 +390,21 @@ const ProductRelatedManager = ({ productId, productName }) => {
    */
   const hasGroupChanges = () => {
     if (!editingGroupData.relationshipType) return false;
-    
+
     const originalProducts = relatedProducts.filter(
       (rp) => rp.relationshipType === editingGroupData.relationshipType
     );
 
     // Verificar si se eliminaron productos
     const hasRemovedProducts = originalProducts.some(
-      (original) => !editingGroupData.products.some(
-        (current) => current.id === original.id
-      )
+      (original) =>
+        !editingGroupData.products.some((current) => current.id === original.id)
     );
 
     // Verificar si se agregaron productos
     const hasNewProducts = editingGroupData.products.some(
-      (current) => !originalProducts.some(
-        (original) => original.id === current.id
-      )
+      (current) =>
+        !originalProducts.some((original) => original.id === current.id)
     );
 
     return hasRemovedProducts || hasNewProducts;
@@ -468,67 +467,68 @@ const ProductRelatedManager = ({ productId, productName }) => {
             <Button variant="outline" onClick={() => setShowAddSection(false)}>
               Cancelar
             </Button>
-                         <Button
-               onClick={handleSaveSelected}
-               disabled={
-                 (!selectedRelationshipType && !newRelationshipType) || selectedProductIds.length === 0
-               }
-               className="bg-blue-600 hover:bg-blue-700 text-white"
-             >
-               <Icon name="FiSave" />
-               Guardar Productos Seleccionados ({selectedProductIds.length})
-             </Button>
+            <Button
+              onClick={handleSaveSelected}
+              disabled={
+                (!selectedRelationshipType && !newRelationshipType) ||
+                selectedProductIds.length === 0
+              }
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              <Icon name="FiSave" />
+              Guardar Productos Seleccionados ({selectedProductIds.length})
+            </Button>
           </div>
         }
       >
         <div className="space-y-6">
-                     {/* Tipo de relación */}
-           <div>
-             {!showNewRelationshipInput ? (
-               <Select
-                 value={selectedRelationshipType}
-                 onChange={(e) => handleRelationshipTypeChange(e.target.value)}
-                 label="Tipo de Relación"
-                 helperText="Selecciona un tipo existente o crea uno nuevo"
-                 className="w-full max-w-md"
-                 required
-               >
-                 <option value="">Selecciona un tipo de relación</option>
-                 {relationshipTypes.map((type) => (
-                   <option key={type} value={type}>
-                     {type.charAt(0).toUpperCase() + type.slice(1)}
-                   </option>
-                 ))}
-                 <option value="new">➕ Crear nuevo tipo</option>
-               </Select>
-             ) : (
-               <div className="space-y-2">
-                 <Input
-                   type="text"
-                   value={newRelationshipType}
-                   onChange={(value) => setNewRelationshipType(value)}
-                   label="Nuevo Tipo de Relación"
-                   helperText="Escribe el nombre del nuevo tipo de relación"
-                   placeholder="Ej: complementario, alternativo, etc."
-                   className="w-full max-w-md"
-                   required
-                 />
-                 <Button
-                   variant="outline"
-                   size="sm"
-                   onClick={() => {
-                     setShowNewRelationshipInput(false);
-                     setNewRelationshipType("");
-                     setSelectedRelationshipType("");
-                   }}
-                   className="text-gray-600 hover:text-gray-800"
-                 >
-                   <Icon name="FiX" size="sm" />
-                   Cancelar nuevo tipo
-                 </Button>
-               </div>
-             )}
-           </div>
+          {/* Tipo de relación */}
+          <div>
+            {!showNewRelationshipInput ? (
+              <Select
+                value={selectedRelationshipType}
+                onChange={(e) => handleRelationshipTypeChange(e.target.value)}
+                label="Tipo de Relación"
+                helperText="Selecciona un tipo existente o crea uno nuevo"
+                className="w-full max-w-md"
+                required
+              >
+                <option value="">Selecciona un tipo de relación</option>
+                {relationshipTypes.map((type) => (
+                  <option key={type} value={type}>
+                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                  </option>
+                ))}
+                <option value="new">➕ Crear nuevo tipo</option>
+              </Select>
+            ) : (
+              <div className="space-y-2">
+                <Input
+                  type="text"
+                  value={newRelationshipType}
+                  onChange={(value) => setNewRelationshipType(value)}
+                  label="Nuevo Tipo de Relación"
+                  helperText="Escribe el nombre del nuevo tipo de relación"
+                  placeholder="Ej: complementario, alternativo, etc."
+                  className="w-full max-w-md"
+                  required
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setShowNewRelationshipInput(false);
+                    setNewRelationshipType("");
+                    setSelectedRelationshipType("");
+                  }}
+                  className="text-gray-600 hover:text-gray-800"
+                >
+                  <Icon name="FiX" size="sm" />
+                  Cancelar nuevo tipo
+                </Button>
+              </div>
+            )}
+          </div>
 
           {/* Lista de productos disponibles con checkboxes */}
           <div>
@@ -556,18 +556,127 @@ const ProductRelatedManager = ({ productId, productName }) => {
                 </span>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-3 max-h-80 overflow-y-auto border border-gray-200 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
-                {products
-                  .filter((p) => p.id !== productId && p.is_active)
+              <div className="space-y-2">
+                <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Productos Disponibles:
+                  {searchTerm.trim() === "" &&
+                  products.filter((p) => p.id !== productId && p.is_active)
+                    .length > 30 ? (
+                    <span className="text-xs font-normal text-gray-500 ml-2">
+                      (Mostrando 30 de{" "}
+                      {
+                        products.filter(
+                          (p) => p.id !== productId && p.is_active
+                        ).length
+                      }
+                      )
+                    </span>
+                  ) : (
+                    <span className="text-xs font-normal text-gray-500 ml-2">
+                      (
+                      {
+                        products
+                          .filter((p) => p.id !== productId && p.is_active)
+                          .filter(
+                            (p) =>
+                              searchTerm === "" ||
+                              p.name
+                                .toLowerCase()
+                                .includes(searchTerm.toLowerCase()) ||
+                              p.sku
+                                .toLowerCase()
+                                .includes(searchTerm.toLowerCase())
+                          ).length
+                      }{" "}
+                      productos)
+                    </span>
+                  )}
+                </div>
+
+                {/* Mostrar productos ya relacionados como seleccionados */}
+                {relatedProducts
                   .filter(
-                    (p) =>
+                    (rp) =>
                       searchTerm === "" ||
-                      p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                      p.sku.toLowerCase().includes(searchTerm.toLowerCase())
+                      rp.relatedProduct.name
+                        .toLowerCase()
+                        .includes(searchTerm.toLowerCase()) ||
+                      rp.relatedProduct.sku
+                        .toLowerCase()
+                        .includes(searchTerm.toLowerCase())
                   )
-                  .map((product) => (
+                  .map((relatedProduct) => (
                     <Checkbox
-                      key={product.id}
+                      key={`current-${relatedProduct.id}`}
+                      checked={selectedProductIds.includes(
+                        relatedProduct.relatedProduct.id
+                      )}
+                      onChange={() =>
+                        handleProductSelection(relatedProduct.relatedProduct.id)
+                      }
+                      card={true}
+                      size="md"
+                      variant="success"
+                      align="center"
+                      label={
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                          <ImageWithFallback
+                            src={getProductImage(
+                              relatedProduct.relatedProduct.id
+                            )}
+                            alt={relatedProduct.relatedProduct.name}
+                            className="w-12 h-12 object-cover rounded-lg"
+                          />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                              {relatedProduct.relatedProduct.name}
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              SKU: {relatedProduct.relatedProduct.sku}
+                            </p>
+                            <p className="text-xs text-gray-400 dark:text-gray-500">
+                              ${relatedProduct.relatedProduct.price}
+                            </p>
+                          </div>
+                        </div>
+                      }
+                      description={
+                        <>
+                          <span className="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                            ✓ Ya relacionado
+                          </span>
+                        </>
+                      }
+                    />
+                  ))}
+
+                {/* Mostrar productos disponibles para agregar (máximo 30 si no hay búsqueda) */}
+                {(() => {
+                  const availableProducts = products
+                    .filter((p) => p.id !== productId && p.is_active)
+                    .filter(
+                      (p) =>
+                        !relatedProducts.some(
+                          (rp) => rp.relatedProduct.id === p.id
+                        )
+                    )
+                    .filter(
+                      (p) =>
+                        searchTerm === "" ||
+                        p.name
+                          .toLowerCase()
+                          .includes(searchTerm.toLowerCase()) ||
+                        p.sku.toLowerCase().includes(searchTerm.toLowerCase())
+                    );
+
+                  const displayedProducts =
+                    searchTerm.trim() === ""
+                      ? availableProducts.slice(0, 30)
+                      : availableProducts;
+
+                  return displayedProducts.map((product) => (
+                    <Checkbox
+                      key={`available-${product.id}`}
                       checked={selectedProductIds.includes(product.id)}
                       onChange={() => handleProductSelection(product.id)}
                       card={true}
@@ -595,7 +704,18 @@ const ProductRelatedManager = ({ productId, productName }) => {
                         </div>
                       }
                     />
-                  ))}
+                  ));
+                })()}
+
+                {/* Mensaje informativo sobre el límite de 30 productos */}
+                {searchTerm.trim() === "" &&
+                  products.filter((p) => p.id !== productId && p.is_active)
+                    .length > 30 && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                      💡 Mostrando los primeros 30 productos. Escribe en el
+                      buscador para ver más productos.
+                    </p>
+                  )}
               </div>
             )}
           </div>
@@ -619,7 +739,8 @@ const ProductRelatedManager = ({ productId, productName }) => {
             <Button
               onClick={handleEditGroupSubmit}
               disabled={
-                (showChangeNameInput && !editingGroupData.newRelationshipType) ||
+                (showChangeNameInput &&
+                  !editingGroupData.newRelationshipType) ||
                 (!showChangeNameInput && !hasGroupChanges())
               }
             >
@@ -681,148 +802,184 @@ const ProductRelatedManager = ({ productId, productName }) => {
                 </Button>
               </div>
             </div>
-            {/* Contenedor principal con layout horizontal */}
-            <div className="flex flex-row gap-6">
-              {/* Lista de productos del grupo - Columna izquierda */}
-              <div className="w-1/2">
-                <div className="flex items-center justify-between mb-3">
-                  <h6 className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                    Productos en el Grupo ({editingGroupData.products.length})
-                  </h6>
-                  <div className="flex-1 max-w-xs ml-4">
-                    <Input
-                      type="text"
-                      value={editingGroupSearchTerm}
-                      onChange={(value) => setEditingGroupSearchTerm(value)}
-                      placeholder="Buscar en el grupo..."
-                      className="w-full"
-                    />
-                  </div>
-                </div>
-                <div className="h-full overflow-y-auto border border-gray-200 dark:border-gray-600 rounded-lg p-3 bg-gray-50 dark:bg-gray-800">
-                  {editingGroupData.products
-                    .filter(
-                      (product) =>
-                        editingGroupSearchTerm === "" ||
-                        product.relatedProduct.name
-                          .toLowerCase()
-                          .includes(editingGroupSearchTerm.toLowerCase()) ||
-                        product.relatedProduct.sku
-                          .toLowerCase()
-                          .includes(editingGroupSearchTerm.toLowerCase())
+
+            {/* Barra de búsqueda */}
+            <div className="mb-4">
+              <Input
+                type="text"
+                value={editingGroupSearchTerm}
+                onChange={(value) => setEditingGroupSearchTerm(value)}
+                placeholder="Buscar productos por nombre o SKU..."
+                className="w-full"
+                icon={<Icon name="FiSearch" />}
+              />
+            </div>
+
+            {/* Lista de productos con checkboxes */}
+            <div className="space-y-2">
+              <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Productos Disponibles:
+                {editingGroupSearchTerm.trim() === "" &&
+                products.filter((p) => p.id !== productId && p.is_active)
+                  .length > 30 ? (
+                  <span className="text-xs font-normal text-gray-500 ml-2">
+                    (Mostrando 30 de{" "}
+                    {
+                      products.filter((p) => p.id !== productId && p.is_active)
+                        .length
+                    }
                     )
-                    .map((product, index) => (
-                      <div
-                        key={product.id}
-                        className="flex items-start gap-2 p-2 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600 mb-2 last:mb-0"
-                      >
+                  </span>
+                ) : (
+                  <span className="text-xs font-normal text-gray-500 ml-2">
+                    (
+                    {(() => {
+                      const availableProducts = products
+                        .filter((p) => p.id !== productId && p.is_active)
+                        .filter(
+                          (p) =>
+                            editingGroupSearchTerm === "" ||
+                            p.name
+                              .toLowerCase()
+                              .includes(editingGroupSearchTerm.toLowerCase()) ||
+                            p.sku
+                              .toLowerCase()
+                              .includes(editingGroupSearchTerm.toLowerCase())
+                        );
+                      return availableProducts.length;
+                    })()}{" "}
+                    productos)
+                  </span>
+                )}
+              </div>
+
+              {/* Mostrar productos ya en el grupo como seleccionados */}
+              {editingGroupData.products
+                .filter(
+                  (product) =>
+                    editingGroupSearchTerm === "" ||
+                    product.relatedProduct.name
+                      .toLowerCase()
+                      .includes(editingGroupSearchTerm.toLowerCase()) ||
+                    product.relatedProduct.sku
+                      .toLowerCase()
+                      .includes(editingGroupSearchTerm.toLowerCase())
+                )
+                .map((product) => (
+                  <Checkbox
+                    key={`current-${product.id}`}
+                    checked={true}
+                    onChange={() => handleRemoveFromGroup(product.id)}
+                    card={true}
+                    size="md"
+                    variant="success"
+                    align="center"
+                    label={
+                      <div className="flex items-center gap-3 min-w-0 flex-1 relative">
                         <ImageWithFallback
                           src={getProductImage(product.relatedProduct.id)}
                           alt={product.relatedProduct.name}
-                          className="w-8 h-8 object-cover rounded flex-shrink-0"
+                          className="w-12 h-12 object-cover rounded-lg"
                         />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 dark:text-white break-words leading-tight">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                             {product.relatedProduct.name}
                           </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
                             SKU: {product.relatedProduct.sku}
                           </p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500">
+                            ${product.relatedProduct.price}
+                          </p>
                         </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleRemoveFromGroup(product.id)}
-                          mainColor="#ef4444"
-                          textColor="#f5f5f5"
-                          className="p-1 flex-shrink-0"
-                        >
-                          <Icon name="FiX" size="sm" />
-                        </Button>
+                        <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full absolute right-0 top-0">
+                          ✓ En el grupo
+                        </span>
+                        
                       </div>
-                    ))}
-                </div>
-              </div>
+                    }
+                  />
+                ))}
 
-              {/* Lista de productos disponibles para agregar - Columna derecha */}
-              <div className="w-1/2">
-                <div className="flex items-center justify-between mb-3">
-                  <h6 className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                    Agregar Productos al Grupo
-                  </h6>
-                  <div className="flex-1 max-w-xs ml-4">
-                    <Input
-                      type="text"
-                      value={editingGroupSearchTerm}
-                      onChange={(value) => setEditingGroupSearchTerm(value)}
-                      placeholder="Buscar productos..."
-                      className="w-full"
-                    />
-                  </div>
-                </div>
-                <div className="h-full overflow-y-auto border border-gray-200 dark:border-gray-600 rounded-lg p-3 bg-gray-50 dark:bg-gray-800">
-                  {products
-                    .filter((p) => p.id !== productId && p.is_active)
-                    .filter(
-                      (p) =>
-                        editingGroupSearchTerm === "" ||
-                        p.name
-                          .toLowerCase()
-                          .includes(editingGroupSearchTerm.toLowerCase()) ||
-                        p.sku
-                          .toLowerCase()
-                          .includes(editingGroupSearchTerm.toLowerCase())
-                    )
-                    .filter(
-                      (p) =>
-                        !editingGroupData.products.some(
-                          (gp) => gp.relatedProduct.id === p.id
-                        )
-                    )
-                    .map((product) => (
-                      <div
-                        key={product.id}
-                        className="flex items-start gap-2 p-2 rounded border text-xs bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 mb-2 last:mb-0"
-                      >
-                        <ImageWithFallback
-                          src={product.main_image}
-                          alt={product.name}
-                          className="w-6 h-6 object-cover rounded flex-shrink-0"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-gray-900 dark:text-white break-words leading-tight">
-                            {product.name}
-                          </p>
-                          <p className="text-gray-500 dark:text-gray-400 mt-1">
-                            SKU: {product.sku}
-                          </p>
-                        </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            // Agregar al grupo
-                            const newGroupProduct = {
-                              id: Date.now(), // ID temporal
-                              relationshipType:
-                                editingGroupData.relationshipType,
-                              relatedProduct: product,
-                            };
-                            setEditingGroupData((prev) => ({
-                              ...prev,
-                              products: [...prev.products, newGroupProduct],
-                            }));
-                          }}
-                          mainColor="#10b981"
-                          textColor="#f5f5f5"
-                          className="p-1 text-xs flex-shrink-0"
-                        >
-                          <Icon name="FiPlus" size="sm" />
-                        </Button>
-                      </div>
-                    ))}
-                </div>
-              </div>
+              {/* Mostrar productos disponibles para agregar al grupo (máximo 30 si no hay búsqueda) */}
+              {(() => {
+                const availableProducts = products
+                  .filter((p) => p.id !== productId && p.is_active)
+                  .filter(
+                    (p) =>
+                      !editingGroupData.products.some(
+                        (gp) => gp.relatedProduct.id === p.id
+                      )
+                  )
+                  .filter(
+                    (p) =>
+                      editingGroupSearchTerm === "" ||
+                      p.name
+                        .toLowerCase()
+                        .includes(editingGroupSearchTerm.toLowerCase()) ||
+                      p.sku
+                        .toLowerCase()
+                        .includes(editingGroupSearchTerm.toLowerCase())
+                  );
+
+                const displayedProducts =
+                  editingGroupSearchTerm.trim() === ""
+                    ? availableProducts.slice(0, 30)
+                    : availableProducts;
+
+                                 return displayedProducts.map((product) => (
+                   <Checkbox
+                     key={`available-${product.id}`}
+                     checked={false}
+                     onChange={() => {
+                       // Agregar al grupo
+                       const newGroupProduct = {
+                         id: Date.now(), // ID temporal
+                         relationshipType: editingGroupData.relationshipType,
+                         relatedProduct: product,
+                       };
+                       setEditingGroupData((prev) => ({
+                         ...prev,
+                         products: [...prev.products, newGroupProduct],
+                       }));
+                     }}
+                     card={true}
+                     size="md"
+                     variant="primary"
+                     align="center"
+                     label={
+                       <div className="flex items-center gap-3 min-w-0 flex-1">
+                         <ImageWithFallback
+                           src={product.main_image}
+                           alt={product.name}
+                           className="w-12 h-12 object-cover rounded-lg"
+                         />
+                         <div className="min-w-0 flex-1">
+                           <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                             {product.name}
+                           </p>
+                           <p className="text-xs text-gray-500 dark:text-gray-400">
+                             SKU: {product.sku}
+                           </p>
+                           <p className="text-xs text-gray-400 dark:text-gray-500">
+                             ${product.price}
+                           </p>
+                         </div>
+                       </div>
+                     }
+                   />
+                 ));
+              })()}
+
+              {/* Mensaje informativo sobre el límite de 30 productos */}
+              {editingGroupSearchTerm.trim() === "" &&
+                products.filter((p) => p.id !== productId && p.is_active)
+                  .length > 30 && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                    💡 Mostrando los primeros 30 productos. Escribe en el
+                    buscador para ver más productos.
+                  </p>
+                )}
             </div>
           </div>
         </div>

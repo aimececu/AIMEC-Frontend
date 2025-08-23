@@ -113,7 +113,7 @@ const AccessoriesSection = ({ productId }) => {
           >
             {/* Imagen del accesorio */}
             <div className="aspect-square bg-secondary-100 dark:bg-secondary-700 overflow-hidden">
-              <Link to={`/productos/${accessory.accessoryProduct.id}`}>
+              <Link to={`/producto/${accessory.accessoryProduct.id}`}>
                 <ImageWithFallback
                   src={accessory.accessoryProduct.main_image}
                   alt={accessory.accessoryProduct.name}
@@ -125,7 +125,7 @@ const AccessoriesSection = ({ productId }) => {
             {/* Información del accesorio */}
             <div className="p-4 space-y-3">
               {/* Nombre del accesorio */}
-              <Link to={`/productos/${accessory.accessoryProduct.id}`}>
+              <Link to={`/producto/${accessory.accessoryProduct.id}`}>
                 <h3 className="font-medium text-secondary-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 line-clamp-2">
                   {accessory.accessoryProduct.name}
                 </h3>
@@ -184,7 +184,7 @@ const AccessoriesSection = ({ productId }) => {
               {/* Botón de ver detalles */}
               <Button
                 as={Link}
-                to={`/productos/${accessory.accessoryProduct.id}`}
+                to={`/producto/${accessory.accessoryProduct.id}`}
                 variant="outline"
                 fullWidth
                 size="sm"

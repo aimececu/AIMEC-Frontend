@@ -134,7 +134,7 @@ const Home = () => {
           text: "Ver Productos Siemens",
           variant: "white",
           size: "lg",
-          link: "/productos/siemens"
+          link: "/productos"
         },
         {
           text: "Solicitar Cotización",

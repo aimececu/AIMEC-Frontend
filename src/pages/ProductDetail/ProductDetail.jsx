@@ -28,14 +28,26 @@ const ProductDetail = () => {
   const [applications, setApplications] = useState([]);
   const [loadingDetails, setLoadingDetails] = useState(false);
 
+  // Resetear estados cuando cambie el producto
+  useEffect(() => {
+    setActiveTab("specifications");
+    setQuantity(1);
+    console.log("ProductDetail: ID cambiado a:", id);
+  }, [id]);
+
   // Cargar el producto desde la API
   useEffect(() => {
     const loadProduct = async () => {
       try {
+        console.log("ProductDetail: Cargando producto con ID:", id);
         setLoading(true);
+        setError(null); // Resetear error al cambiar de producto
+        setProduct(null); // Resetear producto anterior
+
         const response = await productEndpoints.getProductById(id);
         if (response.success) {
           setProduct(response.data);
+          console.log("ProductDetail: Producto cargado:", response.data.name);
         } else {
           setError("Producto no encontrado");
         }
@@ -56,12 +68,16 @@ const ProductDetail = () => {
   useEffect(() => {
     const loadProductDetails = async () => {
       if (!product?.id) return;
-      
+
       try {
         setLoadingDetails(true);
+        // Limpiar datos anteriores
+        setFeatures([]);
+        setApplications([]);
+
         const [featuresResponse, applicationsResponse] = await Promise.all([
           productFeatureEndpoints.getFeaturesByProduct(product.id),
-          productApplicationEndpoints.getApplicationsByProduct(product.id)
+          productApplicationEndpoints.getApplicationsByProduct(product.id),
         ]);
 
         if (featuresResponse.success) {
@@ -72,7 +88,7 @@ const ProductDetail = () => {
           setApplications(applicationsResponse.data);
         }
       } catch (error) {
-        console.error('Error loading product details:', error);
+        console.error("Error loading product details:", error);
       } finally {
         setLoadingDetails(false);
       }
@@ -147,7 +163,10 @@ const ProductDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-secondary-50 dark:bg-secondary-900">
+    <div
+      key={id}
+      className="min-h-screen bg-secondary-50 dark:bg-secondary-900"
+    >
       <Container>
         <div className="py-8">
           {/* Breadcrumb */}
@@ -219,7 +238,7 @@ const ProductDetail = () => {
               </div>
 
               {/* Stock Status */}
-              <div className="flex items-center gap-2">
+              {/* <div className="flex items-center gap-2">
                 <span
                   className={clsx(
                     "text-sm px-3 py-1 rounded-full",
@@ -232,7 +251,7 @@ const ProductDetail = () => {
                 >
                   {stock > 0 ? `${stock} unidades en stock` : "Sin stock"}
                 </span>
-              </div>
+              </div> */}
 
               {/* Description */}
               <p className="text-secondary-600 dark:text-secondary-300 text-lg leading-relaxed">
@@ -334,7 +353,8 @@ const ProductDetail = () => {
                         "_blank"
                       );
                     }}
-                    className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white border-green-600 hover:border-green-700"
+                    mainColor={"#16a34a"}
+                    className="flex items-center justify-center gap-2 hover:bg-green-300 text-white border-green-600 hover:border-green-700"
                   >
                     <Icon name="FiMessageCircle" size="sm" />
                     Cotizar por WhatsApp
@@ -366,11 +386,7 @@ const ProductDetail = () => {
           <Card className="mb-8">
             <div className="border-b border-secondary-200 dark:border-secondary-700">
               <nav className="flex space-x-8">
-                {[
-                  "specifications",
-                  "features",
-                  "applications",
-                ].map((tab) => (
+                {["specifications", "features", "applications"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
@@ -481,8 +497,6 @@ const ProductDetail = () => {
                       </div>
                     </div>
                   </div>
-
-                  
                 </div>
               )}
 

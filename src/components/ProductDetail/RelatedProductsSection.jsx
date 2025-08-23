@@ -144,6 +144,8 @@ const RelatedProductsSection = ({ productId }) => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {products.map((relatedProduct) => {
               const product = relatedProduct.relatedProduct;
+
+              console.log(product);
               return (
                 <div
                   key={relatedProduct.id}
@@ -151,7 +153,7 @@ const RelatedProductsSection = ({ productId }) => {
                 >
                   {/* Imagen del producto */}
                   <div className="aspect-square bg-secondary-100 dark:bg-secondary-700 overflow-hidden">
-                    <Link to={`/productos/${product.id}`}>
+                    <Link to={`/producto/${product.id}`}>
                       <ImageWithFallback
                         src={product.main_image}
                         alt={product.name}
@@ -163,16 +165,16 @@ const RelatedProductsSection = ({ productId }) => {
                   {/* Información del producto */}
                   <div className="p-4 space-y-3">
                     {/* Nombre del producto */}
-                    <Link to={`/productos/${product.id}`}>
+                    <Link to={`/producto/${product.id}`}>
                       <h3 className="font-medium text-secondary-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 line-clamp-2">
                         {product.name}
                       </h3>
                     </Link>
 
                     {/* SKU */}
-                    <p className="text-xs text-secondary-500 dark:text-secondary-400 font-mono">
+                    <span className="text-xs text-secondary-500 dark:text-secondary-400 font-mono">
                       SKU: {product.sku}
-                    </p>
+                    </span>
 
                     {/* Precio */}
                     <div className="flex items-baseline gap-2">
@@ -182,7 +184,7 @@ const RelatedProductsSection = ({ productId }) => {
                     </div>
 
                     {/* Stock */}
-                    <div className="flex items-center gap-2">
+                    {/* <div className="flex items-center gap-2">
                       <span
                         className={clsx(
                           "text-xs px-2 py-1 rounded-full",
@@ -197,7 +199,7 @@ const RelatedProductsSection = ({ productId }) => {
                           ? `${product.stock_quantity} en stock`
                           : "Sin stock"}
                       </span>
-                    </div>
+                    </div> */}
 
                     {/* Botón de agregar al carrito */}
                     <Button
@@ -222,7 +224,7 @@ const RelatedProductsSection = ({ productId }) => {
                     {/* Botón de ver detalles */}
                     <Button
                       as={Link}
-                      to={`/productos/${product.id}`}
+                      to={`/producto/${product.id}`}
                       variant="outline"
                       fullWidth
                       size="sm"

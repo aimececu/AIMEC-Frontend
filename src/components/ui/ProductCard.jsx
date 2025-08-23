@@ -24,8 +24,6 @@ const ProductCard = ({
   } = product;
   const { addToCart, isInCart } = useCart();
 
-
-
   const handleAddToQuotation = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -37,124 +35,50 @@ const ProductCard = ({
     return (
       <div
         className={clsx(
-          "bg-white dark:bg-secondary-800 rounded-lg shadow-md border border-secondary-200 dark:border-secondary-700 overflow-hidden transition-all duration-200 hover:shadow-lg hover:-translate-y-1",
+          "bg-white dark:bg-secondary-800 rounded-lg shadow-md border border-secondary-200 dark:border-secondary-700 overflow-hidden transition-all duration-200 hover:shadow-lg hover:-translate-y-1 group cursor-pointer",
           className
         )}
         {...props}
       >
-        <div className="flex">
-                     {/* Product Image - Más pequeña en vista lista */}
-           <div className="relative w-40 h-40 flex-shrink-0 bg-secondary-100 dark:bg-secondary-700">
-             <ImageWithFallback
-               src={main_image}
-               alt={name}
-               className="w-full h-full object-contain p-2"
-             />
-            {showActions && (
-              <div className="absolute top-2 right-2 flex flex-col gap-1">
-                <Link
-                  to={`/producto/${product.id}`}
-                  className="p-1.5 bg-white dark:bg-secondary-800 rounded-full shadow-md hover:bg-secondary-50 dark:hover:bg-secondary-700 transition-colors duration-200"
-                >
-                  <Icon
-                    name="FiEye"
-                    size="xs"
-                    className="text-secondary-600 dark:text-secondary-300"
-                  />
-                </Link>
-                <button
-                  onClick={handleAddToQuotation}
-                  className={clsx(
-                    "p-1.5 rounded-full shadow-md transition-colors duration-200",
-                    isInCart(product.id)
-                      ? "bg-green-600 text-white hover:bg-green-700"
-                      : "bg-primary-600 text-white hover:bg-primary-700"
-                  )}
-                >
-                  <Icon
-                    name={isInCart(product.id) ? "FiCheck" : "FiShoppingCart"}
-                    size="xs"
-                  />
-                </button>
-              </div>
-            )}
+        <Link to={`/producto/${product.id}`} className="flex">
+          {/* Product Image - Adaptable en vista lista */}
+          <div className="relative w-40 aspect-square flex-shrink-0 bg-secondary-100 dark:bg-secondary-700 overflow-hidden">
+            <ImageWithFallback
+              src={main_image}
+              alt={name}
+              className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-200"
+            />
           </div>
 
           {/* Product Info - Expandido en vista lista */}
           <div className="flex-1 p-4 flex flex-col justify-between min-w-0">
             <div className="min-w-0">
-              {/* Category, Brand and Series */}
+              {/* Brand and Category */}
               <div className="flex flex-col gap-2 mb-2">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-xs text-secondary-500 dark:text-secondary-400 bg-secondary-100 dark:bg-secondary-700 px-2 py-1 rounded-full">
-                    {category?.name || 'Sin categoría'}
+                  <span className="text-xs text-secondary-400 dark:text-secondary-400 bg-secondary-200 dark:bg-secondary-800 px-2 py-1 rounded-full">
+                    {brand?.name || "Sin marca"}
                   </span>
-                  {/* series and brand are not directly available in the new product structure */}
-                  {/* <span className="text-xs text-secondary-500 dark:text-secondary-400 bg-primary-100 dark:bg-primary-900 px-2 py-1 rounded-full">
-                    {series}
-                  </span> */}
+                  <span className="text-xs text-secondary-500 dark:text-secondary-400 bg-secondary-100 dark:bg-secondary-700 px-2 py-1 rounded-full">
+                    {category?.name || "Sin categoría"}
+                  </span>
                 </div>
-                <span className="text-xs text-secondary-500 dark:text-secondary-400">
-                  {brand?.name || 'Sin marca'}
-                </span>
               </div>
 
               {/* Product Name */}
-              <Link to={`/producto/${product.id}`} className="block mb-2">
-                <h3 className="text-lg font-semibold text-secondary-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 truncate">
-                  {name}
-                </h3>
-              </Link>
-
-
+              <h3 className="text-lg font-semibold text-secondary-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-200 truncate mb-2">
+                {name}
+              </h3>
 
               {/* Description - Más espacio en vista lista */}
               <p className="text-sm text-secondary-600 dark:text-secondary-300 line-clamp-2 mb-2">
                 {description}
               </p>
-
-              {/* Stock Status */}
-              <div className="flex items-center gap-2 mb-2">
-                <span
-                  className={clsx(
-                    "text-xs px-2 py-1 rounded-full whitespace-nowrap",
-                    stock_quantity > 10
-                      ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                      : stock_quantity > 0
-                      ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
-                      : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
-                  )}
-                >
-                  {stock_quantity > 0 ? `${stock_quantity} en stock` : "Sin stock"}
-                </span>
-              </div>
-
-              {/* Quick Specs (if available) */}
-              {/* showSpecs and specifications are not directly available in the new product structure */}
-              {/* {showSpecs &&
-                specifications && Array.isArray(specifications) && specifications.length > 0 && (
-                  <div className="mt-2 text-xs text-secondary-500 dark:text-secondary-400">
-                    {specifications.slice(0, 3).map((spec, index) => (
-                      <div key={index}>
-                        {spec.name}: {spec.value}
-                      </div>
-                    ))}
-                    {specifications.length > 3 && (
-                      <div className="text-secondary-500">
-                        +{specifications.length - 3} más...
-                      </div>
-                    )}
-                  </div>
-                )} */}
             </div>
 
             {/* Price and Actions */}
             <div className="flex items-center justify-between mt-2">
               <div className="flex gap-2">
-                {/* product.originalPrice and product.originalPrice are not directly available in the new product structure */}
-                {/* <span className="text-base text-secondary-400 line-through">
-                  ${product.originalPrice.toFixed(2)}
-                </span> */}
                 <span className="text-xl font-bold text-primary-600 dark:text-primary-400">
                   ${(parseFloat(price) || 0).toFixed(2)}
                 </span>
@@ -181,7 +105,7 @@ const ProductCard = ({
               )}
             </div>
           </div>
-        </div>
+        </Link>
       </div>
     );
   }
@@ -190,127 +114,89 @@ const ProductCard = ({
   return (
     <div
       className={clsx(
-        "bg-white dark:bg-secondary-800 rounded-lg shadow-md border border-secondary-200 dark:border-secondary-700 overflow-hidden transition-all duration-200 hover:shadow-lg hover:-translate-y-1",
+        "bg-white dark:bg-secondary-800 rounded-lg shadow-md border border-secondary-200 dark:border-secondary-700 overflow-hidden transition-all duration-200 hover:shadow-lg hover:-translate-y-1 group cursor-pointer",
         className
       )}
       {...props}
     >
-      {/* Product Image */}
-      <div className="relative aspect-square bg-secondary-100 dark:bg-secondary-700">
-        <span className="text-xs text-secondary-400 dark:text-secondary-400 absolute top-1 left-1 bg-secondary-200 dark:bg-secondary-800 px-2 py-1 rounded-full">
-          {brand?.name || 'Sin marca'}
-        </span>
-        <ImageWithFallback
-          src={main_image}
-          alt={name}
-          className="w-full h-full object-cover"
-        />
-        {showActions && (
-          <div className="absolute top-2 right-2 flex flex-col gap-2">
-            <Link
-              to={`/producto/${product.id}`}
-              className="p-2 bg-white dark:bg-secondary-800 rounded-full shadow-md hover:bg-secondary-50 dark:hover:bg-secondary-700 transition-colors duration-200"
-            >
-              <Icon
-                name="FiEye"
-                size="sm"
-                className="text-secondary-600 dark:text-secondary-300"
-              />
-            </Link>
-            <button
-              onClick={handleAddToQuotation}
-              className={clsx(
-                "p-2 rounded-full shadow-md transition-colors duration-200",
-                isInCart(product.id)
-                  ? "bg-green-600 text-white hover:bg-green-700"
-                  : "bg-primary-600 text-white hover:bg-primary-700"
-              )}
-            >
-              <Icon
-                name={isInCart(product.id) ? "FiCheck" : "FiShoppingCart"}
-                size="sm"
-              />
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Product Info */}
-      <div className="p-4 min-w-0">
-        {/* Category, Brand and Series */}
-        <div className="flex flex-col gap-2 mb-2">
-          <div className="flex items-center gap-1 flex-wrap">
-            <span className="text-xs text-secondary-500 dark:text-secondary-400 bg-secondary-100 dark:bg-secondary-700 px-2 py-1 rounded-full">
-              {category?.name || 'Sin categoría'}
-            </span>
-            {/* series and brand are not directly available in the new product structure */}
-            {/* <span className="text-xs text-secondary-500 dark:text-secondary-400 bg-primary-100 dark:bg-primary-900 px-2 py-1 rounded-full">
-              {series}
-            </span> */}
-          </div>
+      <Link to={`/producto/${product.id}`} className="block">
+        {/* Product Image */}
+        <div className="relative aspect-square bg-secondary-100 dark:bg-secondary-700">
+          <ImageWithFallback
+            src={main_image}
+            alt={name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+          />
         </div>
 
-        {/* Product Name */}
-        <Link to={`/producto/${product.id}`} className="block mb-2">
-          <h3 className="text-sm font-semibold text-secondary-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 line-clamp-2 min-h-[2.5rem]">
+        {/* Product Info */}
+        <div className="p-4 min-w-0">
+          {/* Category, Brand and Series */}
+          <div className="flex flex-col gap-2 mb-2">
+            <div className="flex items-center gap-1 flex-wrap">
+              <span className="text-xs text-secondary-400 dark:text-secondary-400 bg-secondary-200 dark:bg-secondary-800 px-2 py-1 rounded-full">
+                {brand?.name || "Sin marca"}
+              </span>
+              <span className="text-xs text-secondary-500 dark:text-secondary-400 bg-secondary-100 dark:bg-secondary-700 px-2 py-1 rounded-full">
+                {category?.name || "Sin categoría"}
+              </span>
+            </div>
+          </div>
+
+          {/* Product Name */}
+          <h3 className="text-sm font-semibold text-secondary-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-200 line-clamp-2 min-h-[2.5rem] mb-2">
             {name}
           </h3>
-        </Link>
 
+          {/* Description */}
+          <p className="text-xs text-secondary-600 dark:text-secondary-300 mb-3 line-clamp-2 min-h-[2rem]">
+            {description}
+          </p>
 
-
-        {/* Description */}
-        <p className="text-xs text-secondary-600 dark:text-secondary-300 mb-3 line-clamp-2 min-h-[2rem]">
-          {description}
-        </p>
-
-        {/* Stock Status */}
-        <div className="flex items-center gap-2 mb-3">
-          <span
-            className={clsx(
-              "text-xs px-2 py-1 rounded-full whitespace-nowrap",
-              stock_quantity > 10
-                ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                : stock_quantity > 0
-                ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
-                : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
-            )}
-          >
-            {stock_quantity > 0 ? `${stock_quantity} en stock` : "Sin stock"}
-          </span>
-        </div>
-
-        {/* Price and Actions */}
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex flex-col items-baseline gap-0 flex-shrink-0">
-            {/* product.originalPrice and product.originalPrice are not directly available in the new product structure */}
-            {/* <span className="text-sm text-secondary-400 line-through">
-              ${product.originalPrice.toFixed(2)}
-            </span> */}
-            <span className="text-lg font-bold text-primary-600 dark:text-primary-400">
-              ${(parseFloat(price) || 0).toFixed(2)}
-            </span>
-          </div>
-
-          {showActions && (
-            <button
-              onClick={handleAddToQuotation}
+          {/* Stock Status */}
+          {/* <div className="flex items-center gap-2 mb-3">
+            <span
               className={clsx(
-                "px-3 py-1.5 text-white text-xs font-medium rounded-md transition-colors duration-200 flex items-center gap-1 whitespace-nowrap flex-shrink-0",
-                isInCart(product.id)
-                  ? "bg-green-600 hover:bg-green-700"
-                  : "bg-primary-600 hover:bg-primary-700"
+                "text-xs px-2 py-1 rounded-full whitespace-nowrap",
+                stock_quantity > 10
+                  ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+                  : stock_quantity > 0
+                  ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
+                  : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
               )}
             >
-              <Icon
-                name={isInCart(product.id) ? "FiCheck" : "FiShoppingCart"}
-                size="xs"
-              />
-              {isInCart(product.id) ? "Agregado" : "Cotizar"}
-            </button>
-          )}
+              {stock_quantity > 0 ? `${stock_quantity} en stock` : "Sin stock"}
+            </span>
+          </div> */}
+
+          {/* Price and Actions */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col items-baseline gap-0 flex-shrink-0">
+              <span className="text-lg font-bold text-primary-600 dark:text-primary-400">
+                ${(parseFloat(price) || 0).toFixed(2)}
+              </span>
+            </div>
+
+            {showActions && (
+              <button
+                onClick={handleAddToQuotation}
+                className={clsx(
+                  "px-3 py-1.5 text-white text-xs font-medium rounded-md transition-colors duration-200 flex items-center gap-1 whitespace-nowrap flex-shrink-0",
+                  isInCart(product.id)
+                    ? "bg-green-600 hover:bg-green-700"
+                    : "bg-primary-600 hover:bg-primary-700"
+                )}
+              >
+                <Icon
+                  name={isInCart(product.id) ? "FiCheck" : "FiShoppingCart"}
+                  size="xs"
+                />
+                {isInCart(product.id) ? "Agregado" : "Cotizar"}
+              </button>
+            )}
+          </div>
         </div>
-      </div>
+      </Link>
     </div>
   );
 };

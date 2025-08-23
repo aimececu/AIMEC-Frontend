@@ -45,6 +45,7 @@ const ProductRelatedManager = ({ productId, productName }) => {
   const [showNewRelationshipInput, setShowNewRelationshipInput] =
     useState(false);
   const [newRelationshipType, setNewRelationshipType] = useState("");
+  const [newRelationshipTypeError, setNewRelationshipTypeError] = useState("");
 
   const [editingGroupData, setEditingGroupData] = useState({
     relationshipType: "",
@@ -73,6 +74,7 @@ const ProductRelatedManager = ({ productId, productName }) => {
       setSearchTerm("");
       setShowNewRelationshipInput(false);
       setNewRelationshipType("");
+      setNewRelationshipTypeError("");
     }
   }, [showAddSection]);
 
@@ -154,11 +156,45 @@ const ProductRelatedManager = ({ productId, productName }) => {
       setShowNewRelationshipInput(true);
       setSelectedRelationshipType("");
       setNewRelationshipType("");
+      setNewRelationshipTypeError("");
     } else {
       setShowNewRelationshipInput(false);
       setSelectedRelationshipType(value);
       setNewRelationshipType("");
+      setNewRelationshipTypeError("");
     }
+  };
+
+  /**
+   * Maneja el cambio del nuevo tipo de relación con validación en tiempo real
+   */
+  const handleNewRelationshipTypeChange = (value) => {
+    setNewRelationshipType(value);
+    // Validar en tiempo real
+    const error = validateNewRelationshipType(value);
+    setNewRelationshipTypeError(error);
+  };
+
+  /**
+   * Valida que el nuevo tipo de relación no exista ya
+   */
+  const validateNewRelationshipType = (newType) => {
+    if (!newType || newType.trim() === "") {
+      return "El tipo de relación es requerido";
+    }
+
+    const trimmedType = newType.trim().toLowerCase();
+    const existingTypes = relationshipTypes.map((type) => type.toLowerCase());
+
+    if (existingTypes.includes(trimmedType)) {
+      return "Este tipo de relación ya existe";
+    }
+
+    if (trimmedType.length < 2) {
+      return "El tipo de relación debe tener al menos 2 caracteres";
+    }
+
+    return null; // No hay errores
   };
 
   /**
@@ -177,6 +213,15 @@ const ProductRelatedManager = ({ productId, productName }) => {
       return;
     }
 
+    // Validar el nuevo tipo de relación si se está creando uno
+    if (showNewRelationshipInput) {
+      const validationError = validateNewRelationshipType(relationshipType);
+      if (validationError) {
+        showToast(validationError, "error");
+        return;
+      }
+    }
+
     try {
       const success = await addMultipleRelatedProducts({
         relationship_type: relationshipType,
@@ -188,7 +233,8 @@ const ProductRelatedManager = ({ productId, productName }) => {
         setSelectedProductIds([]);
         setSelectedRelationshipType("");
         setShowNewRelationshipInput(false);
-        setSelectedRelationshipType("");
+        setNewRelationshipType("");
+        setNewRelationshipTypeError("");
         setShowAddSection(false);
       }
     } catch (error) {
@@ -471,7 +517,8 @@ const ProductRelatedManager = ({ productId, productName }) => {
               onClick={handleSaveSelected}
               disabled={
                 (!selectedRelationshipType && !newRelationshipType) ||
-                selectedProductIds.length === 0
+                selectedProductIds.length === 0 ||
+                (showNewRelationshipInput && newRelationshipTypeError)
               }
               className="bg-blue-600 hover:bg-blue-700 text-white"
             >
@@ -485,47 +532,104 @@ const ProductRelatedManager = ({ productId, productName }) => {
           {/* Tipo de relación */}
           <div>
             {!showNewRelationshipInput ? (
-              <Select
-                value={selectedRelationshipType}
-                onChange={(e) => handleRelationshipTypeChange(e.target.value)}
-                label="Tipo de Relación"
-                helperText="Selecciona un tipo existente o crea uno nuevo"
-                className="w-full max-w-md"
-                required
-              >
-                <option value="">Selecciona un tipo de relación</option>
-                {relationshipTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type.charAt(0).toUpperCase() + type.slice(1)}
-                  </option>
-                ))}
-                <option value="new">➕ Crear nuevo tipo</option>
-              </Select>
+              <div className="space-y-3">
+                <Select
+                  value={selectedRelationshipType}
+                  onChange={(e) => handleRelationshipTypeChange(e.target.value)}
+                  label="Tipo de Relación"
+                  helperText="Selecciona un tipo existente o crea uno nuevo"
+                  className="w-full max-w-md"
+                  required
+                >
+                  <option value="">Selecciona un tipo de relación</option>
+                  {relationshipTypes.map((type) => (
+                    <option key={type} value={type}>
+                      {type.charAt(0).toUpperCase() + type.slice(1)}
+                    </option>
+                  ))}
+                  <option value="new">➕ Crear nuevo tipo de relación</option>
+                </Select>
+
+                {/* Opción alternativa con botón para crear nuevo tipo */}
+                <div className="flex items-center gap-3">
+                  <Button
+                    variant={showNewRelationshipInput ? "primary" : "outline"}
+                    size="sm"
+                    onClick={() => {
+                      if (!showNewRelationshipInput) {
+                        setShowNewRelationshipInput(true);
+                        setSelectedRelationshipType("");
+                        setNewRelationshipType("");
+                        setNewRelationshipTypeError("");
+                      } else {
+                        setShowNewRelationshipInput(false);
+                        setNewRelationshipType("");
+                        setNewRelationshipTypeError("");
+                      }
+                    }}
+                    className={`flex items-center gap-2 transition-all duration-200 ${
+                      showNewRelationshipInput 
+                        ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-600" 
+                        : "border-blue-300 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-400"
+                    }`}
+                  >
+                    <Icon name={showNewRelationshipInput ? "FiCheck" : "FiPlus"} size="sm" />
+                    {showNewRelationshipInput ? "Cancelar nuevo tipo" : "Crear nuevo tipo de relación"}
+                  </Button>
+                  
+                  {!showNewRelationshipInput && (
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      Haga clic en el botón para crear un tipo de relación personalizado
+                    </span>
+                  )}
+                </div>
+              </div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
+                <div className="flex items-center justify-between">
+                  <h5 className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                    ✨ Creando nuevo tipo de relación
+                  </h5>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setShowNewRelationshipInput(false);
+                      setNewRelationshipType("");
+                      setNewRelationshipTypeError("");
+                    }}
+                    className="text-blue-600 hover:text-blue-700 border-blue-300 hover:border-blue-400"
+                  >
+                    <Icon name="FiX" size="sm" />
+                    Cancelar
+                  </Button>
+                </div>
+
                 <Input
                   type="text"
                   value={newRelationshipType}
-                  onChange={(value) => setNewRelationshipType(value)}
+                  onChange={handleNewRelationshipTypeChange}
                   label="Nuevo Tipo de Relación"
-                  helperText="Escribe el nombre del nuevo tipo de relación"
-                  placeholder="Ej: complementario, alternativo, etc."
-                  className="w-full max-w-md"
+                  helperText={
+                    newRelationshipTypeError
+                      ? newRelationshipTypeError
+                      : "Escribe el nombre del nuevo tipo de relación (mínimo 2 caracteres)"
+                  }
+                  placeholder="Ej: complementario, alternativo, similar, etc."
+                  className={`w-full max-w-md ${
+                    newRelationshipTypeError
+                      ? "border-red-300 focus:border-red-500"
+                      : ""
+                  }`}
                   required
+                  error={newRelationshipTypeError}
                 />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setShowNewRelationshipInput(false);
-                    setNewRelationshipType("");
-                    setSelectedRelationshipType("");
-                  }}
-                  className="text-gray-600 hover:text-gray-800"
-                >
-                  <Icon name="FiX" size="sm" />
-                  Cancelar nuevo tipo
-                </Button>
+
+                {newRelationshipType && !newRelationshipTypeError && (
+                  <div className="text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-3 py-2 rounded-md border border-green-200 dark:border-green-700">
+                    ✓ Tipo de relación válido
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -895,7 +999,6 @@ const ProductRelatedManager = ({ productId, productName }) => {
                         <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full absolute right-0 top-0">
                           ✓ En el grupo
                         </span>
-                        
                       </div>
                     }
                   />
@@ -927,48 +1030,48 @@ const ProductRelatedManager = ({ productId, productName }) => {
                     ? availableProducts.slice(0, 30)
                     : availableProducts;
 
-                                 return displayedProducts.map((product) => (
-                   <Checkbox
-                     key={`available-${product.id}`}
-                     checked={false}
-                     onChange={() => {
-                       // Agregar al grupo
-                       const newGroupProduct = {
-                         id: Date.now(), // ID temporal
-                         relationshipType: editingGroupData.relationshipType,
-                         relatedProduct: product,
-                       };
-                       setEditingGroupData((prev) => ({
-                         ...prev,
-                         products: [...prev.products, newGroupProduct],
-                       }));
-                     }}
-                     card={true}
-                     size="md"
-                     variant="primary"
-                     align="center"
-                     label={
-                       <div className="flex items-center gap-3 min-w-0 flex-1">
-                         <ImageWithFallback
-                           src={product.main_image}
-                           alt={product.name}
-                           className="w-12 h-12 object-cover rounded-lg"
-                         />
-                         <div className="min-w-0 flex-1">
-                           <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                             {product.name}
-                           </p>
-                           <p className="text-xs text-gray-500 dark:text-gray-400">
-                             SKU: {product.sku}
-                           </p>
-                           <p className="text-xs text-gray-400 dark:text-gray-500">
-                             ${product.price}
-                           </p>
-                         </div>
-                       </div>
-                     }
-                   />
-                 ));
+                return displayedProducts.map((product) => (
+                  <Checkbox
+                    key={`available-${product.id}`}
+                    checked={false}
+                    onChange={() => {
+                      // Agregar al grupo
+                      const newGroupProduct = {
+                        id: Date.now(), // ID temporal
+                        relationshipType: editingGroupData.relationshipType,
+                        relatedProduct: product,
+                      };
+                      setEditingGroupData((prev) => ({
+                        ...prev,
+                        products: [...prev.products, newGroupProduct],
+                      }));
+                    }}
+                    card={true}
+                    size="md"
+                    variant="primary"
+                    align="center"
+                    label={
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <ImageWithFallback
+                          src={product.main_image}
+                          alt={product.name}
+                          className="w-12 h-12 object-cover rounded-lg"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                            {product.name}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            SKU: {product.sku}
+                          </p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500">
+                            ${product.price}
+                          </p>
+                        </div>
+                      </div>
+                    }
+                  />
+                ));
               })()}
 
               {/* Mensaje informativo sobre el límite de 30 productos */}

@@ -91,10 +91,13 @@ const ProductRelatedManager = ({ productId, productName }) => {
     }
   }, [showEditGroupModal]);
 
+  console.log("relatedproducts", relatedProducts);
+
   // Tipos de relación únicos de productos existentes (solo los que están en la base)
   const relationshipTypes = relatedProducts
     .map((rp) => rp.relationshipType)
     .filter((type, index, arr) => arr.indexOf(type) === index);
+  console.log("relationshipTypes", relationshipTypes);
 
   /**
    * Abre la sección para agregar productos relacionados
@@ -535,54 +538,20 @@ const ProductRelatedManager = ({ productId, productName }) => {
               <div className="space-y-3">
                 <Select
                   value={selectedRelationshipType}
-                  onChange={(e) => handleRelationshipTypeChange(e.target.value)}
+                  onChange={(value) => handleRelationshipTypeChange(value)}
                   label="Tipo de Relación"
                   helperText="Selecciona un tipo existente o crea uno nuevo"
-                  className="w-full max-w-md"
                   required
-                >
-                  <option value="">Selecciona un tipo de relación</option>
-                  {relationshipTypes.map((type) => (
-                    <option key={type} value={type}>
-                      {type.charAt(0).toUpperCase() + type.slice(1)}
-                    </option>
-                  ))}
-                  <option value="new">➕ Crear nuevo tipo de relación</option>
-                </Select>
-
-                {/* Opción alternativa con botón para crear nuevo tipo */}
-                <div className="flex items-center gap-3">
-                  <Button
-                    variant={showNewRelationshipInput ? "primary" : "outline"}
-                    size="sm"
-                    onClick={() => {
-                      if (!showNewRelationshipInput) {
-                        setShowNewRelationshipInput(true);
-                        setSelectedRelationshipType("");
-                        setNewRelationshipType("");
-                        setNewRelationshipTypeError("");
-                      } else {
-                        setShowNewRelationshipInput(false);
-                        setNewRelationshipType("");
-                        setNewRelationshipTypeError("");
-                      }
-                    }}
-                    className={`flex items-center gap-2 transition-all duration-200 ${
-                      showNewRelationshipInput 
-                        ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-600" 
-                        : "border-blue-300 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-400"
-                    }`}
-                  >
-                    <Icon name={showNewRelationshipInput ? "FiCheck" : "FiPlus"} size="sm" />
-                    {showNewRelationshipInput ? "Cancelar nuevo tipo" : "Crear nuevo tipo de relación"}
-                  </Button>
-                  
-                  {!showNewRelationshipInput && (
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      Haga clic en el botón para crear un tipo de relación personalizado
-                    </span>
-                  )}
-                </div>
+                  searchable
+                  options={[
+                    { label: "Selecciona un tipo de relación", value: "" },
+                    ...relationshipTypes.map((type) => ({
+                      label: type.charAt(0).toUpperCase() + type.slice(1),
+                      value: type,
+                    })),
+                    { label: "➕ Crear nuevo tipo de relación", value: "new" },
+                  ]}
+                />
               </div>
             ) : (
               <div className="space-y-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
@@ -1135,6 +1104,21 @@ const ProductRelatedManager = ({ productId, productName }) => {
                       <div
                         key={relatedProduct.id}
                         className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-600/50 transition-colors border border-gray-200 dark:border-gray-600"
+                        title={`${relatedProduct.relatedProduct.name}
+                          SKU: ${relatedProduct.relatedProduct.sku}
+                          Precio: $${relatedProduct.relatedProduct.price}
+                          Categoría: ${
+                            relatedProduct.relatedProduct.category?.name ||
+                            "Sin categoría"
+                          }
+                          Subcategoría: ${
+                            relatedProduct.relatedProduct.subcategory?.name ||
+                            "Sin subcategoría"
+                          }
+                          Marca: ${
+                            relatedProduct.relatedProduct.brand?.name ||
+                            "Sin marca"
+                          }`}
                       >
                         <div className="flex flex-col items-center text-center">
                           {/* Imagen del producto */}

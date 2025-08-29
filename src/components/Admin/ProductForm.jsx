@@ -14,6 +14,7 @@ const ProductForm = ({
   setProductForm,
   categories,
   brands,
+  subcategories, // Agregar subcategories como prop
   onSubmit,
   onCancel,
   editingProduct,
@@ -28,13 +29,23 @@ const ProductForm = ({
     }));
   };
 
-  // Limpiar subcategoría cuando cambie la categoría
+  // Limpiar subcategoría cuando cambie la categoría (solo si no es la carga inicial)
+  const prevCategoryIdRef = useRef();
+  
   useEffect(() => {
-    if (productForm.category_id !== undefined) {
+    // Si es la primera vez que se carga, solo guardar la referencia
+    if (prevCategoryIdRef.current === undefined) {
+      prevCategoryIdRef.current = productForm.category_id;
+      return;
+    }
+    
+    // Solo limpiar subcategoría si el usuario cambia manualmente la categoría
+    if (prevCategoryIdRef.current !== productForm.category_id) {
       setProductForm((prev) => ({
         ...prev,
         subcategory_id: "",
       }));
+      prevCategoryIdRef.current = productForm.category_id;
     }
   }, [productForm.category_id, setProductForm]);
 
@@ -274,6 +285,9 @@ const ProductForm = ({
                 }))}
               />
 
+              {console.log(subcategories)}
+              {console.log(productForm)}
+
               {/* Subcategoría */}
               <Select
                 label="Subcategoría"
@@ -282,12 +296,13 @@ const ProductForm = ({
                 options={[
                   { label: "Sin subcategoría", value: "" },
                   ...(
-                    categories.find((cat) => cat.id === productForm.category_id)
-                      ?.subcategories || []
-                  ).map((subcat) => ({
-                    label: subcat.name,
-                    value: subcat.id,
-                  })),
+                    subcategories
+                      .filter(subcat => subcat.category_id === productForm.category_id)
+                      .map((subcat) => ({
+                        label: subcat.name,
+                        value: subcat.id,
+                      }))
+                  ),
                 ]}
               />
 

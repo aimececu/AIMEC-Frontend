@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Card from "../ui/Card";
 import Heading from "../ui/Heading";
 import Button from "../ui/Button";
@@ -21,6 +21,12 @@ const ImportData = ({ onRefresh }) => {
   const [message, setMessage] = useState({ type: "", text: "" });
   const [validationErrors, setValidationErrors] = useState([]);
   const [canImport, setCanImport] = useState(false);
+  
+  // Nuevos estados para la barra de progreso y control de subida
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadStatus, setUploadStatus] = useState('idle'); // 'idle', 'uploading', 'processing', 'success', 'error'
+  const [uploadAbortController, setUploadAbortController] = useState(null);
+  const fileInputRef = useRef(null);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -30,6 +36,9 @@ const ImportData = ({ onRefresh }) => {
       setPreviewData(null);
       setValidationErrors([]);
       setCanImport(false);
+      setUploadProgress(0);
+      setUploadStatus('idle');
+      
       // Procesar archivo para previsualización
       handleFilePreview(selectedFile);
     }
@@ -37,30 +46,44 @@ const ImportData = ({ onRefresh }) => {
 
   const handleFilePreview = async (selectedFile) => {
     setLoading(true);
+    setUploadStatus('uploading');
+    setUploadProgress(10);
+    
     try {
       console.log('Previewing file:', selectedFile);
+      
+      // Crear un AbortController para poder cancelar la operación
+      const abortController = new AbortController();
+      setUploadAbortController(abortController);
+      
+      setUploadProgress(25);
+      
       const response = await importEndpoints.previewImportData(selectedFile);
 
       if (response.success) {
+        setUploadProgress(75);
         setPreviewData(response.data.preview);
         setValidationErrors(response.data.validation_errors || []);
         setCanImport(response.data.can_import);
+        setUploadProgress(100);
+        setUploadStatus('success');
 
         if (
           response.data.validation_errors &&
           response.data.validation_errors.length > 0
         ) {
           setMessage({
-            type: "error",
-            text: `Se encontraron ${response.data.validation_errors.length} errores de validación. Revisa los datos antes de importar.`,
+            type: "warning",
+            text: `Archivo procesado correctamente. Se encontraron ${response.data.validation_errors.length} errores de validación. Revisa los datos antes de importar.`,
           });
         } else {
           setMessage({
             type: "success",
-            text: `Archivo procesado correctamente. ${response.data.total_rows} filas encontradas.`,
+            text: `¡Archivo subido y procesado exitosamente! ${response.data.total_rows} productos encontrados y listos para importar.`,
           });
         }
       } else {
+        setUploadStatus('error');
         setMessage({
           type: "error",
           text: response.error || "Error al procesar el archivo",
@@ -68,14 +91,22 @@ const ImportData = ({ onRefresh }) => {
       }
     } catch (error) {
       console.error("Error procesando archivo:", error);
-      setMessage({
-        type: "error",
-        text:
-          error.message ||
-          "Error al procesar el archivo. Verifica que sea un archivo CSV válido.",
-      });
+      setUploadStatus('error');
+      
+      if (error.name === 'AbortError') {
+        setMessage({
+          type: "info",
+          text: "Subida cancelada por el usuario.",
+        });
+      } else {
+        setMessage({
+          type: "error",
+          text: error.message || "Error al procesar el archivo. Verifica que sea un archivo Excel válido.",
+        });
+      }
     } finally {
       setLoading(false);
+      setUploadAbortController(null);
     }
   };
 
@@ -83,14 +114,26 @@ const ImportData = ({ onRefresh }) => {
     if (!file || !canImport) return;
 
     setImporting(true);
+    setUploadStatus('processing');
+    setUploadProgress(0);
+    
     try {
+      setUploadProgress(25);
+      setMessage({
+        type: "info",
+        text: "Procesando datos del archivo...",
+      });
+      
       const response = await importEndpoints.importSystemData(file);
 
       if (response.success) {
         const results = response.data;
+        setUploadProgress(75);
+        setUploadStatus('success');
+        
         setMessage({
           type: "success",
-          text: `Importación completada exitosamente. ${
+          text: `¡Importación completada exitosamente! ${
             results.products_created
           } productos creados, ${results.products_updated} actualizados. ${
             results.features_created || 0
@@ -106,12 +149,15 @@ const ImportData = ({ onRefresh }) => {
         setPreviewData(null);
         setValidationErrors([]);
         setCanImport(false);
+        setUploadProgress(0);
+        setUploadStatus('idle');
 
         // Recargar datos del sistema
         if (onRefresh) {
           onRefresh();
         }
       } else {
+        setUploadStatus('error');
         setMessage({
           type: "error",
           text: response.error || "Error durante la importación",
@@ -119,18 +165,52 @@ const ImportData = ({ onRefresh }) => {
       }
     } catch (error) {
       console.error("Error importando datos:", error);
+      setUploadStatus('error');
       setMessage({
         type: "error",
-        text:
-          error.message ||
-          "Error durante la importación. Verifica la conexión y vuelve a intentar.",
+        text: error.message || "Error durante la importación. Verifica la conexión y vuelve a intentar.",
       });
     } finally {
       setImporting(false);
+        }
+  };
+
+  const cancelUpload = () => {
+    if (uploadAbortController) {
+      uploadAbortController.abort();
+    }
+    
+    // Limpiar estado
+    setFile(null);
+    setPreviewData(null);
+    setValidationErrors([]);
+    setCanImport(false);
+    setUploadProgress(0);
+    setUploadStatus('idle');
+    setMessage({ type: "", text: "" });
+    
+    // Limpiar el input de archivo
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
-    const downloadTemplate = () => {
+  const resetUpload = () => {
+    setFile(null);
+    setPreviewData(null);
+    setValidationErrors([]);
+    setCanImport(false);
+    setUploadProgress(0);
+    setUploadStatus('idle');
+    setMessage({ type: "", text: "" });
+    
+    // Limpiar el input de archivo
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const downloadTemplate = () => {
     // CSV simplificado con nombres intuitivos incluyendo características, aplicaciones, accesorios y productos relacionados
     const csvContent = `sku,nombre,descripcion,marca,categoria,subcategoria,precio,stock,stock_minimo,peso,dimensiones,imagen,caracteristicas,aplicaciones,accesorios,productos_relacionados
  SIEMENS-3RT1015-1BB41,Contacto auxiliar 3RT1015-1BB41,Contacto auxiliar normalmente abierto para contactores Siemens,Siemens,Contactores,Contactos auxiliares,25.50,100,10,0.5,50x30x20,https://example.com/siemens-contact.jpg,"Contacto NO;Tensión 24V DC;Corriente 10A;Temperatura -25°C a +70°C","Control de iluminación;Sistemas de seguridad;Automatización industrial","SIEMENS-3RT1015-1BB42;SIEMENS-3RT1015-1BB43","SIEMENS-3RT1015-1BB44:Complementario;SIEMENS-3RT1015-1BB45:Alternativo"
@@ -601,6 +681,7 @@ const ImportData = ({ onRefresh }) => {
             onChange={handleFileChange}
             label="Seleccionar archivo"
             helperText="Formatos soportados: CSV, Excel (.xlsx, .xls)"
+            ref={fileInputRef}
           />
 
           {file && (
@@ -611,6 +692,78 @@ const ImportData = ({ onRefresh }) => {
                 <span className="text-sm text-secondary-500">
                   ({(file.size / 1024).toFixed(1)} KB)
                 </span>
+              </div>
+            </div>
+          )}
+
+          {/* Barra de progreso y controles */}
+          {uploadStatus !== 'idle' && (
+            <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+              <div className="flex items-center gap-2 mb-3">
+                <Icon name="FiInfo" className="text-blue-500 flex-shrink-0" />
+                <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                  Estado de la subida
+                </span>
+              </div>
+              
+              <div className="space-y-4">
+                {/* Barra de progreso visual */}
+                <div className="w-full bg-gray-200 rounded-full h-3 dark:bg-gray-700">
+                  <div
+                    className={`h-3 rounded-full transition-all duration-300 ease-out ${
+                      uploadStatus === 'uploading' ? 'bg-blue-600' :
+                      uploadStatus === 'processing' ? 'bg-green-600' :
+                      uploadStatus === 'success' ? 'bg-green-600' :
+                      uploadStatus === 'error' ? 'bg-red-600' : 'bg-gray-600'
+                    }`}
+                    style={{ width: `${uploadProgress}%` }}
+                  ></div>
+                </div>
+
+                {/* Estado y progreso */}
+                <div className="flex justify-between items-center text-sm">
+                  <span className={`font-medium ${
+                    uploadStatus === 'uploading' ? 'text-blue-600 dark:text-blue-400' :
+                    uploadStatus === 'processing' ? 'text-green-600 dark:text-green-400' :
+                    uploadStatus === 'success' ? 'text-green-600 dark:text-green-400' :
+                    uploadStatus === 'error' ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400'
+                  }`}>
+                    {uploadStatus === 'uploading' && 'Subiendo archivo...'}
+                    {uploadStatus === 'processing' && 'Procesando datos...'}
+                    {uploadStatus === 'success' && '¡Completado!'}
+                    {uploadStatus === 'error' && 'Error detectado'}
+                  </span>
+                  <span className="text-secondary-600 dark:text-secondary-400">
+                    {uploadProgress}%
+                  </span>
+                </div>
+
+                {/* Botones de control */}
+                {uploadStatus === 'uploading' && (
+                  <div className="flex justify-end gap-2">
+                    <Button variant="outline" onClick={cancelUpload} disabled={importing}>
+                      <Icon name="FiX" className="mr-2" />
+                      Cancelar Subida
+                    </Button>
+                    <Button onClick={resetUpload} disabled={importing}>
+                      <Icon name="FiRefreshCw" className="mr-2" />
+                      Reintentar
+                    </Button>
+                  </div>
+                )}
+
+                {uploadStatus === 'error' && (
+                  <div className="flex justify-end gap-2">
+                    <Button variant="outline" onClick={resetUpload}>
+                      <Icon name="FiRefreshCw" className="mr-2" />
+                      Reintentar
+                    </Button>
+                    <Button onClick={cancelUpload}>
+                      <Icon name="FiX" className="mr-2" />
+                      Cancelar
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           )}

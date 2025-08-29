@@ -6,6 +6,7 @@ import ImageWithFallback from "../ui/ImageWithFallback";
 import Loader from "../ui/Loader";
 import Icon from "../ui/Icon";
 import Button from "../ui/Button";
+import ProductCarousel from "../ui/ProductCarousel";
 import { useCart } from "../../context/CartContext";
 import clsx from "clsx";
 
@@ -34,44 +35,6 @@ const RelatedProductsSection = ({ productId }) => {
 
   const handleAddToCart = (product) => {
     addToCart(product, quantity);
-  };
-
-  // Componente del contador integrado
-  const RelatedProductsCount = () => {
-    if (loading) {
-      return (
-        <span className="text-sm text-secondary-500 dark:text-secondary-400">
-          Cargando...
-        </span>
-      );
-    }
-
-    if (!relatedProducts || relatedProducts.length === 0) {
-      return (
-        <span className="text-sm text-secondary-500 dark:text-secondary-400">
-          Sin productos relacionados
-        </span>
-      );
-    }
-
-    // Agrupa por tipo de relación para mostrar mejor el conteo
-    const groupedTypes = relatedProducts.reduce((groups, product) => {
-      const type = product.relationshipType;
-      if (!groups[type]) {
-        groups[type] = 0;
-      }
-      groups[type]++;
-      return groups;
-    }, {});
-
-    const totalCount = relatedProducts.length;
-    const typeCount = Object.keys(groupedTypes).length;
-
-    return (
-      <span className="text-sm text-secondary-500 dark:text-secondary-400">
-        ({totalCount} producto{totalCount !== 1 ? 's' : ''} en {typeCount} categoría{typeCount !== 1 ? 's' : ''})
-      </span>
-    );
   };
 
   if (loading) {
@@ -115,7 +78,7 @@ const RelatedProductsSection = ({ productId }) => {
 
   return (
     <div className="space-y-8">
-      {/* Header con contador integrado */}
+      {/* Header principal */}
       <div className="flex items-center gap-3 mb-6">
         <Icon 
           name="FiLink" 
@@ -124,7 +87,9 @@ const RelatedProductsSection = ({ productId }) => {
         <h2 className="text-2xl font-bold text-secondary-900 dark:text-white">
           Productos Relacionados
         </h2>
-        <RelatedProductsCount />
+        <span className="text-sm text-secondary-500 dark:text-secondary-400">
+          ({relatedProducts.length} producto{relatedProducts.length !== 1 ? 's' : ''} en {Object.keys(groupedRelatedProducts).length} categoría{Object.keys(groupedRelatedProducts).length !== 1 ? 's' : ''})
+        </span>
       </div>
 
       {/* Grupos de productos relacionados */}
@@ -140,16 +105,18 @@ const RelatedProductsSection = ({ productId }) => {
             </span>
           </div>
 
-          {/* Grid de productos del grupo */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {/* Carrusel de productos del grupo */}
+          <ProductCarousel
+            itemsPerView={4}
+            showNavigation={products.length > 4}
+          >
             {products.map((relatedProduct) => {
               const product = relatedProduct.relatedProduct;
 
-              console.log(product);
               return (
                 <div
                   key={relatedProduct.id}
-                  className="bg-white dark:bg-secondary-800 rounded-lg border border-secondary-200 dark:border-secondary-700 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200"
+                  className="bg-white dark:bg-secondary-800 rounded-lg border border-secondary-200 dark:border-secondary-700 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 min-w-[280px] max-w-[280px]"
                 >
                   {/* Imagen del producto */}
                   <div className="aspect-square bg-secondary-100 dark:bg-secondary-700 overflow-hidden">
@@ -182,24 +149,6 @@ const RelatedProductsSection = ({ productId }) => {
                         ${(parseFloat(product.price) || 0).toFixed(2)}
                       </span>
                     </div>
-
-                    {/* Stock */}
-                    {/* <div className="flex items-center gap-2">
-                      <span
-                        className={clsx(
-                          "text-xs px-2 py-1 rounded-full",
-                          product.stock_quantity > 10
-                            ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                            : product.stock_quantity > 0
-                            ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
-                            : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
-                        )}
-                      >
-                        {product.stock_quantity > 0
-                          ? `${product.stock_quantity} en stock`
-                          : "Sin stock"}
-                      </span>
-                    </div> */}
 
                     {/* Botón de agregar al carrito */}
                     <Button
@@ -236,7 +185,7 @@ const RelatedProductsSection = ({ productId }) => {
                 </div>
               );
             })}
-          </div>
+          </ProductCarousel>
         </div>
       ))}
     </div>

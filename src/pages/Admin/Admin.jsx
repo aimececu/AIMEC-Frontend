@@ -186,7 +186,7 @@ const Admin = () => {
                 filters={filters}
                 setFilters={setFilters}
                 onEditProduct={(product) =>
-                  handleEditProduct(product, categories, brands)
+                  handleEditProduct(product)
                 }
                 onDeleteProduct={handleDeleteProduct}
                 onAddProduct={handleAddProduct}
@@ -205,6 +205,7 @@ const Admin = () => {
               setProductForm={setProductForm}
               categories={categories}
               brands={brands}
+              subcategories={subcategories}
               onSubmit={handleProductFormSubmit}
               onCancel={handleCancelForm}
               editingProduct={editingProduct}

@@ -46,6 +46,9 @@ const Catalog = () => {
       // Usar directamente los datos del backend sin transformaciones
       if (productsResponse.success) {
         const productsData = productsResponse.data.products || productsResponse.data || [];
+        console.log('Productos recibidos:', productsData);
+        console.log('Primer producto:', productsData[0]);
+        console.log('Subcategoría del primer producto:', productsData[0]?.subcategory);
         setProducts(productsData);
         
         // Extraer series únicas de los productos (si existen)

@@ -141,7 +141,9 @@ export const useProducts = (loadInitialData) => {
     }
   };
 
-  const handleEditProduct = (product, categories = [], brands = []) => {
+  const handleEditProduct = (product) => {
+
+    console.log(product);
     
     setEditingProduct(product);
     

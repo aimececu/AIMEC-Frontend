@@ -461,6 +461,14 @@ const ProductDetail = () => {
                             {product.sku || "No especificado"}
                           </span>
                         </div>
+                        <div className="flex justify-between items-center py-2 border-b border-secondary-200 dark:border-secondary-700">
+                          <span className="text-secondary-600 dark:text-secondary-400">
+                            SKU EC:
+                          </span>
+                          <span className="font-medium text-secondary-900 dark:text-white font-mono">
+                            {product.sku_ec || "No especificado"}
+                          </span>
+                        </div>
                       </div>
                     </div>
 
@@ -494,6 +502,45 @@ const ProductDetail = () => {
                             {stock} unidades
                           </span>
                         </div>
+                      </div>
+                    </div>
+
+                    {/* Especificaciones técnicas */}
+                    <div className="space-y-4">
+                      <h4 className="text-lg font-medium text-secondary-800 dark:text-secondary-200">
+                        Especificaciones Técnicas
+                      </h4>
+                      <div className="space-y-3">
+                        {product.potencia_kw && (
+                          <div className="flex justify-between items-center py-2 border-b border-secondary-200 dark:border-secondary-700">
+                            <span className="text-secondary-600 dark:text-secondary-400">
+                              Potencia:
+                            </span>
+                            <span className="font-medium text-secondary-900 dark:text-white">
+                              {product.potencia_kw} kW
+                            </span>
+                          </div>
+                        )}
+                        {product.voltaje && (
+                          <div className="flex justify-between items-center py-2 border-b border-secondary-200 dark:border-secondary-700">
+                            <span className="text-secondary-600 dark:text-secondary-400">
+                              Voltaje:
+                            </span>
+                            <span className="font-medium text-secondary-900 dark:text-white">
+                              {product.voltaje}
+                            </span>
+                          </div>
+                        )}
+                        {product.frame_size && (
+                          <div className="flex justify-between items-center py-2 border-b border-secondary-200 dark:border-secondary-700">
+                            <span className="text-secondary-600 dark:text-secondary-400">
+                              Frame Size:
+                            </span>
+                            <span className="font-medium text-secondary-900 dark:text-white">
+                              {product.frame_size}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

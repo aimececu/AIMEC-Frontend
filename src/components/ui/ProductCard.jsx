@@ -21,6 +21,9 @@ const ProductCard = ({
     category,
     brand,
     stock_quantity,
+    potencia_kw,
+    voltaje,
+    frame_size,
   } = product;
   const { addToCart, isInCart } = useCart();
 
@@ -74,6 +77,36 @@ const ProductCard = ({
               <p className="text-sm text-secondary-600 dark:text-secondary-300 line-clamp-2 mb-2">
                 {description}
               </p>
+
+              {/* Technical Specifications */}
+              {showSpecs && (
+                <div className="grid grid-cols-2 gap-2 mb-3">
+                  {potencia_kw && (
+                    <div className="text-xs">
+                      <span className="text-secondary-500 dark:text-secondary-400">Potencia:</span>
+                      <span className="ml-1 font-medium text-secondary-700 dark:text-secondary-300">
+                        {potencia_kw} kW
+                      </span>
+                    </div>
+                  )}
+                  {voltaje && (
+                    <div className="text-xs">
+                      <span className="text-secondary-500 dark:text-secondary-400">Voltaje:</span>
+                      <span className="ml-1 font-medium text-secondary-700 dark:text-secondary-300">
+                        {voltaje}
+                      </span>
+                    </div>
+                  )}
+                  {frame_size && (
+                    <div className="text-xs">
+                      <span className="text-secondary-500 dark:text-secondary-400">Frame:</span>
+                      <span className="ml-1 font-medium text-secondary-700 dark:text-secondary-300">
+                        {frame_size}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Price and Actions */}
@@ -152,6 +185,36 @@ const ProductCard = ({
           <p className="text-xs text-secondary-600 dark:text-secondary-300 mb-3 line-clamp-2 min-h-[2rem]">
             {description}
           </p>
+
+          {/* Technical Specifications */}
+          {showSpecs && (
+            <div className="grid grid-cols-1 gap-1 mb-3">
+              {potencia_kw && (
+                <div className="text-xs">
+                  <span className="text-secondary-500 dark:text-secondary-400">Potencia:</span>
+                  <span className="ml-1 font-medium text-secondary-700 dark:text-secondary-300">
+                    {potencia_kw} kW
+                  </span>
+                </div>
+              )}
+              {voltaje && (
+                <div className="text-xs">
+                  <span className="text-secondary-500 dark:text-secondary-400">Voltaje:</span>
+                  <span className="ml-1 font-medium text-secondary-700 dark:text-secondary-300">
+                    {voltaje}
+                  </span>
+                </div>
+              )}
+              {frame_size && (
+                <div className="text-xs">
+                  <span className="text-secondary-500 dark:text-secondary-400">Frame:</span>
+                  <span className="ml-1 font-medium text-secondary-700 dark:text-secondary-300">
+                    {frame_size}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Stock Status */}
           {/* <div className="flex items-center gap-2 mb-3">

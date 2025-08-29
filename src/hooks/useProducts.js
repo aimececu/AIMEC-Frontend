@@ -14,6 +14,7 @@ export const useProducts = (loadInitialData) => {
   const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
   const [productForm, setProductForm] = useState({
     sku: '',
+    sku_ec: '',
     name: '',
     description: '',
     price: '',
@@ -23,6 +24,9 @@ export const useProducts = (loadInitialData) => {
     category_id: '',
     subcategory_id: '',
     weight: '',
+    potencia_kw: '',
+    voltaje: '',
+    frame_size: '',
     dimensions: '',
     main_image: '',
     is_active: true
@@ -96,7 +100,10 @@ export const useProducts = (loadInitialData) => {
         ...productForm,
         price: parseFloat(productForm.price) || 0,
         stock_quantity: parseInt(productForm.stock_quantity) || 0,
-        weight: parseFloat(productForm.weight) || 0
+        weight: parseFloat(productForm.weight) || 0,
+        potencia_kw: parseFloat(productForm.potencia_kw) || null,
+        voltaje: productForm.voltaje || null,
+        frame_size: productForm.frame_size || null
       };
 
 
@@ -141,6 +148,7 @@ export const useProducts = (loadInitialData) => {
     // Usar directamente los datos del backend sin transformaciones
     setProductForm({
       sku: product.sku || '',
+      sku_ec: product.sku_ec || '',
       name: product.name || '',
       description: product.description || '',
       price: product.price?.toString() || '',
@@ -150,6 +158,9 @@ export const useProducts = (loadInitialData) => {
       category_id: product.category_id || '',
       subcategory_id: product.subcategory_id || '',
       weight: product.weight?.toString() || '',
+      potencia_kw: product.potencia_kw?.toString() || '',
+      voltaje: product.voltaje || '',
+      frame_size: product.frame_size || '',
       dimensions: product.dimensions || '',
       main_image: product.main_image || '',
       is_active: product.is_active !== false
@@ -188,6 +199,7 @@ export const useProducts = (loadInitialData) => {
   const resetProductForm = () => {
     setProductForm({
       sku: '',
+      sku_ec: '',
       name: '',
       description: '',
       price: '',
@@ -197,6 +209,9 @@ export const useProducts = (loadInitialData) => {
       category_id: '',
       subcategory_id: '',
       weight: '',
+      potencia_kw: '',
+      voltaje: '',
+      frame_size: '',
       dimensions: '',
       main_image: '',
       is_active: true

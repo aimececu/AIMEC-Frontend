@@ -480,7 +480,7 @@ const ProductRelatedManager = ({ productId, productName }) => {
   return (
     <div className="space-y-4">
       <div className="mb-6">
-        <div className="flex justify-between items-center flex-row">
+        <div className="flex justify-between items-center flex-row gap-2">
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
               Productos Relacionados

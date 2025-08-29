@@ -158,6 +158,15 @@ const ProductForm = ({
                 required
               />
 
+              {/* SKU EC */}
+              <Input
+                label="SKU EC"
+                value={productForm.sku_ec}
+                onChange={(value) => handleFormChange("sku_ec", value)}
+                placeholder="Código alternativo"
+                required
+              />
+
               {/* Nombre */}
               <Input
                 label="Nombre"
@@ -205,6 +214,32 @@ const ProductForm = ({
                 value={productForm.weight}
                 onChange={(value) => handleFormChange("weight", value)}
                 placeholder="0.00"
+              />
+
+              {/* Potencia */}
+              <Input
+                label="Potencia (kW)"
+                type="number"
+                step="0.01"
+                value={productForm.potencia_kw}
+                onChange={(value) => handleFormChange("potencia_kw", value)}
+                placeholder="0.37"
+              />
+
+              {/* Voltaje */}
+              <Input
+                label="Voltaje"
+                value={productForm.voltaje}
+                onChange={(value) => handleFormChange("voltaje", value)}
+                placeholder="1AC 200-400 V"
+              />
+
+              {/* Frame Size */}
+              <Input
+                label="Frame Size"
+                value={productForm.frame_size}
+                onChange={(value) => handleFormChange("frame_size", value)}
+                placeholder="FSAA"
               />
 
               {/* Dimensiones */}

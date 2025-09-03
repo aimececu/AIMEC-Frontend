@@ -21,10 +21,10 @@ const ImportData = ({ onRefresh }) => {
   const [message, setMessage] = useState({ type: "", text: "" });
   const [validationErrors, setValidationErrors] = useState([]);
   const [canImport, setCanImport] = useState(false);
-  
+
   // Nuevos estados para la barra de progreso y control de subida
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [uploadStatus, setUploadStatus] = useState('idle'); // 'idle', 'uploading', 'processing', 'success', 'error'
+  const [uploadStatus, setUploadStatus] = useState("idle"); // 'idle', 'uploading', 'processing', 'success', 'error'
   const [uploadAbortController, setUploadAbortController] = useState(null);
   const fileInputRef = useRef(null);
 
@@ -37,8 +37,8 @@ const ImportData = ({ onRefresh }) => {
       setValidationErrors([]);
       setCanImport(false);
       setUploadProgress(0);
-      setUploadStatus('idle');
-      
+      setUploadStatus("idle");
+
       // Procesar archivo para previsualización
       handleFilePreview(selectedFile);
     }
@@ -46,27 +46,31 @@ const ImportData = ({ onRefresh }) => {
 
   const handleFilePreview = async (selectedFile) => {
     setLoading(true);
-    setUploadStatus('uploading');
+    setUploadStatus("uploading");
     setUploadProgress(10);
-    
+    console.log("Iniciando subida - Estado:", "uploading", "Progreso:", 10);
+
     try {
-      console.log('Previewing file:', selectedFile);
-      
+      console.log("Previewing file:", selectedFile);
+
       // Crear un AbortController para poder cancelar la operación
       const abortController = new AbortController();
       setUploadAbortController(abortController);
-      
+
       setUploadProgress(25);
-      
+      console.log("Progreso actualizado:", 25);
+
       const response = await importEndpoints.previewImportData(selectedFile);
 
       if (response.success) {
         setUploadProgress(75);
+        console.log("Progreso actualizado:", 75);
         setPreviewData(response.data.preview);
         setValidationErrors(response.data.validation_errors || []);
         setCanImport(response.data.can_import);
         setUploadProgress(100);
-        setUploadStatus('success');
+        setUploadStatus("success");
+        console.log("Subida completada - Estado:", "success", "Progreso:", 100);
 
         if (
           response.data.validation_errors &&
@@ -83,7 +87,7 @@ const ImportData = ({ onRefresh }) => {
           });
         }
       } else {
-        setUploadStatus('error');
+        setUploadStatus("error");
         setMessage({
           type: "error",
           text: response.error || "Error al procesar el archivo",
@@ -91,9 +95,9 @@ const ImportData = ({ onRefresh }) => {
       }
     } catch (error) {
       console.error("Error procesando archivo:", error);
-      setUploadStatus('error');
-      
-      if (error.name === 'AbortError') {
+      setUploadStatus("error");
+
+      if (error.name === "AbortError") {
         setMessage({
           type: "info",
           text: "Subida cancelada por el usuario.",
@@ -101,7 +105,9 @@ const ImportData = ({ onRefresh }) => {
       } else {
         setMessage({
           type: "error",
-          text: error.message || "Error al procesar el archivo. Verifica que sea un archivo Excel válido.",
+          text:
+            error.message ||
+            "Error al procesar el archivo. Verifica que sea un archivo Excel válido.",
         });
       }
     } finally {
@@ -114,23 +120,23 @@ const ImportData = ({ onRefresh }) => {
     if (!file || !canImport) return;
 
     setImporting(true);
-    setUploadStatus('processing');
+    setUploadStatus("processing");
     setUploadProgress(0);
-    
+
     try {
       setUploadProgress(25);
       setMessage({
         type: "info",
         text: "Procesando datos del archivo...",
       });
-      
+
       const response = await importEndpoints.importSystemData(file);
 
       if (response.success) {
         const results = response.data;
         setUploadProgress(75);
-        setUploadStatus('success');
-        
+        setUploadStatus("success");
+
         setMessage({
           type: "success",
           text: `¡Importación completada exitosamente! ${
@@ -150,14 +156,14 @@ const ImportData = ({ onRefresh }) => {
         setValidationErrors([]);
         setCanImport(false);
         setUploadProgress(0);
-        setUploadStatus('idle');
+        setUploadStatus("idle");
 
         // Recargar datos del sistema
         if (onRefresh) {
           onRefresh();
         }
       } else {
-        setUploadStatus('error');
+        setUploadStatus("error");
         setMessage({
           type: "error",
           text: response.error || "Error durante la importación",
@@ -165,33 +171,35 @@ const ImportData = ({ onRefresh }) => {
       }
     } catch (error) {
       console.error("Error importando datos:", error);
-      setUploadStatus('error');
+      setUploadStatus("error");
       setMessage({
         type: "error",
-        text: error.message || "Error durante la importación. Verifica la conexión y vuelve a intentar.",
+        text:
+          error.message ||
+          "Error durante la importación. Verifica la conexión y vuelve a intentar.",
       });
     } finally {
       setImporting(false);
-        }
+    }
   };
 
   const cancelUpload = () => {
     if (uploadAbortController) {
       uploadAbortController.abort();
     }
-    
+
     // Limpiar estado
     setFile(null);
     setPreviewData(null);
     setValidationErrors([]);
     setCanImport(false);
     setUploadProgress(0);
-    setUploadStatus('idle');
+    setUploadStatus("idle");
     setMessage({ type: "", text: "" });
-    
+
     // Limpiar el input de archivo
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 
@@ -201,12 +209,12 @@ const ImportData = ({ onRefresh }) => {
     setValidationErrors([]);
     setCanImport(false);
     setUploadProgress(0);
-    setUploadStatus('idle');
+    setUploadStatus("idle");
     setMessage({ type: "", text: "" });
-    
+
     // Limpiar el input de archivo
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 
@@ -483,12 +491,6 @@ const ImportData = ({ onRefresh }) => {
             </h3>
             <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
               <li>
-                • <strong>Un solo archivo</strong> para todo el sistema
-              </li>
-              <li>
-                • <strong>Nombres intuitivos</strong> en lugar de IDs técnicos
-              </li>
-              <li>
                 • <strong>Creación automática</strong> de marcas, categorías y
                 subcategorías
               </li>
@@ -507,10 +509,6 @@ const ImportData = ({ onRefresh }) => {
               <li>
                 • <strong>Productos relacionados</strong> separados por punto y
                 coma (;) - SKUs con tipos de relación
-              </li>
-              <li>
-                • <strong>Validación automática</strong> de datos antes de
-                importar
               </li>
             </ul>
           </div>
@@ -535,6 +533,35 @@ const ImportData = ({ onRefresh }) => {
           separados por punto y coma.
         </p>
 
+        <div className="flex flex-col sm:flex-row gap-3 mb-3">
+          <Button onClick={downloadTemplate} variant="outline">
+            <Icon name="FiDownload" className="mr-2" />
+            Descargar Plantilla
+          </Button>
+
+          <Button
+            onClick={downloadCurrentData}
+            disabled={exporting}
+            className="bg-green-50 hover:bg-green-100 border-green-300 text-green-700 hover:text-green-800"
+          >
+            {exporting ? (
+              <>
+                <Loader
+                  size="sm"
+                  variant="spinner"
+                  className="mr-2"
+                  text="Exportando..."
+                />
+              </>
+            ) : (
+              <>
+                <Icon name="FiDatabase" className="mr-2" />
+                Exportar base actual
+              </>
+            )}
+          </Button>
+        </div>
+
         {/* Nota sobre accesorios y productos relacionados */}
         <div className="mb-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
           <div className="flex items-start gap-2">
@@ -556,88 +583,12 @@ const ImportData = ({ onRefresh }) => {
                   separados por punto y coma (ej:
                   "SKU1:Complementario;SKU2:Alternativo")
                 </li>
-                <li>
-                  • Los productos referenciados deben existir en el sistema o
-                  ser creados en la misma importación
-                </li>
-                <li>
-                  • <strong>Tipos comunes:</strong> Complementario, Alternativo,
-                  Similar, Reemplazo, Compatible, Potencia superior, Potencia
-                  inferior
-                </li>
               </ul>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Button onClick={downloadTemplate} variant="outline">
-            <Icon name="FiDownload" className="mr-2" />
-            Descargar Plantilla con Accesorios y Relacionados
-          </Button>
-
-          <Button
-            onClick={downloadCurrentData}
-            variant="outline"
-            disabled={exporting}
-            className="bg-green-50 hover:bg-green-100 border-green-300 text-green-700 hover:text-green-800"
-          >
-            {exporting ? (
-              <>
-                <Loader size="sm" variant="spinner" className="mr-2" />
-                Exportando...
-              </>
-            ) : (
-              <>
-                <Icon name="FiDatabase" className="mr-2" />
-                Exportar Completo (1 Llamada)
-              </>
-            )}
-          </Button>
-
-          <Button
-            onClick={() => downloadCurrentDataBasic()}
-            variant="outline"
-            disabled={exporting}
-            className="bg-blue-50 hover:bg-blue-100 border-blue-300 text-blue-700 hover:text-blue-800"
-          >
-            <Icon name="FiDatabase" className="mr-2" />
-            Solo Datos Básicos
-          </Button>
-        </div>
-
-        {/* Nota sobre la exportación completa */}
-        <div className="mt-2 text-xs text-secondary-600 dark:text-secondary-400">
-          ⚡ <strong>Data Actual:</strong> Incluye características,
-          aplicaciones, accesorios y productos relacionados (muy eficiente - una
-          sola llamada).
-          <br />⚡ <strong>Solo Datos Básicos:</strong> Solo información básica
-          de productos (más rápido).
-        </div>
-
-        {/* Nota sobre cuándo usar cada botón */}
-        <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-          <div className="flex items-start gap-2">
-            <Icon name="FiInfo" className="text-blue-600 mt-1 flex-shrink-0" />
-            <div className="text-xs text-blue-800 dark:text-blue-200">
-              <p className="font-medium mb-1">💡 ¿Cuándo usar cada botón?</p>
-              <ul className="space-y-1">
-                <li>
-                  • <strong>Plantilla:</strong> Para crear nuevos productos
-                  desde cero
-                </li>
-                <li>
-                  • <strong>Data Actual:</strong> Para ver productos existentes
-                  con características, aplicaciones, accesorios y relacionados
-                </li>
-                <li>
-                  • <strong>Solo Datos Básicos:</strong> Para respaldos rápidos
-                  o cuando los endpoints de características no funcionen
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
+        
 
         {/* Ejemplos de formato */}
         <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
@@ -677,10 +628,10 @@ const ImportData = ({ onRefresh }) => {
         <div className="space-y-4">
           <Input
             type="file"
-            accept=".csv,.xlsx,.xls"
+            accept=".xlsx"
             onChange={handleFileChange}
             label="Seleccionar archivo"
-            helperText="Formatos soportados: CSV, Excel (.xlsx, .xls)"
+            helperText="Formato soportado: Excel (.xlsx)"
             ref={fileInputRef}
           />
 
@@ -697,51 +648,95 @@ const ImportData = ({ onRefresh }) => {
           )}
 
           {/* Barra de progreso y controles */}
-          {uploadStatus !== 'idle' && (
+          {uploadStatus !== "idle" && (
             <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
               <div className="flex items-center gap-2 mb-3">
                 <Icon name="FiInfo" className="text-blue-500 flex-shrink-0" />
                 <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
                   Estado de la subida
                 </span>
+                <span className="text-xs text-blue-600 dark:text-blue-400 ml-auto">
+                  {uploadStatus} - {uploadProgress}%
+                </span>
               </div>
-              
+
               <div className="space-y-4">
-                {/* Barra de progreso visual */}
-                <div className="w-full bg-gray-200 rounded-full h-3 dark:bg-gray-700">
+                {/* Barra de progreso visual mejorada */}
+                <div className="w-full bg-gray-200 rounded-full h-4 dark:bg-gray-700 relative overflow-hidden">
                   <div
-                    className={`h-3 rounded-full transition-all duration-300 ease-out ${
-                      uploadStatus === 'uploading' ? 'bg-blue-600' :
-                      uploadStatus === 'processing' ? 'bg-green-600' :
-                      uploadStatus === 'success' ? 'bg-green-600' :
-                      uploadStatus === 'error' ? 'bg-red-600' : 'bg-gray-600'
+                    className={`h-4 rounded-full transition-all duration-500 ease-out relative ${
+                      uploadStatus === "uploading"
+                        ? "bg-blue-600"
+                        : uploadStatus === "processing"
+                        ? "bg-green-600"
+                        : uploadStatus === "success"
+                        ? "bg-green-600"
+                        : uploadStatus === "error"
+                        ? "bg-red-600"
+                        : "bg-gray-600"
                     }`}
                     style={{ width: `${uploadProgress}%` }}
-                  ></div>
+                  >
+                    {/* Efecto de brillo animado para uploading */}
+                    {uploadStatus === "uploading" && (
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-pulse"></div>
+                    )}
+                  </div>
+                  {/* Texto de progreso superpuesto */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-xs font-medium text-white drop-shadow-sm">
+                      {uploadProgress}%
+                    </span>
+                  </div>
                 </div>
 
                 {/* Estado y progreso */}
                 <div className="flex justify-between items-center text-sm">
-                  <span className={`font-medium ${
-                    uploadStatus === 'uploading' ? 'text-blue-600 dark:text-blue-400' :
-                    uploadStatus === 'processing' ? 'text-green-600 dark:text-green-400' :
-                    uploadStatus === 'success' ? 'text-green-600 dark:text-green-400' :
-                    uploadStatus === 'error' ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400'
-                  }`}>
-                    {uploadStatus === 'uploading' && 'Subiendo archivo...'}
-                    {uploadStatus === 'processing' && 'Procesando datos...'}
-                    {uploadStatus === 'success' && '¡Completado!'}
-                    {uploadStatus === 'error' && 'Error detectado'}
-                  </span>
-                  <span className="text-secondary-600 dark:text-secondary-400">
+                  <div className="flex items-center gap-2">
+                    {uploadStatus === "uploading" && (
+                      <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
+                    )}
+                    {uploadStatus === "processing" && (
+                      <div className="w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>
+                    )}
+                    {uploadStatus === "success" && (
+                      <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                    )}
+                    {uploadStatus === "error" && (
+                      <div className="w-2 h-2 bg-red-600 rounded-full"></div>
+                    )}
+                    <span
+                      className={`font-medium ${
+                        uploadStatus === "uploading"
+                          ? "text-blue-600 dark:text-blue-400"
+                          : uploadStatus === "processing"
+                          ? "text-green-600 dark:text-green-400"
+                          : uploadStatus === "success"
+                          ? "text-green-600 dark:text-green-400"
+                          : uploadStatus === "error"
+                          ? "text-red-600 dark:text-red-400"
+                          : "text-gray-600 dark:text-gray-400"
+                      }`}
+                    >
+                      {uploadStatus === "uploading" && "Subiendo archivo..."}
+                      {uploadStatus === "processing" && "Procesando datos..."}
+                      {uploadStatus === "success" && "¡Completado!"}
+                      {uploadStatus === "error" && "Error detectado"}
+                    </span>
+                  </div>
+                  <span className="text-secondary-600 dark:text-secondary-400 font-mono">
                     {uploadProgress}%
                   </span>
                 </div>
 
                 {/* Botones de control */}
-                {uploadStatus === 'uploading' && (
+                {uploadStatus === "uploading" && (
                   <div className="flex justify-end gap-2">
-                    <Button variant="outline" onClick={cancelUpload} disabled={importing}>
+                    <Button
+                      variant="outline"
+                      onClick={cancelUpload}
+                      disabled={importing}
+                    >
                       <Icon name="FiX" className="mr-2" />
                       Cancelar Subida
                     </Button>
@@ -752,7 +747,7 @@ const ImportData = ({ onRefresh }) => {
                   </div>
                 )}
 
-                {uploadStatus === 'error' && (
+                {uploadStatus === "error" && (
                   <div className="flex justify-end gap-2">
                     <Button variant="outline" onClick={resetUpload}>
                       <Icon name="FiRefreshCw" className="mr-2" />
@@ -914,8 +909,12 @@ const ImportData = ({ onRefresh }) => {
           >
             {importing ? (
               <>
-                <Loader size="sm" variant="spinner" className="mr-2" />
-                Importando datos...
+                <Loader
+                  size="sm"
+                  variant="spinner"
+                  className="mr-2"
+                  text="Importando datos..."
+                />
               </>
             ) : (
               <>

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Icon from "./Icon";
 
 const ProductCarousel = ({ 
@@ -10,81 +10,83 @@ const ProductCarousel = ({
   itemsPerView = 4,
   showNavigation = true 
 }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
-  const scrollContainerRef = useRef(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [currentItems, setCurrentItems] = useState([]);
+  const [responsiveItemsPerView, setResponsiveItemsPerView] = useState(itemsPerView);
 
-  // Verificar si se puede hacer scroll en ambas direcciones
-  const checkScrollButtons = () => {
-    if (scrollContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-      setCanScrollLeft(scrollLeft > 0);
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 1);
-      
-      // Actualizar el índice actual basado en la posición del scroll
-      const firstChild = scrollContainerRef.current.firstElementChild;
-      if (firstChild) {
-        const itemWidth = firstChild.offsetWidth + 24; // 24px es el gap (gap-6)
-        const newIndex = Math.round(scrollLeft / itemWidth);
-        setCurrentIndex(Math.max(0, newIndex));
-      }
-    }
+  // Detectar el número de columnas basado en el tamaño de pantalla
+  const getResponsiveItemsPerView = () => {
+    if (typeof window === 'undefined') return itemsPerView;
+    
+    const width = window.innerWidth;
+    
+    if (width < 475) return 1;      // Mobile: 1 columna
+    if (width < 640) return 2;      // XS: 2 columnas
+    if (width < 768) return 2;      // SM: 2 columnas
+    if (width < 1024) return 3;     // MD: 3 columnas
+    if (width < 1280) return 3;     // LG: 3 columnas
+    return 4;                       // XL+: 4 columnas
   };
 
-  // Verificar scroll al montar y cuando cambien los children
+  // Actualizar itemsPerView cuando cambie el tamaño de pantalla
   useEffect(() => {
-    checkScrollButtons();
-    const handleResize = () => checkScrollButtons();
+    const handleResize = () => {
+      const newItemsPerView = getResponsiveItemsPerView();
+      setResponsiveItemsPerView(newItemsPerView);
+    };
+
+    // Establecer el valor inicial
+    handleResize();
+
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [children]);
+  }, []);
 
-  // Scroll hacia la izquierda (de 1 en 1)
-  const scrollLeft = () => {
-    if (scrollContainerRef.current) {
-      const container = scrollContainerRef.current;
-      const firstChild = container.firstElementChild;
-      if (firstChild) {
-        const itemWidth = firstChild.offsetWidth + 24; // 24px es el gap (gap-6)
-        container.scrollBy({ left: -itemWidth, behavior: 'smooth' });
-      }
+  // Calcular páginas y items actuales
+  useEffect(() => {
+    const childrenArray = React.Children.toArray(children);
+    const total = childrenArray.length;
+    const pages = Math.ceil(total / responsiveItemsPerView);
+    
+    setTotalPages(pages);
+    
+    // Obtener los items de la página actual
+    const startIndex = currentPage * responsiveItemsPerView;
+    const endIndex = startIndex + responsiveItemsPerView;
+    const pageItems = childrenArray.slice(startIndex, endIndex);
+    
+    setCurrentItems(pageItems);
+  }, [children, currentPage, responsiveItemsPerView]);
+
+  // Resetear página cuando cambie el número de items por vista
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [responsiveItemsPerView]);
+
+  // Navegar a la página anterior
+  const goToPreviousPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1);
     }
   };
 
-  // Scroll hacia la derecha (de 1 en 1)
-  const scrollRight = () => {
-    if (scrollContainerRef.current) {
-      const container = scrollContainerRef.current;
-      const firstChild = container.firstElementChild;
-      if (firstChild) {
-        const itemWidth = firstChild.offsetWidth + 24; // 24px es el gap (gap-6)
-        container.scrollBy({ left: itemWidth, behavior: 'smooth' });
-      }
+  // Navegar a la página siguiente
+  const goToNextPage = () => {
+    if (currentPage < totalPages - 1) {
+      setCurrentPage(currentPage + 1);
     }
   };
 
-  // Ir a un índice específico
-  const goToIndex = (index) => {
-    if (scrollContainerRef.current) {
-      const container = scrollContainerRef.current;
-      const firstChild = container.firstElementChild;
-      if (firstChild) {
-        const itemWidth = firstChild.offsetWidth + 24; // 24px es el gap
-        const scrollAmount = itemWidth * index;
-        container.scrollTo({ left: scrollAmount, behavior: 'smooth' });
-        setCurrentIndex(index);
-      }
+  // Ir a una página específica
+  const goToPage = (page) => {
+    if (page >= 0 && page < totalPages) {
+      setCurrentPage(page);
     }
   };
 
-  // Manejar scroll del contenedor
-  const handleScroll = () => {
-    checkScrollButtons();
-  };
-
-  const totalItems = React.Children.count(children);
-  const totalPages = Math.ceil(totalItems / itemsPerView);
+  const canGoPrevious = currentPage > 0;
+  const canGoNext = currentPage < totalPages - 1;
 
   return (
     <div className={`space-y-4 ${className}`}>
@@ -106,53 +108,45 @@ const ProductCarousel = ({
         )}
       </div>
 
-      {/* Contenedor del carrusel con navegación */}
+      {/* Contenedor del grid con navegación */}
       <div className="relative group">
         {/* Botón de navegación izquierda */}
-        {showNavigation && canScrollLeft && (
+        {showNavigation && canGoPrevious && (
           <button
-            onClick={scrollLeft}
+            onClick={goToPreviousPage}
             className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white dark:bg-secondary-800 border border-secondary-200 dark:border-secondary-700 rounded-full shadow-lg flex items-center justify-center text-secondary-600 dark:text-secondary-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-200 opacity-0 group-hover:opacity-100"
-            aria-label="Ver productos anteriores"
+            aria-label="Página anterior"
           >
             <Icon name="FiChevronLeft" size="sm" />
           </button>
         )}
 
-        {/* Contenedor scrollable con padding para evitar corte */}
-        <div
-          ref={scrollContainerRef}
-          onScroll={handleScroll}
-          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-4 px-4"
-          style={{
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none'
-          }}
-        >
-          {children}
+        {/* Grid de productos responsive */}
+        <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-4 md:gap-6 px-4">
+          {currentItems}
         </div>
 
         {/* Botón de navegación derecha */}
-        {showNavigation && canScrollRight && (
+        {showNavigation && canGoNext && (
           <button
-            onClick={scrollRight}
+            onClick={goToNextPage}
             className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white dark:bg-secondary-800 border border-secondary-200 dark:border-secondary-700 rounded-full shadow-lg flex items-center justify-center text-secondary-600 dark:text-secondary-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-200 opacity-0 group-hover:opacity-100"
-            aria-label="Ver más productos"
+            aria-label="Página siguiente"
           >
             <Icon name="FiChevronRight" size="sm" />
           </button>
         )}
 
-        {/* Indicadores de scroll */}
+        {/* Indicadores de páginas */}
         {showNavigation && totalPages > 1 && (
-          <div className="flex justify-center mt-4 space-x-2">
+          <div className="flex justify-center mt-6 space-x-2">
             <div className="flex space-x-1">
               {Array.from({ length: totalPages }).map((_, index) => (
                 <button
                   key={index}
-                  onClick={() => goToIndex(index)}
+                  onClick={() => goToPage(index)}
                   className={`w-2 h-2 rounded-full transition-colors duration-200 ${
-                    index === currentIndex 
+                    index === currentPage 
                       ? 'bg-primary-600 dark:bg-primary-400' 
                       : 'bg-secondary-300 dark:bg-secondary-600 hover:bg-secondary-400 dark:hover:bg-secondary-500'
                   }`}
@@ -160,6 +154,13 @@ const ProductCarousel = ({
                 />
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Información de página */}
+        {showNavigation && totalPages > 1 && (
+          <div className="text-center mt-4 text-sm text-secondary-500 dark:text-secondary-400">
+            Página {currentPage + 1} de {totalPages}
           </div>
         )}
       </div>

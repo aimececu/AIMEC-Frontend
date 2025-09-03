@@ -76,7 +76,7 @@ const AccessoriesSection = ({ productId }) => {
       {accessories.map((accessory) => (
         <div
           key={accessory.id}
-          className="bg-white dark:bg-secondary-800 rounded-lg border border-secondary-200 dark:border-secondary-700 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 min-w-[280px] max-w-[280px]"
+          className="bg-white dark:bg-secondary-800 rounded-lg border border-secondary-200 dark:border-secondary-700 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 h-full flex flex-col"
         >
           {/* Imagen del accesorio */}
           <div className="aspect-square bg-secondary-100 dark:bg-secondary-700 overflow-hidden">
@@ -90,7 +90,7 @@ const AccessoriesSection = ({ productId }) => {
           </div>
 
           {/* Información del accesorio */}
-          <div className="p-4 space-y-3">
+          <div className="p-4 space-y-3 flex-1 flex flex-col">
             {/* Nombre del accesorio */}
             <Link to={`/producto/${accessory.accessoryProduct.id}`}>
               <h3 className="font-medium text-secondary-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 line-clamp-2">
@@ -128,37 +128,40 @@ const AccessoriesSection = ({ productId }) => {
               </span>
             </div>
 
-            {/* Botón de agregar al carrito */}
-            <Button
-              onClick={() => handleAddToCart(accessory.accessoryProduct)}
-              fullWidth
-              size="sm"
-              disabled={accessory.accessoryProduct.stock_quantity === 0}
-              className={clsx(
-                isInCart(accessory.accessoryProduct.id) && "bg-green-600 hover:bg-green-700"
-              )}
-            >
-              <Icon
-                name={isInCart(accessory.accessoryProduct.id) ? "FiCheck" : "FiShoppingCart"}
-                className="mr-2"
+            {/* Botones en la parte inferior */}
+            <div className="mt-auto space-y-2">
+              {/* Botón de agregar al carrito */}
+              <Button
+                onClick={() => handleAddToCart(accessory.accessoryProduct)}
+                fullWidth
                 size="sm"
-              />
-              {isInCart(accessory.accessoryProduct.id)
-                ? "Agregado a Cotización"
-                : "Agregar a Cotización"}
-            </Button>
+                disabled={accessory.accessoryProduct.stock_quantity === 0}
+                className={clsx(
+                  isInCart(accessory.accessoryProduct.id) && "bg-green-600 hover:bg-green-700"
+                )}
+              >
+                <Icon
+                  name={isInCart(accessory.accessoryProduct.id) ? "FiCheck" : "FiShoppingCart"}
+                  className="mr-2"
+                  size="sm"
+                />
+                {isInCart(accessory.accessoryProduct.id)
+                  ? "Agregado a Cotización"
+                  : "Agregar a Cotización"}
+              </Button>
 
-            {/* Botón de ver detalles */}
-            <Button
-              as={Link}
-              to={`/producto/${accessory.accessoryProduct.id}`}
-              variant="outline"
-              fullWidth
-              size="sm"
-            >
-              <Icon name="FiEye" className="mr-2" size="sm" />
-              Ver Detalles
-            </Button>
+              {/* Botón de ver detalles */}
+              <Button
+                as={Link}
+                to={`/producto/${accessory.accessoryProduct.id}`}
+                variant="outline"
+                fullWidth
+                size="sm"
+              >
+                <Icon name="FiEye" className="mr-2" size="sm" />
+                Ver Detalles
+              </Button>
+            </div>
           </div>
         </div>
       ))}

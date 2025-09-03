@@ -241,19 +241,7 @@ const AdminManager = ({
             onChange={(value) => handleFormChange("description", value)}
             required
           />
-          <Input
-            label="Icono (FontAwesome)"
-            value={formData.icon || ""}
-            onChange={(value) => handleFormChange("icon", value)}
-            placeholder="fas fa-plug"
-          />
-          <Input
-            label="Color"
-            type="color"
-            value={formData.color || "#3B82F6"}
-            onChange={(value) => handleFormChange("color", value)}
-            required
-          />
+
         </div>
       );
     } else if (activeSubTab === "subcategories") {
@@ -326,8 +314,6 @@ const AdminManager = ({
       columns = [
         { key: "name", label: "Nombre" },
         { key: "description", label: "Descripción" },
-        { key: "icon", label: "Icono" },
-        { key: "color", label: "Color" },
       ];
     } else if (activeSubTab === "subcategories") {
       data = subcategories;

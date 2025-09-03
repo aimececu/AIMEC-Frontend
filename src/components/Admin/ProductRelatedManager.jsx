@@ -623,10 +623,7 @@ const ProductRelatedManager = ({ productId, productName }) => {
 
             {productsLoading ? (
               <div className="flex justify-center items-center py-12">
-                <Loader size="lg" />
-                <span className="ml-3 text-gray-600 dark:text-gray-400">
-                  Cargando productos...
-                </span>
+                <Loader size="lg" text="Cargando productos..." />
               </div>
             ) : (
               <div className="space-y-2">

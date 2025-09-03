@@ -1,4 +1,9 @@
-import React, { useState, useEffect, useImperativeHandle, forwardRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useImperativeHandle,
+  forwardRef,
+} from "react";
 import { useAccessories } from "../../hooks/useAccessories";
 import { productEndpoints } from "../../api/endpoints/products";
 import Button from "../ui/Button";
@@ -33,19 +38,16 @@ const AccessoriesManager = forwardRef(({ productId, productName }, ref) => {
   // Filtrar productos disponibles según el término de búsqueda
   const filteredAvailableProducts = availableProducts.filter(
     (product) =>
-      product.name
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (product.sku &&
-        product.sku
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase()))
+        product.sku.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   // Mostrar solo los primeros 30 productos si no hay búsqueda activa
-  const displayedAvailableProducts = searchTerm.trim() === "" 
-    ? filteredAvailableProducts.slice(0, 30)
-    : filteredAvailableProducts;
+  const displayedAvailableProducts =
+    searchTerm.trim() === ""
+      ? filteredAvailableProducts.slice(0, 30)
+      : filteredAvailableProducts;
 
   const handleSaveAccessories = async () => {
     console.log(
@@ -97,7 +99,7 @@ const AccessoriesManager = forwardRef(({ productId, productName }, ref) => {
 
   // Exponer funciones al componente padre
   useImperativeHandle(ref, () => ({
-    handleSaveAccessories
+    handleSaveAccessories,
   }));
 
   const getProductById = (id) => {
@@ -126,7 +128,9 @@ const AccessoriesManager = forwardRef(({ productId, productName }, ref) => {
   // Inicializar el estado de selección cuando se carguen los accesorios
   useEffect(() => {
     if (accessories.length > 0 && selectedAccessoryIds.length === 0) {
-      const currentAccessoryIds = accessories.map((acc) => acc.accessoryProduct.id);
+      const currentAccessoryIds = accessories.map(
+        (acc) => acc.accessoryProduct.id
+      );
       setSelectedAccessoryIds(currentAccessoryIds);
     }
   }, [accessories, selectedAccessoryIds.length]);
@@ -153,10 +157,7 @@ const AccessoriesManager = forwardRef(({ productId, productName }, ref) => {
       <div className="space-y-6">
         {productsLoading ? (
           <div className="text-center py-6">
-            <Loader />
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-              Cargando productos...
-            </p>
+            <Loader text="Cargando productos..." />
           </div>
         ) : (
           <div>
@@ -172,7 +173,8 @@ const AccessoriesManager = forwardRef(({ productId, productName }, ref) => {
               />
               {searchTerm.trim() === "" && availableProducts.length > 30 && (
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                  💡 Mostrando los primeros 30 productos. Escribe en el buscador para ver más productos.
+                  💡 Mostrando los primeros 30 productos. Escribe en el buscador
+                  para ver más productos.
                 </p>
               )}
             </div>
@@ -191,7 +193,7 @@ const AccessoriesManager = forwardRef(({ productId, productName }, ref) => {
                   </span>
                 )}
               </div>
-              
+
               {/* Mostrar productos ya asignados como accesorios */}
               {accessories
                 .filter(
@@ -207,7 +209,9 @@ const AccessoriesManager = forwardRef(({ productId, productName }, ref) => {
                 .map((accessory) => (
                   <Checkbox
                     key={`current-${accessory.id}`}
-                    checked={selectedAccessoryIds.includes(accessory.accessoryProduct.id)}
+                    checked={selectedAccessoryIds.includes(
+                      accessory.accessoryProduct.id
+                    )}
                     onChange={(e) => {
                       if (e.target.checked) {
                         setSelectedAccessoryIds([
@@ -225,9 +229,13 @@ const AccessoriesManager = forwardRef(({ productId, productName }, ref) => {
                     label={accessory.accessoryProduct.name}
                     description={
                       <div className="flex items-center gap-2 relative">
-                        {accessory.accessoryProduct.sku && `SKU: ${accessory.accessoryProduct.sku}`}
-                        {accessory.accessoryProduct.sku && accessory.accessoryProduct.brand && " • "}
-                        {accessory.accessoryProduct.brand && `Marca: ${accessory.accessoryProduct.brand.name}`}
+                        {accessory.accessoryProduct.sku &&
+                          `SKU: ${accessory.accessoryProduct.sku}`}
+                        {accessory.accessoryProduct.sku &&
+                          accessory.accessoryProduct.brand &&
+                          " • "}
+                        {accessory.accessoryProduct.brand &&
+                          `Marca: ${accessory.accessoryProduct.brand.name}`}
                         <span className="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
                           ✓ Ya asignado
                         </span>
@@ -241,39 +249,36 @@ const AccessoriesManager = forwardRef(({ productId, productName }, ref) => {
                 ))}
 
               {/* Mostrar productos disponibles para agregar */}
-              {displayedAvailableProducts
-                .map((product) => (
-                  <Checkbox
-                    key={`available-${product.id}`}
-                    checked={selectedAccessoryIds.includes(product.id)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setSelectedAccessoryIds([
-                          ...selectedAccessoryIds,
-                          product.id,
-                        ]);
-                      } else {
-                        setSelectedAccessoryIds(
-                          selectedAccessoryIds.filter(
-                            (id) => id !== product.id
-                          )
-                        );
-                      }
-                    }}
-                    label={product.name}
-                    description={
-                      <>
-                        {product.sku && `SKU: ${product.sku}`}
-                        {product.sku && product.brand && " • "}
-                        {product.brand && `Marca: ${product.brand.name}`}
-                      </>
+              {displayedAvailableProducts.map((product) => (
+                <Checkbox
+                  key={`available-${product.id}`}
+                  checked={selectedAccessoryIds.includes(product.id)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedAccessoryIds([
+                        ...selectedAccessoryIds,
+                        product.id,
+                      ]);
+                    } else {
+                      setSelectedAccessoryIds(
+                        selectedAccessoryIds.filter((id) => id !== product.id)
+                      );
                     }
-                    variant="primary"
-                    size="md"
-                    card={true}
-                    align="center"
-                  />
-                ))}
+                  }}
+                  label={product.name}
+                  description={
+                    <>
+                      {product.sku && `SKU: ${product.sku}`}
+                      {product.sku && product.brand && " • "}
+                      {product.brand && `Marca: ${product.brand.name}`}
+                    </>
+                  }
+                  variant="primary"
+                  size="md"
+                  card={true}
+                  align="center"
+                />
+              ))}
             </div>
 
             {/* Contador de seleccionados */}
@@ -281,28 +286,31 @@ const AccessoriesManager = forwardRef(({ productId, productName }, ref) => {
               <div className="mt-4 p-3 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg">
                 <p className="text-sm text-primary-800 dark:text-primary-200">
                   ✅ {selectedAccessoryIds.length} producto
-                  {selectedAccessoryIds.length !== 1 ? "s" : ""}{" "}
-                  seleccionado{selectedAccessoryIds.length !== 1 ? "s" : ""}
+                  {selectedAccessoryIds.length !== 1 ? "s" : ""} seleccionado
+                  {selectedAccessoryIds.length !== 1 ? "s" : ""}
                 </p>
               </div>
             )}
           </div>
         )}
 
-        {availableProducts.length === 0 && accessories.length === 0 && !productsLoading && (
-          <div className="text-center py-6 text-gray-500">
-            <Icon
-              name="FiPackage"
-              className="w-12 h-12 mx-auto mb-4 text-gray-400"
-            />
-            <p className="text-gray-500 dark:text-gray-400">
-              No hay productos disponibles para agregar como accesorios
-            </p>
-            <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
-              No hay otros productos en el sistema además de este producto principal.
-            </p>
-          </div>
-        )}
+        {availableProducts.length === 0 &&
+          accessories.length === 0 &&
+          !productsLoading && (
+            <div className="text-center py-6 text-gray-500">
+              <Icon
+                name="FiPackage"
+                className="w-12 h-12 mx-auto mb-4 text-gray-400"
+              />
+              <p className="text-gray-500 dark:text-gray-400">
+                No hay productos disponibles para agregar como accesorios
+              </p>
+              <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
+                No hay otros productos en el sistema además de este producto
+                principal.
+              </p>
+            </div>
+          )}
       </div>
     </div>
   );

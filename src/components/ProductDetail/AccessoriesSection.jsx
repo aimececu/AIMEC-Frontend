@@ -30,10 +30,7 @@ const AccessoriesSection = ({ productId }) => {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-8">
-        <Loader size="lg" />
-        <span className="ml-3 text-secondary-600 dark:text-secondary-400">
-          Cargando accesorios...
-        </span>
+        <Loader size="lg" text="Cargando accesorios..." />
       </div>
     );
   }
@@ -110,24 +107,6 @@ const AccessoriesSection = ({ productId }) => {
               </span>
             </div>
 
-            {/* Stock */}
-            <div className="flex items-center gap-2">
-              <span
-                className={clsx(
-                  "text-xs px-2 py-1 rounded-full",
-                  accessory.accessoryProduct.stock_quantity > 10
-                    ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                    : accessory.accessoryProduct.stock_quantity > 0
-                    ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
-                    : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
-                )}
-              >
-                {accessory.accessoryProduct.stock_quantity > 0
-                  ? `${accessory.accessoryProduct.stock_quantity} en stock`
-                  : "Sin stock"}
-              </span>
-            </div>
-
             {/* Botones en la parte inferior */}
             <div className="mt-auto space-y-2">
               {/* Botón de agregar al carrito */}
@@ -135,7 +114,6 @@ const AccessoriesSection = ({ productId }) => {
                 onClick={() => handleAddToCart(accessory.accessoryProduct)}
                 fullWidth
                 size="sm"
-                disabled={accessory.accessoryProduct.stock_quantity === 0}
                 className={clsx(
                   isInCart(accessory.accessoryProduct.id) && "bg-green-600 hover:bg-green-700"
                 )}
@@ -150,17 +128,6 @@ const AccessoriesSection = ({ productId }) => {
                   : "Agregar a Cotización"}
               </Button>
 
-              {/* Botón de ver detalles */}
-              <Button
-                as={Link}
-                to={`/producto/${accessory.accessoryProduct.id}`}
-                variant="outline"
-                fullWidth
-                size="sm"
-              >
-                <Icon name="FiEye" className="mr-2" size="sm" />
-                Ver Detalles
-              </Button>
             </div>
           </div>
         </div>

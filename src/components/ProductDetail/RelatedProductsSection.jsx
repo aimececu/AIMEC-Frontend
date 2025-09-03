@@ -40,10 +40,7 @@ const RelatedProductsSection = ({ productId }) => {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-8">
-        <Loader size="lg" />
-        <span className="ml-3 text-secondary-600 dark:text-secondary-400">
-          Cargando productos relacionados...
-        </span>
+        <Loader size="lg" text="Cargando productos relacionados..." />
       </div>
     );
   }
@@ -163,7 +160,6 @@ const RelatedProductsSection = ({ productId }) => {
                           onClick={() => handleAddToCart(product)}
                           fullWidth
                           size="sm"
-                          disabled={product.stock_quantity === 0}
                           className={clsx(
                             isInCart(product.id) &&
                               "bg-green-600 hover:bg-green-700"
@@ -183,17 +179,6 @@ const RelatedProductsSection = ({ productId }) => {
                             : "Agregar a Cotización"}
                         </Button>
 
-                        {/* Botón de ver detalles */}
-                        <Button
-                          as={Link}
-                          to={`/producto/${product.id}`}
-                          variant="outline"
-                          fullWidth
-                          size="sm"
-                        >
-                          <Icon name="FiEye" className="mr-2" size="sm" />
-                          Ver Detalles
-                        </Button>
                       </div>
                     </div>
                   </div>

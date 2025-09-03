@@ -152,12 +152,6 @@ const ProductDetail = () => {
     subcategory,
     weight,
     dimensions,
-    potencia_kw,
-    corriente,
-    voltaje,
-    frame_size,
-    comunicacion,
-    alimentacion,
   } = product;
 
   console.log("ProductDetail: Producto cargado:", product);
@@ -237,6 +231,15 @@ const ProductDetail = () => {
               <Heading level={1} className="text-3xl lg:text-4xl">
                 {name}
               </Heading>
+
+              {
+                /* SKU */
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-secondary-500 dark:text-secondary-400">
+                    SKU: {product.sku || "Sin SKU"}
+                  </span>
+                </div>
+              }
 
               {/* Price */}
               <div className="flex items-baseline gap-3">

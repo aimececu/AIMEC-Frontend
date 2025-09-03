@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Icon from '../../components/ui/Icon';
 import Container from '../../components/ui/Container';
 import Heading from '../../components/ui/Heading';
@@ -12,6 +12,7 @@ import clsx from 'clsx';
 
 const Quotation = () => {
   const { items, total, itemCount, removeFromCart, updateQuantity, clearCart } = useCart();
+  const navigate = useNavigate();
   const [customerInfo, setCustomerInfo] = useState({
     name: '',
     email: '',
@@ -19,6 +20,9 @@ const Quotation = () => {
     company: '',
     message: ''
   });
+
+  // Debug: Log del estado del carrito
+  console.log('Quotation: Estado del carrito:', { items, total, itemCount });
 
   const handleQuantityChange = (productId, newQuantity) => {
     if (newQuantity <= 0) {
@@ -52,7 +56,7 @@ const Quotation = () => {
             <p className="text-secondary-600 dark:text-secondary-300 mb-8 max-w-md mx-auto">
               Agrega productos desde nuestro catálogo para crear una cotización personalizada
             </p>
-            <Button as={Link} to="/catalogo" size="lg">
+            <Button size="lg" onClick={() => navigate('/productos')}>
               <Icon name="FiShoppingBag" className="mr-2" />
               Explorar Catálogo
             </Button>
@@ -112,18 +116,18 @@ const Quotation = () => {
 
                       {/* Información del producto */}
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-secondary-900 dark:text-white mb-1 line-clamp-1">
+                        <h4 className="font-semibold text-secondary-900 dark:text-white mb-1 ">
                           {item.name}
                         </h4>
                         <p className="text-sm text-secondary-600 dark:text-secondary-300 mb-2 line-clamp-2">
                           {item.description}
                         </p>
                         <div className="flex items-center gap-4">
-                          <span className="text-sm text-secondary-500 dark:text-secondary-400">
-                            {item.brand}
+                          <span className="text-xs text-secondary-500 dark:text-secondary-400">
+                            {typeof item.brand === 'object' ? item.brand?.name || 'Sin marca' : item.brand || 'Sin marca'}
                           </span>
-                          <span className="text-sm text-secondary-500 dark:text-secondary-400">
-                            {item.category}
+                          <span className="text-xs text-secondary-500 dark:text-secondary-400">
+                            {typeof item.category === 'object' ? item.category?.name || 'Sin categoría' : item.category || 'Sin categoría'}
                           </span>
                         </div>
                       </div>
@@ -154,10 +158,10 @@ const Quotation = () => {
                       {/* Precio */}
                       <div className="text-right min-w-[100px]">
                         <div className="font-semibold text-secondary-900 dark:text-white">
-                          ${(item.price * item.quantity).toFixed(2)}
+                          ${(parseFloat(item.price || 0) * item.quantity).toFixed(2)}
                         </div>
                         <div className="text-sm text-secondary-500 dark:text-secondary-400">
-                          ${item.price.toFixed(2)} c/u
+                          ${parseFloat(item.price || 0).toFixed(2)} c/u
                         </div>
                       </div>
 
@@ -189,14 +193,14 @@ const Quotation = () => {
                       Productos ({itemCount})
                     </span>
                     <span className="font-medium">
-                      ${total.toFixed(2)}
+                      ${parseFloat(total || 0).toFixed(2)}
                     </span>
                   </div>
                   <div className="border-t border-secondary-200 dark:border-secondary-700 pt-3">
                     <div className="flex justify-between text-lg font-bold">
                       <span>Total Estimado</span>
                       <span className="text-primary-600 dark:text-primary-400">
-                        ${total.toFixed(2)}
+                        ${parseFloat(total || 0).toFixed(2)}
                       </span>
                     </div>
                     <p className="text-xs text-secondary-500 dark:text-secondary-400 mt-1">
@@ -264,10 +268,9 @@ const Quotation = () => {
                   Enviar Cotización
                 </Button>
                 <Button
-                  as={Link}
-                  to="/catalogo"
                   variant="outline"
                   fullWidth
+                  onClick={() => navigate('/productos')}
                 >
                   <Icon name="FiPlus" className="mr-2" />
                   Agregar Más Productos

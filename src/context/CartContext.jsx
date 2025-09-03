@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useState } from 'react';
 
 // Tipos de acciones
 const CART_ACTIONS = {
@@ -45,7 +45,7 @@ const cartReducer = (state, action) => {
           description: product.description,
           price: product.price,
           originalPrice: product.originalPrice,
-          image: product.image,
+          image: product.main_image || product.image,
           category: product.category,
           brand: product.brand,
           quantity: quantity
@@ -113,11 +113,18 @@ const cartReducer = (state, action) => {
 
 // Funciones auxiliares
 const calculateTotal = (items) => {
-  return items.reduce((total, item) => total + (item.price * item.quantity), 0);
+  return items.reduce((total, item) => {
+    const price = parseFloat(item.price || 0);
+    const quantity = parseInt(item.quantity || 0);
+    return total + (price * quantity);
+  }, 0);
 };
 
 const calculateItemCount = (items) => {
-  return items.reduce((count, item) => count + item.quantity, 0);
+  return items.reduce((count, item) => {
+    const quantity = parseInt(item.quantity || 0);
+    return count + quantity;
+  }, 0);
 };
 
 // Crear el contexto
@@ -135,24 +142,36 @@ export const useCart = () => {
 // Proveedor del contexto
 export const CartProvider = ({ children }) => {
   const [state, dispatch] = useReducer(cartReducer, initialState);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Cargar carrito desde localStorage al inicializar
   useEffect(() => {
     const savedCart = localStorage.getItem('cart');
+    console.log('CartContext: Cargando carrito desde localStorage:', savedCart);
     if (savedCart) {
       try {
         const parsedCart = JSON.parse(savedCart);
+        console.log('CartContext: Carrito parseado:', parsedCart);
         dispatch({ type: CART_ACTIONS.SET_CART, payload: { items: parsedCart } });
       } catch (error) {
         console.error('Error al cargar el carrito:', error);
       }
+    } else {
+      console.log('CartContext: No hay carrito guardado en localStorage');
     }
+    setIsInitialized(true);
   }, []);
 
   // Guardar carrito en localStorage cuando cambie
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(state.items));
-  }, [state.items]);
+    // Solo guardar después de la inicialización
+    if (isInitialized) {
+      console.log('CartContext: Guardando carrito en localStorage:', state.items);
+      localStorage.setItem('cart', JSON.stringify(state.items));
+    } else {
+      console.log('CartContext: No guardando durante inicialización');
+    }
+  }, [state.items, isInitialized]);
 
   // Funciones del carrito
   const addToCart = (product, quantity = 1) => {

@@ -8,6 +8,7 @@ import Loader from "../ui/Loader";
 import Select from "../ui/Select";
 import { categoryEndpoints } from "../../api/endpoints/categories";
 import { brandEndpoints } from "../../api/endpoints/brands";
+import { useToast } from "../../context/ToastContext";
 
 const AdminManager = ({
   categories,
@@ -18,11 +19,14 @@ const AdminManager = ({
   onSubcategoriesUpdate,
   onBrandsUpdate,
 }) => {
+  const { showToast } = useToast();
   const [activeSubTab, setActiveSubTab] = useState("categories");
   const [showForm, setShowForm] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({});
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
 
   const subTabs = [
     { id: "categories", label: "Categorías", icon: "FiFolder" },
@@ -147,52 +151,71 @@ const AdminManager = ({
     setShowForm(true);
   };
 
-  const handleDelete = async (id) => {
-    if (!confirm("¿Estás seguro de que quieres eliminar este elemento?"))
-      return;
+  const handleDelete = (id) => {
+    setItemToDelete(id);
+    setShowConfirmDialog(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!itemToDelete) return;
 
     try {
       let response;
+      let itemName = "";
 
       if (activeSubTab === "categories") {
-        response = await categoryEndpoints.deleteCategory(id);
+        const item = categories.find(cat => cat.id === itemToDelete);
+        itemName = item?.name || "categoría";
+        response = await categoryEndpoints.deleteCategory(itemToDelete);
         if (response && response.success) {
-          const updatedCategories = categories.filter((cat) => cat.id !== id);
+          const updatedCategories = categories.filter((cat) => cat.id !== itemToDelete);
           if (onCategoriesUpdate) {
             onCategoriesUpdate(updatedCategories);
           } else {
             onRefresh(); // Fallback si no hay callback
           }
+          showToast("Categoría eliminada correctamente", "success");
         }
       } else if (activeSubTab === "subcategories") {
-        response = await categoryEndpoints.deleteSubcategory(id);
+        const item = subcategories.find(sub => sub.id === itemToDelete);
+        itemName = item?.name || "subcategoría";
+        response = await categoryEndpoints.deleteSubcategory(itemToDelete);
         if (response && response.success) {
           const updatedSubcategories = subcategories.filter(
-            (sub) => sub.id !== id
+            (sub) => sub.id !== itemToDelete
           );
           if (onSubcategoriesUpdate) {
             onSubcategoriesUpdate(updatedSubcategories);
           } else {
             onRefresh(); // Fallback si no hay callback
           }
+          showToast("Subcategoría eliminada correctamente", "success");
         }
       } else if (activeSubTab === "brands") {
-        response = await brandEndpoints.deleteBrand(id);
+        const item = brands.find(brand => brand.id === itemToDelete);
+        itemName = item?.name || "marca";
+        response = await brandEndpoints.deleteBrand(itemToDelete);
         if (response && response.success) {
-          const updatedBrands = brands.filter((brand) => brand.id !== id);
+          const updatedBrands = brands.filter((brand) => brand.id !== itemToDelete);
           if (onBrandsUpdate) {
             onBrandsUpdate(updatedBrands);
           } else {
             onRefresh(); // Fallback si no hay callback
           }
+          showToast("Marca eliminada correctamente", "success");
         }
       }
 
       if (!response || !response.success) {
         console.error("Error al eliminar:", response?.error);
+        showToast(`Error al eliminar ${itemName}: ${response?.error || 'Error desconocido'}`, "error");
       }
     } catch (error) {
       console.error("Error al eliminar:", error);
+      showToast(`Error al eliminar: ${error.message || 'Error desconocido'}`, "error");
+    } finally {
+      setShowConfirmDialog(false);
+      setItemToDelete(null);
     }
   };
 
@@ -328,7 +351,7 @@ const AdminManager = ({
     }
 
     return (
-      <div className="w-full">
+      <div className="w-full max-h-[450px] overflow-y-auto">
         <table className="min-w-full bg-white dark:bg-secondary-800 rounded-lg overflow-hidden">
           <thead className="bg-secondary-100 dark:bg-secondary-700">
             <tr>
@@ -454,6 +477,42 @@ const AdminManager = ({
         }
       >
         <form onSubmit={handleSubmit}>{renderForm()}</form>
+      </Modal>
+
+      {/* Modal de Confirmación */}
+      <Modal
+        isOpen={showConfirmDialog}
+        onClose={() => {
+          setShowConfirmDialog(false);
+          setItemToDelete(null);
+        }}
+        title="Confirmar eliminación"
+        footer={
+          <div className="flex justify-end space-x-3">
+            <Button 
+              onClick={() => {
+                setShowConfirmDialog(false);
+                setItemToDelete(null);
+              }} 
+              variant="secondary"
+            >
+              Cancelar
+            </Button>
+            <Button onClick={confirmDelete} variant="danger">
+              Eliminar
+            </Button>
+          </div>
+        }
+      >
+        <div className="text-center">
+          <Icon name="FiAlertTriangle" className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <p className="text-lg font-medium text-secondary-900 dark:text-white mb-2">
+            ¿Estás seguro de que quieres eliminar este elemento?
+          </p>
+          <p className="text-sm text-secondary-600 dark:text-secondary-400">
+            Esta acción no se puede deshacer.
+          </p>
+        </div>
       </Modal>
     </div>
   );

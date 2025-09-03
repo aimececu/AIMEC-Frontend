@@ -25,8 +25,11 @@ export const useProducts = (loadInitialData) => {
     subcategory_id: '',
     weight: '',
     potencia_kw: '',
+    corriente: '',
     voltaje: '',
     frame_size: '',
+    comunicacion: '',
+    alimentacion: '',
     dimensions: '',
     main_image: '',
     is_active: true
@@ -98,12 +101,17 @@ export const useProducts = (loadInitialData) => {
     try {
       const productData = {
         ...productForm,
-        price: parseFloat(productForm.price) || 0,
-        stock_quantity: parseInt(productForm.stock_quantity) || 0,
-        weight: parseFloat(productForm.weight) || 0,
-        potencia_kw: parseFloat(productForm.potencia_kw) || null,
+        // Los campos ahora son texto, no necesitan conversión
+        price: productForm.price || null,
+        stock_quantity: productForm.stock_quantity || null,
+        min_stock_level: productForm.min_stock_level || null,
+        weight: productForm.weight || null,
+        potencia_kw: productForm.potencia_kw || null,
+        corriente: productForm.corriente || null,
         voltaje: productForm.voltaje || null,
-        frame_size: productForm.frame_size || null
+        frame_size: productForm.frame_size || null,
+        comunicacion: productForm.comunicacion || null,
+        alimentacion: productForm.alimentacion || null
       };
 
 
@@ -147,22 +155,25 @@ export const useProducts = (loadInitialData) => {
     
     setEditingProduct(product);
     
-    // Usar directamente los datos del backend sin transformaciones
+    // Usar directamente los datos del backend (ya son texto)
     setProductForm({
       sku: product.sku || '',
       sku_ec: product.sku_ec || '',
       name: product.name || '',
       description: product.description || '',
-      price: product.price?.toString() || '',
-      stock_quantity: product.stock_quantity?.toString() || '',
-      min_stock_level: product.min_stock_level?.toString() || '',
+      price: product.price || '',
+      stock_quantity: product.stock_quantity || '',
+      min_stock_level: product.min_stock_level || '',
       brand_id: product.brand_id || '',
       category_id: product.category_id || '',
       subcategory_id: product.subcategory_id || '',
-      weight: product.weight?.toString() || '',
-      potencia_kw: product.potencia_kw?.toString() || '',
+      weight: product.weight || '',
+      potencia_kw: product.potencia_kw || '',
+      corriente: product.corriente || '',
       voltaje: product.voltaje || '',
       frame_size: product.frame_size || '',
+      comunicacion: product.comunicacion || '',
+      alimentacion: product.alimentacion || '',
       dimensions: product.dimensions || '',
       main_image: product.main_image || '',
       is_active: product.is_active !== false
@@ -212,8 +223,11 @@ export const useProducts = (loadInitialData) => {
       subcategory_id: '',
       weight: '',
       potencia_kw: '',
+      corriente: '',
       voltaje: '',
       frame_size: '',
+      comunicacion: '',
+      alimentacion: '',
       dimensions: '',
       main_image: '',
       is_active: true

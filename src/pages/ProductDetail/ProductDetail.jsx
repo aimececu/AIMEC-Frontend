@@ -152,7 +152,15 @@ const ProductDetail = () => {
     subcategory,
     weight,
     dimensions,
+    potencia_kw,
+    corriente,
+    voltaje,
+    frame_size,
+    comunicacion,
+    alimentacion,
   } = product;
+
+  console.log("ProductDetail: Producto cargado:", product);
 
   // Simplificar variables usando solo los campos que existen
   const image = main_image;
@@ -233,7 +241,7 @@ const ProductDetail = () => {
               {/* Price */}
               <div className="flex items-baseline gap-3">
                 <span className="text-3xl font-bold text-primary-600 dark:text-primary-400">
-                  ${(parseFloat(price) || 0).toFixed(2)}
+                  ${price || "0.00"}
                 </span>
               </div>
 
@@ -483,7 +491,7 @@ const ProductDetail = () => {
                             Peso:
                           </span>
                           <span className="font-medium text-secondary-900 dark:text-white">
-                            {weight ? `${weight} kg` : "No especificado"}
+                            {weight || "No especificado"}
                           </span>
                         </div>
                         <div className="flex justify-between items-center py-2 border-b border-secondary-200 dark:border-secondary-700">
@@ -538,6 +546,36 @@ const ProductDetail = () => {
                             </span>
                             <span className="font-medium text-secondary-900 dark:text-white">
                               {product.frame_size}
+                            </span>
+                          </div>
+                        )}
+                        {product.corriente && (
+                          <div className="flex justify-between items-center py-2 border-b border-secondary-200 dark:border-secondary-700">
+                            <span className="text-secondary-600 dark:text-secondary-400">
+                              Corriente:
+                            </span>
+                            <span className="font-medium text-secondary-900 dark:text-white">
+                              {product.corriente}
+                            </span>
+                          </div>
+                        )}
+                        {product.comunicacion && (
+                          <div className="flex justify-between items-center py-2 border-b border-secondary-200 dark:border-secondary-700">
+                            <span className="text-secondary-600 dark:text-secondary-400">
+                              Comunicación:
+                            </span>
+                            <span className="font-medium text-secondary-900 dark:text-white">
+                              {product.comunicacion}
+                            </span>
+                          </div>
+                        )}
+                        {product.alimentacion && (
+                          <div className="flex justify-between items-center py-2 border-b border-secondary-200 dark:border-secondary-700">
+                            <span className="text-secondary-600 dark:text-secondary-400">
+                              Alimentación:
+                            </span>
+                            <span className="font-medium text-secondary-900 dark:text-white">
+                              {product.alimentacion}
                             </span>
                           </div>
                         )}

@@ -190,51 +190,43 @@ const ProductForm = ({
               {/* Precio */}
               <Input
                 label="Precio"
-                type="number"
-                step="0.01"
                 value={productForm.price}
                 onChange={(value) => handleFormChange("price", value)}
-                placeholder="0.00"
+                placeholder="262.50, 1,250.00, etc."
                 required
               />
 
               {/* Stock */}
               <Input
                 label="Stock"
-                type="number"
                 value={productForm.stock_quantity}
                 onChange={(value) => handleFormChange("stock_quantity", value)}
-                placeholder="0"
+                placeholder="10, 0, Disponible, etc."
                 required
               />
 
               {/* Nivel mínimo de stock */}
               <Input
                 label="Nivel Mínimo de Stock"
-                type="number"
                 value={productForm.min_stock_level}
                 onChange={(value) => handleFormChange("min_stock_level", value)}
-                placeholder="0"
+                placeholder="5, 0, etc."
               />
 
               {/* Peso */}
               <Input
-                label="Peso (kg)"
-                type="number"
-                step="0.01"
+                label="Peso"
                 value={productForm.weight}
                 onChange={(value) => handleFormChange("weight", value)}
-                placeholder="0.00"
+                placeholder="0.5 kg, 1.2 lbs, etc."
               />
 
               {/* Potencia */}
               <Input
-                label="Potencia (kW)"
-                type="number"
-                step="0.01"
+                label="Potencia"
                 value={productForm.potencia_kw}
                 onChange={(value) => handleFormChange("potencia_kw", value)}
-                placeholder="0.37"
+                placeholder="0.37 kW, 1.5 HP, etc."
               />
 
               {/* Voltaje */}
@@ -251,6 +243,30 @@ const ProductForm = ({
                 value={productForm.frame_size}
                 onChange={(value) => handleFormChange("frame_size", value)}
                 placeholder="FSAA"
+              />
+
+              {/* Corriente */}
+              <Input
+                label="Corriente"
+                value={productForm.corriente}
+                onChange={(value) => handleFormChange("corriente", value)}
+                placeholder="0.37 A, 1.5-2.2 A, etc."
+              />
+
+              {/* Comunicación */}
+              <Input
+                label="Comunicación"
+                value={productForm.comunicacion}
+                onChange={(value) => handleFormChange("comunicacion", value)}
+                placeholder="Modbus/USS/BACnet, etc."
+              />
+
+              {/* Alimentación */}
+              <Input
+                label="Alimentación"
+                value={productForm.alimentacion}
+                onChange={(value) => handleFormChange("alimentacion", value)}
+                placeholder="3AC, etc."
               />
 
               {/* Dimensiones */}

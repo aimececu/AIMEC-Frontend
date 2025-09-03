@@ -38,6 +38,7 @@ const Admin = () => {
     loading,
     stats,
     loadInitialData,
+    refreshData,
   } = useAdminData();
   const {
     editingProduct,
@@ -51,7 +52,7 @@ const Admin = () => {
     handleCancelForm,
     toast,
     hideToast,
-  } = useProducts(loadInitialData);
+  } = useProducts(refreshData);
 
   // Función para cambiar a la pestaña de importación
   const handleImportClick = () => {
@@ -174,7 +175,7 @@ const Admin = () => {
                 categories={categories}
                 subcategories={subcategories}
                 brands={brands}
-                onRefresh={loadInitialData}
+                onRefresh={refreshData}
               />
             )}
 
@@ -194,7 +195,7 @@ const Admin = () => {
             )}
 
             {activeTab === "import" && (
-              <ImportData onRefresh={loadInitialData} />
+              <ImportData onRefresh={refreshData} />
             )}
           </div>
 

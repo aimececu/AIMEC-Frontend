@@ -1,7 +1,7 @@
 import React from "react";
 import clsx from "clsx";
 
-const Input = ({
+const Input = React.forwardRef(({
   label,
   error,
   helperText,
@@ -10,7 +10,7 @@ const Input = ({
   onChange,
   className = "",
   ...props
-}) => {
+}, ref) => {
   const baseClasses =
     "w-full px-3 py-2 border rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-0";
 
@@ -47,6 +47,7 @@ const Input = ({
         )}
 
         <input
+          ref={ref}
           className={clsx(classes, leftIcon && "pl-10", rightIcon && "pr-10")}
           onChange={handleChange}
           {...props}
@@ -73,6 +74,8 @@ const Input = ({
       )}
     </div>
   );
-};
+});
+
+Input.displayName = 'Input';
 
 export default Input;

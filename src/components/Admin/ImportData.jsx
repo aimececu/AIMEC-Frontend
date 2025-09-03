@@ -11,8 +11,11 @@ import { getAccessoriesByProduct } from "../../api/endpoints/accessories";
 import { productFeatureEndpoints } from "../../api/endpoints/productFeatures";
 import { productApplicationEndpoints } from "../../api/endpoints/productApplications";
 import { relatedProductsEndpoints } from "../../api/endpoints/relatedProducts";
+import Modal from "../ui/Modal";
+import { useToast } from "../../context/ToastContext";
 
 const ImportData = ({ onRefresh }) => {
+  const { showToast } = useToast();
   const [file, setFile] = useState(null);
   const [previewData, setPreviewData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -26,6 +29,9 @@ const ImportData = ({ onRefresh }) => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadStatus, setUploadStatus] = useState("idle"); // 'idle', 'uploading', 'processing', 'success', 'error'
   const [uploadAbortController, setUploadAbortController] = useState(null);
+  const [clearing, setClearing] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmText, setConfirmText] = useState("");
   const fileInputRef = useRef(null);
 
   const handleFileChange = (e) => {
@@ -88,27 +94,45 @@ const ImportData = ({ onRefresh }) => {
         }
       } else {
         setUploadStatus("error");
-        setMessage({
-          type: "error",
-          text: response.error || "Error al procesar el archivo",
-        });
+        showToast(response.error || "Error al procesar el archivo", "error");
       }
     } catch (error) {
       console.error("Error procesando archivo:", error);
       setUploadStatus("error");
 
       if (error.name === "AbortError") {
-        setMessage({
-          type: "info",
-          text: "Subida cancelada por el usuario.",
-        });
+        showToast("Subida cancelada por el usuario.", "info");
       } else {
-        setMessage({
-          type: "error",
-          text:
-            error.message ||
-            "Error al procesar el archivo. Verifica que sea un archivo Excel válido.",
-        });
+        // Mensaje de error más específico
+        let errorMessage = "Error al procesar el archivo. ";
+
+        if (
+          error.message &&
+          error.message.includes("No se encontró ninguna hoja")
+        ) {
+          errorMessage +=
+            "El archivo Excel no tiene hojas de trabajo. Asegúrate de que el archivo tenga al menos una hoja con datos.";
+        } else if (
+          error.message &&
+          error.message.includes("vacío o corrupto")
+        ) {
+          errorMessage +=
+            "El archivo está vacío o corrupto. Verifica que el archivo no esté dañado.";
+        } else if (
+          error.message &&
+          error.message.includes("no contiene hojas")
+        ) {
+          errorMessage +=
+            "El archivo Excel no contiene hojas de trabajo. Asegúrate de que el archivo tenga al menos una hoja con datos.";
+        } else if (error.message && error.message.includes("está vacía")) {
+          errorMessage +=
+            "La hoja de trabajo está vacía. Asegúrate de que tenga al menos una fila de encabezados y datos.";
+        } else {
+          errorMessage +=
+            "Verifica que sea un archivo Excel válido (.xlsx) y que no esté protegido por contraseña.";
+        }
+
+        showToast(errorMessage, "error");
       }
     } finally {
       setLoading(false);
@@ -132,52 +156,69 @@ const ImportData = ({ onRefresh }) => {
 
       const response = await importEndpoints.importSystemData(file);
 
-      if (response.success) {
-        const results = response.data;
-        setUploadProgress(75);
-        setUploadStatus("success");
+      console.log(response);
 
+      if (response.success) {
+        const results = response.results;
+        setUploadProgress(75);
         setMessage({
-          type: "success",
-          text: `¡Importación completada exitosamente! ${
-            results.products_created
-          } productos creados, ${results.products_updated} actualizados. ${
-            results.features_created || 0
-          } características, ${
-            results.applications_created || 0
-          } aplicaciones, ${results.accessories_created || 0} accesorios y ${
-            results.related_products_created || 0
-          } productos relacionados procesados.`,
+          type: "info",
+          text: "Finalizando importación...",
         });
 
-        // Limpiar estado
-        setFile(null);
-        setPreviewData(null);
-        setValidationErrors([]);
-        setCanImport(false);
-        setUploadProgress(0);
-        setUploadStatus("idle");
+        // Simular un pequeño delay para mostrar el progreso completo
+        setTimeout(() => {
+          setUploadProgress(100);
+          setUploadStatus("success");
 
-        // Recargar datos del sistema
-        if (onRefresh) {
-          onRefresh();
-        }
+          // Mostrar toast de éxito
+          showToast(
+            `¡Importación completada! ${
+              results.products_created
+            } productos creados, ${results.products_updated} actualizados. ${
+              results.features_created || 0
+            } características, ${
+              results.applications_created || 0
+            } aplicaciones, ${results.accessories_created || 0} accesorios y ${
+              results.related_products_created || 0
+            } productos relacionados procesados.`,
+            "success",
+            8000
+          );
+
+          // Limpiar estado después de un delay para que se vea el 100%
+          setTimeout(() => {
+            setFile(null);
+            setPreviewData(null);
+            setValidationErrors([]);
+            setCanImport(false);
+            setUploadProgress(0);
+            setUploadStatus("idle");
+            setMessage({ type: "", text: "" });
+
+            // Limpiar el input de archivo
+            if (fileInputRef.current) {
+              fileInputRef.current.value = "";
+            }
+
+            // Actualizar los datos del admin (productos, estadísticas, etc.)
+            if (onRefresh) {
+              onRefresh();
+            }
+          }, 2000); // 2 segundos para mostrar el éxito
+        }, 500); // 500ms para mostrar el 75% -> 100%
       } else {
         setUploadStatus("error");
-        setMessage({
-          type: "error",
-          text: response.error || "Error durante la importación",
-        });
+        showToast(response.error || "Error durante la importación", "error");
       }
     } catch (error) {
       console.error("Error importando datos:", error);
       setUploadStatus("error");
-      setMessage({
-        type: "error",
-        text:
-          error.message ||
+      showToast(
+        error.message ||
           "Error durante la importación. Verifica la conexión y vuelve a intentar.",
-      });
+        "error"
+      );
     } finally {
       setImporting(false);
     }
@@ -216,6 +257,60 @@ const ImportData = ({ onRefresh }) => {
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+  };
+
+  // Limpiar todos los productos
+  const handleClearAllProducts = () => {
+    setShowConfirmModal(true);
+    setConfirmText("");
+  };
+
+  const handleConfirmClear = async () => {
+    if (confirmText !== "ELIMINAR PRODUCTOS") {
+      showToast(
+        "Debes escribir exactamente 'ELIMINAR PRODUCTOS' para confirmar la operación.",
+        "error"
+      );
+      return;
+    }
+
+    setShowConfirmModal(false);
+    setClearing(true);
+    setMessage({ type: "info", text: "Eliminando todos los productos..." });
+
+    try {
+      const response = await productEndpoints.clearAllProducts();
+
+      if (response.success) {
+        // Mostrar toast de éxito
+        showToast(
+          `✅ ${response.message}. Se eliminaron ${response.data.deleted_count} productos del sistema.`,
+          "success",
+          6000
+        );
+
+        // Actualizar los datos del admin (productos, estadísticas, etc.)
+        if (onRefresh) {
+          onRefresh();
+        }
+      } else {
+        showToast(response.error || "Error al limpiar productos", "error");
+      }
+    } catch (error) {
+      console.error("Error limpiando productos:", error);
+      showToast(
+        "Error al limpiar productos. Verifica la conexión y vuelve a intentar.",
+        "error"
+      );
+    } finally {
+      setClearing(false);
+    }
+  };
+
+  const handleCancelClear = () => {
+    setShowConfirmModal(false);
+    setConfirmText("");
+    showToast("Operación de limpieza cancelada.", "info");
   };
 
   const downloadTemplate = () => {
@@ -351,10 +446,11 @@ const ImportData = ({ onRefresh }) => {
         console.log(`Con productos relacionados: ${productsWithRelated}`);
         console.log("===============================");
 
-        setMessage({
-          type: "success",
-          text: `Exportación completada exitosamente. ${csvData.length} productos exportados con todas sus relaciones en una sola operación.`,
-        });
+        showToast(
+          `Exportación completada exitosamente. ${csvData.length} productos exportados con todas sus relaciones en una sola operación.`,
+          "success",
+          6000
+        );
       } else {
         setMessage({
           type: "error",
@@ -392,6 +488,7 @@ const ImportData = ({ onRefresh }) => {
         const csvData = products.map((product) => {
           return {
             sku: product.sku || "",
+            sku_ec: product.sku_ec || "",
             nombre: product.name || "",
             descripcion: product.description || "",
             marca: product.brand?.name || "",
@@ -400,6 +497,12 @@ const ImportData = ({ onRefresh }) => {
             precio: product.price || "",
             stock: product.stock_quantity || "",
             stock_minimo: product.min_stock || "",
+            potencia_kw: product.potencia_kw || "",
+            corriente: product.corriente || "",
+            voltaje: product.voltaje || "",
+            frame_size: product.frame_size || "",
+            comunicacion: product.comunicacion || "",
+            alimentacion: product.alimentacion || "",
             peso: product.weight || "",
             dimensiones: product.dimensions || "",
             imagen: product.main_image || "",
@@ -447,10 +550,11 @@ const ImportData = ({ onRefresh }) => {
         a.click();
         window.URL.revokeObjectURL(url);
 
-        setMessage({
-          type: "success",
-          text: `Exportación básica completada. ${csvData.length} productos exportados con información básica.`,
-        });
+        showToast(
+          `Exportación básica completada. ${csvData.length} productos exportados con información básica.`,
+          "success",
+          5000
+        );
       } else {
         setMessage({
           type: "error",
@@ -481,68 +585,24 @@ const ImportData = ({ onRefresh }) => {
         </div>
       </div>
 
-      {/* Información del sistema */}
-      <Card className="p-6 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-        <div className="flex items-start gap-3">
-          <Icon name="FiInfo" className="text-blue-500 mt-1 flex-shrink-0" />
-          <div>
-            <h3 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">
-              ¿Cómo funciona la importación?
-            </h3>
-            <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
-              <li>
-                • <strong>Creación automática</strong> de marcas, categorías y
-                subcategorías
-              </li>
-              <li>
-                • <strong>Campos opcionales</strong> como peso, dimensiones e
-                imagen
-              </li>
-              <li>
-                • <strong>Características y aplicaciones</strong> separadas por
-                punto y coma (;)
-              </li>
-              <li>
-                • <strong>Accesorios</strong> separados por punto y coma (;) -
-                SKUs de productos accesorios
-              </li>
-              <li>
-                • <strong>Productos relacionados</strong> separados por punto y
-                coma (;) - SKUs con tipos de relación
-              </li>
-            </ul>
-          </div>
-        </div>
-      </Card>
-
-      {/* Descarga de plantilla */}
+      {/* Acciones principales */}
       <Card className="p-6">
         <Heading level={3} className="mb-4">
-          Paso 1: Descargar Plantilla
+          Acciones del Sistema
         </Heading>
         <p className="text-secondary-600 dark:text-secondary-400 mb-4">
-          Descarga la plantilla simplificada o exporta los productos actuales
-          del sistema. Solo necesitas llenar los campos básicos y el sistema se
-          encargará del resto.
-          <strong>
-            Las características y aplicaciones se separan con punto y coma (;)
-          </strong>
-          . Los <strong>accesorios</strong> son SKUs de productos que
-          complementan el producto principal, y los{" "}
-          <strong>productos relacionados</strong> se especifican como "SKU:Tipo"
-          separados por punto y coma.
+          Gestiona los datos del sistema: exporta la base actual o limpia todos
+          los productos.
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-3 mb-3">
-          <Button onClick={downloadTemplate} variant="outline">
-            <Icon name="FiDownload" className="mr-2" />
-            Descargar Plantilla
-          </Button>
-
+        <div className="flex flex-col sm:flex-row gap-3">
           <Button
             onClick={downloadCurrentData}
             disabled={exporting}
-            className="bg-green-50 hover:bg-green-100 border-green-300 text-green-700 hover:text-green-800"
+            variant="outline"
+            mainColor="#10b981"
+            textColor="#ffffff"
+            className="hover:bg-green-100"
           >
             {exporting ? (
               <>
@@ -560,59 +620,117 @@ const ImportData = ({ onRefresh }) => {
               </>
             )}
           </Button>
-        </div>
 
-        {/* Nota sobre accesorios y productos relacionados */}
-        <div className="mb-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
-          <div className="flex items-start gap-2">
-            <Icon
-              name="FiInfo"
-              className="text-yellow-600 mt-1 flex-shrink-0"
-            />
-            <div className="text-sm text-yellow-800 dark:text-yellow-200">
-              <p className="font-medium mb-2">
-                📋 Formato para Accesorios y Productos Relacionados:
-              </p>
-              <ul className="space-y-1">
-                <li>
-                  • <strong>Accesorios:</strong> Solo SKUs (ej:
-                  "SKU1;SKU2;SKU3")
-                </li>
-                <li>
-                  • <strong>Productos Relacionados:</strong> Formato "SKU:Tipo"
-                  separados por punto y coma (ej:
-                  "SKU1:Complementario;SKU2:Alternativo")
-                </li>
-              </ul>
+          <Button
+            onClick={handleClearAllProducts}
+            disabled={clearing}
+            variant="outline"
+            mainColor="#ef4444"
+            textColor="#ffffff"
+            className="hover:bg-red-100"
+          >
+            {clearing ? (
+              <>
+                <Loader
+                  size="sm"
+                  variant="spinner"
+                  className="mr-2"
+                  text="Limpiando..."
+                />
+              </>
+            ) : (
+              <>
+                <Icon name="FiTrash2" className="mr-2" />
+                Limpiar productos
+              </>
+            )}
+          </Button>
+
+          <Button onClick={downloadTemplate} variant="outline">
+            <Icon name="FiDownload" className="mr-2" />
+            Descargar Plantilla
+          </Button>
+        </div>
+      </Card>
+
+      {/* Información de formato */}
+      <Card className="p-6">
+        <Heading level={3} className="mb-4">
+          Formato de Archivo
+        </Heading>
+
+        <div className="space-y-4">
+          {/* Información básica */}
+          <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+            <div className="flex items-start gap-3">
+              <Icon
+                name="FiInfo"
+                className="text-blue-500 mt-1 flex-shrink-0"
+              />
+              <div>
+                <h4 className="font-medium text-blue-800 dark:text-blue-200 mb-2">
+                  📋 Requisitos del archivo
+                </h4>
+                <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
+                  <li>
+                    • <strong>Campos obligatorios:</strong> Solo SKU y Nombre
+                  </li>
+                  <li>
+                    • <strong>Campos opcionales:</strong> Marca, categoría,
+                    precio, stock, peso, dimensiones, imagen, etc.
+                  </li>
+                  <li>
+                    • <strong>Creación automática:</strong> Marcas, categorías y
+                    subcategorías se crean automáticamente
+                  </li>
+                  <li>
+                    • <strong>Formato:</strong> Archivo Excel (.xlsx) con
+                    encabezados en la primera fila
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
-        </div>
 
-        
+          {/* Formato de campos especiales */}
+          <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+            <div className="flex items-start gap-3">
+              <Icon
+                name="FiCheckCircle"
+                className="text-green-600 mt-1 flex-shrink-0"
+              />
+              <div>
+                <h4 className="font-medium text-green-800 dark:text-green-200 mb-2">
+                  ✅ Formato de campos especiales
+                </h4>
+                <div className="text-sm text-green-700 dark:text-green-300 space-y-3">
+                  <div>
+                    <strong>Características y Aplicaciones:</strong>
+                    <p className="text-xs mt-1">Separar con punto y coma (;)</p>
+                    <code className="block bg-white dark:bg-secondary-800 px-2 py-1 rounded text-xs mt-1">
+                      "Tensión 24V DC;Corriente 10A;Temperatura -25°C a +70°C"
+                    </code>
+                  </div>
 
-        {/* Ejemplos de formato */}
-        <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-          <div className="flex items-start gap-2">
-            <Icon
-              name="FiCheckCircle"
-              className="text-green-600 mt-1 flex-shrink-0"
-            />
-            <div className="text-sm text-green-800 dark:text-green-200">
-              <p className="font-medium mb-2">
-                ✅ Ejemplos de formato correcto:
-              </p>
-              <div className="space-y-2">
-                <div>
-                  <strong>Accesorios:</strong>
-                  <code className="block bg-white dark:bg-secondary-800 px-2 py-1 rounded text-xs mt-1">
-                    SIEMENS-3RT1015-1BB42;SIEMENS-3RT1015-1BB43
-                  </code>
-                </div>
-                <div>
-                  <strong>Productos Relacionados:</strong>
-                  <code className="block bg-white dark:bg-secondary-800 px-2 py-1 rounded text-xs mt-1">
-                    SIEMENS-3RT1015-1BB44:Complementario;SIEMENS-3RT1015-1BB45:Alternativo
-                  </code>
+                  <div>
+                    <strong>Accesorios:</strong>
+                    <p className="text-xs mt-1">
+                      Solo SKUs separados por punto y coma (;)
+                    </p>
+                    <code className="block bg-white dark:bg-secondary-800 px-2 py-1 rounded text-xs mt-1">
+                      "SIEMENS-3RT1015-1BB42;SIEMENS-3RT1015-1BB43"
+                    </code>
+                  </div>
+
+                  <div>
+                    <strong>Productos Relacionados:</strong>
+                    <p className="text-xs mt-1">
+                      Formato "SKU:Tipo" separados por punto y coma (;)
+                    </p>
+                    <code className="block bg-white dark:bg-secondary-800 px-2 py-1 rounded text-xs mt-1">
+                      "SIEMENS-3RT1015-1BB44:Complementario;SIEMENS-3RT1015-1BB45:Alternativo"
+                    </code>
+                  </div>
                 </div>
               </div>
             </div>
@@ -623,7 +741,7 @@ const ImportData = ({ onRefresh }) => {
       {/* Subida de archivo */}
       <Card className="p-6">
         <Heading level={3} className="mb-4">
-          Paso 2: Subir Archivo
+          Subir Archivo
         </Heading>
         <div className="space-y-4">
           <Input
@@ -637,128 +755,23 @@ const ImportData = ({ onRefresh }) => {
 
           {file && (
             <div className="p-4 bg-secondary-50 dark:bg-secondary-800 rounded-lg">
-              <div className="flex items-center gap-2">
-                <Icon name="FiFile" className="text-primary-500" />
-                <span className="font-medium">{file.name}</span>
-                <span className="text-sm text-secondary-500">
-                  ({(file.size / 1024).toFixed(1)} KB)
-                </span>
-              </div>
-            </div>
-          )}
-
-          {/* Barra de progreso y controles */}
-          {uploadStatus !== "idle" && (
-            <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-              <div className="flex items-center gap-2 mb-3">
-                <Icon name="FiInfo" className="text-blue-500 flex-shrink-0" />
-                <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
-                  Estado de la subida
-                </span>
-                <span className="text-xs text-blue-600 dark:text-blue-400 ml-auto">
-                  {uploadStatus} - {uploadProgress}%
-                </span>
-              </div>
-
-              <div className="space-y-4">
-                {/* Barra de progreso visual mejorada */}
-                <div className="w-full bg-gray-200 rounded-full h-4 dark:bg-gray-700 relative overflow-hidden">
-                  <div
-                    className={`h-4 rounded-full transition-all duration-500 ease-out relative ${
-                      uploadStatus === "uploading"
-                        ? "bg-blue-600"
-                        : uploadStatus === "processing"
-                        ? "bg-green-600"
-                        : uploadStatus === "success"
-                        ? "bg-green-600"
-                        : uploadStatus === "error"
-                        ? "bg-red-600"
-                        : "bg-gray-600"
-                    }`}
-                    style={{ width: `${uploadProgress}%` }}
-                  >
-                    {/* Efecto de brillo animado para uploading */}
-                    {uploadStatus === "uploading" && (
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-pulse"></div>
-                    )}
-                  </div>
-                  {/* Texto de progreso superpuesto */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-xs font-medium text-white drop-shadow-sm">
-                      {uploadProgress}%
-                    </span>
-                  </div>
-                </div>
-
-                {/* Estado y progreso */}
-                <div className="flex justify-between items-center text-sm">
-                  <div className="flex items-center gap-2">
-                    {uploadStatus === "uploading" && (
-                      <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
-                    )}
-                    {uploadStatus === "processing" && (
-                      <div className="w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>
-                    )}
-                    {uploadStatus === "success" && (
-                      <div className="w-2 h-2 bg-green-600 rounded-full"></div>
-                    )}
-                    {uploadStatus === "error" && (
-                      <div className="w-2 h-2 bg-red-600 rounded-full"></div>
-                    )}
-                    <span
-                      className={`font-medium ${
-                        uploadStatus === "uploading"
-                          ? "text-blue-600 dark:text-blue-400"
-                          : uploadStatus === "processing"
-                          ? "text-green-600 dark:text-green-400"
-                          : uploadStatus === "success"
-                          ? "text-green-600 dark:text-green-400"
-                          : uploadStatus === "error"
-                          ? "text-red-600 dark:text-red-400"
-                          : "text-gray-600 dark:text-gray-400"
-                      }`}
-                    >
-                      {uploadStatus === "uploading" && "Subiendo archivo..."}
-                      {uploadStatus === "processing" && "Procesando datos..."}
-                      {uploadStatus === "success" && "¡Completado!"}
-                      {uploadStatus === "error" && "Error detectado"}
-                    </span>
-                  </div>
-                  <span className="text-secondary-600 dark:text-secondary-400 font-mono">
-                    {uploadProgress}%
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Icon name="FiFile" className="text-primary-500" />
+                  <span className="font-medium">{file.name}</span>
+                  <span className="text-sm text-secondary-500">
+                    ({(file.size / 1024).toFixed(1)} KB)
                   </span>
                 </div>
-
-                {/* Botones de control */}
-                {uploadStatus === "uploading" && (
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={cancelUpload}
-                      disabled={importing}
-                    >
-                      <Icon name="FiX" className="mr-2" />
-                      Cancelar Subida
-                    </Button>
-                    <Button onClick={resetUpload} disabled={importing}>
-                      <Icon name="FiRefreshCw" className="mr-2" />
-                      Reintentar
-                    </Button>
-                  </div>
-                )}
-
-                {uploadStatus === "error" && (
-                  <div className="flex justify-end gap-2">
-                    <Button variant="outline" onClick={resetUpload}>
-                      <Icon name="FiRefreshCw" className="mr-2" />
-                      Reintentar
-                    </Button>
-                    <Button onClick={cancelUpload}>
-                      <Icon name="FiX" className="mr-2" />
-                      Cancelar
-                    </Button>
-                  </div>
-                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={resetUpload}
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                >
+                  <Icon name="FiX" className="mr-1" size="sm" />
+                  Eliminar
+                </Button>
               </div>
             </div>
           )}
@@ -805,14 +818,14 @@ const ImportData = ({ onRefresh }) => {
       {previewData && (
         <Card className="p-6">
           <Heading level={3} className="mb-4">
-            Paso 3: Previsualización y Validación
+            Previsualización y Validación
           </Heading>
           <p className="text-secondary-600 dark:text-secondary-400 mb-4">
             Revisa los datos antes de importar. El sistema validará y creará
             automáticamente las entidades necesarias.
           </p>
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto max-h-[450px] overflow-y-auto">
             <table className="min-w-full divide-y divide-secondary-200 dark:divide-secondary-700">
               <thead className="bg-secondary-50 dark:bg-secondary-800">
                 <tr>
@@ -856,6 +869,30 @@ const ImportData = ({ onRefresh }) => {
               </span>
             </div>
           </div>
+
+          <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+            <div className="flex items-start gap-3">
+              <Icon
+                name="FiInfo"
+                className="text-blue-500 mt-1 flex-shrink-0"
+              />
+              <div>
+                <h4 className="font-medium text-blue-800 dark:text-blue-200 mb-2">
+                  📍 ¿Cómo continuar?
+                </h4>
+                <p className="text-sm text-blue-700 dark:text-blue-300">
+                  Para importar los datos, busca el botón{" "}
+                  <strong>"Importar Datos"</strong> en la
+                  <strong>
+                    {" "}
+                    barra de progreso fija en la parte inferior de la pantalla
+                  </strong>
+                  . El botón aparecerá cuando el archivo esté listo para
+                  importar.
+                </p>
+              </div>
+            </div>
+          </div>
         </Card>
       )}
 
@@ -890,40 +927,323 @@ const ImportData = ({ onRefresh }) => {
         </Card>
       )}
 
-      {/* Botón de importación */}
-      {previewData && canImport && (
-        <Card className="p-6">
-          <Heading level={3} className="mb-4">
-            Paso 4: Importar Datos
-          </Heading>
-          <p className="text-secondary-600 dark:text-secondary-400 mb-4">
-            Una vez que hayas revisado los datos, haz clic en el botón para
-            comenzar la importación inteligente.
-          </p>
+      {/* Modal de confirmación para limpiar productos */}
+      <Modal
+        isOpen={showConfirmModal}
+        onClose={handleCancelClear}
+        title="🚨 CONFIRMACIÓN FINAL - LIMPIAR PRODUCTOS"
+        size="max-w-2xl"
+        footer={
+          <div className="flex justify-end gap-3">
+            <Button
+              onClick={handleCancelClear}
+              variant="outline"
+              disabled={clearing}
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleConfirmClear}
+              variant="danger"
+              disabled={clearing || confirmText !== "ELIMINAR PRODUCTOS"}
+            >
+              {clearing ? (
+                <>
+                  <Loader
+                    size="sm"
+                    variant="spinner"
+                    className="mr-2"
+                    text="Eliminando..."
+                  />
+                </>
+              ) : (
+                <>
+                  <Icon name="FiTrash2" className="mr-2" />
+                  Eliminar Todos los Productos
+                </>
+              )}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-6">
+          {/* Advertencia principal */}
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <Icon
+                name="FiAlertTriangle"
+                className="text-red-500 mt-1 flex-shrink-0"
+              />
+              <div>
+                <h3 className="font-semibold text-red-800 dark:text-red-200 mb-2">
+                  ⚠️ ADVERTENCIA CRÍTICA
+                </h3>
+                <p className="text-red-700 dark:text-red-300 text-sm">
+                  Esta acción eliminará <strong>TODOS los productos</strong> del
+                  sistema de forma permanente. Esta operación{" "}
+                  <strong>NO se puede deshacer</strong>.
+                </p>
+              </div>
+            </div>
+          </div>
 
-          <Button
-            onClick={handleImport}
-            disabled={importing}
-            className="w-full md:w-auto"
-            size="lg"
-          >
-            {importing ? (
-              <>
-                <Loader
-                  size="sm"
-                  variant="spinner"
-                  className="mr-2"
-                  text="Importando datos..."
-                />
-              </>
-            ) : (
-              <>
-                <Icon name="FiUpload" className="mr-2" />
-                Importar Datos del Sistema
-              </>
+          {/* Información detallada */}
+          <div className="space-y-4">
+            <div>
+              <h4 className="font-medium text-secondary-900 dark:text-white mb-2">
+                ¿Qué se eliminará?
+              </h4>
+              <ul className="text-sm text-secondary-600 dark:text-secondary-400 space-y-1 ml-4">
+                <li>• Todos los productos activos del sistema</li>
+                <li>• Sus características y aplicaciones</li>
+                <li>
+                  • Sus relaciones con accesorios y productos relacionados
+                </li>
+                <li>• Toda la información de inventario</li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-medium text-secondary-900 dark:text-white mb-2">
+                ¿Qué NO se eliminará?
+              </h4>
+              <ul className="text-sm text-secondary-600 dark:text-secondary-400 space-y-1 ml-4">
+                <li>• Marcas, categorías y subcategorías</li>
+                <li>• Usuarios y configuraciones del sistema</li>
+                <li>• Cotizaciones y órdenes existentes</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Campo de confirmación */}
+          <div className="space-y-3">
+            <div>
+              <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                Para confirmar esta operación, escribe exactamente:
+              </label>
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mb-3">
+                <code className="text-lg font-mono font-bold text-yellow-800 dark:text-yellow-200">
+                  ELIMINAR PRODUCTOS
+                </code>
+              </div>
+            </div>
+
+            <Input
+              value={confirmText}
+              onChange={(value) => setConfirmText(value)}
+              placeholder="Escribe 'ELIMINAR PRODUCTOS' aquí"
+              className="text-center font-mono text-lg"
+            />
+
+            {confirmText && confirmText !== "ELIMINAR PRODUCTOS" && (
+              <p className="text-sm text-red-600 dark:text-red-400">
+                ❌ El texto no coincide. Debes escribir exactamente "ELIMINAR
+                PRODUCTOS"
+              </p>
             )}
-          </Button>
-        </Card>
+
+            {confirmText === "ELIMINAR PRODUCTOS" && (
+              <p className="text-sm text-green-600 dark:text-green-400">
+                ✅ Texto correcto. Puedes proceder con la eliminación.
+              </p>
+            )}
+          </div>
+
+          {/* Recomendación final */}
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <Icon
+                name="FiInfo"
+                className="text-blue-500 mt-1 flex-shrink-0"
+              />
+              <div>
+                <h4 className="font-medium text-blue-800 dark:text-blue-200 mb-1">
+                  💡 Recomendación
+                </h4>
+                <p className="text-blue-700 dark:text-blue-300 text-sm">
+                  Si no estás seguro, cancela esta operación y exporta primero
+                  los datos actuales para tener una copia de respaldo.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Barra de progreso fija en la parte inferior */}
+      {uploadStatus !== "idle" && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-secondary-900 border-t border-secondary-200 dark:border-secondary-700 shadow-lg">
+          <div className="max-w-7xl mx-auto px-4 py-3">
+            <div className="flex items-center justify-between gap-4">
+              {/* Información del estado */}
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  {uploadStatus === "uploading" && (
+                    <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+                  )}
+                  {uploadStatus === "processing" && (
+                    <div className="w-3 h-3 bg-yellow-500 rounded-full animate-pulse"></div>
+                  )}
+                  {uploadStatus === "success" && (
+                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  )}
+                  {uploadStatus === "error" && (
+                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                  )}
+
+                  <span
+                    className={`text-sm font-medium whitespace-nowrap ${
+                      uploadStatus === "uploading"
+                        ? "text-blue-600 dark:text-blue-400"
+                        : uploadStatus === "processing"
+                        ? "text-yellow-600 dark:text-yellow-400"
+                        : uploadStatus === "success"
+                        ? "text-green-600 dark:text-green-400"
+                        : uploadStatus === "error"
+                        ? "text-red-600 dark:text-red-400"
+                        : "text-gray-600 dark:text-gray-400"
+                    }`}
+                  >
+                    {uploadStatus === "uploading" && "Subiendo archivo..."}
+                    {uploadStatus === "processing" && "Procesando datos..."}
+                    {uploadStatus === "success" && "¡Completado!"}
+                    {uploadStatus === "error" && "Error detectado"}
+                  </span>
+                </div>
+
+                {/* Barra de progreso animada */}
+                <div className="flex-1 min-w-0">
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 relative overflow-hidden">
+                    <div
+                      className={`h-2 rounded-full transition-all duration-700 ease-out relative ${
+                        uploadStatus === "uploading"
+                          ? "bg-gradient-to-r from-blue-500 to-blue-600"
+                          : uploadStatus === "processing"
+                          ? "bg-gradient-to-r from-yellow-500 to-yellow-600"
+                          : uploadStatus === "success"
+                          ? "bg-gradient-to-r from-green-500 to-green-600"
+                          : uploadStatus === "error"
+                          ? "bg-gradient-to-r from-red-500 to-red-600"
+                          : "bg-gray-500"
+                      }`}
+                      style={{ width: `${uploadProgress}%` }}
+                    >
+                      {/* Efecto de brillo animado para estados activos */}
+                      {(uploadStatus === "uploading" ||
+                        uploadStatus === "processing") && (
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-40 animate-pulse"></div>
+                      )}
+
+                      {/* Efecto de ondas para uploading */}
+                      {uploadStatus === "uploading" && (
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-300 to-transparent opacity-60 animate-pulse"></div>
+                      )}
+
+                      {/* Efecto de ondas para processing */}
+                      {uploadStatus === "processing" && (
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-300 to-transparent opacity-60 animate-pulse"></div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Porcentaje */}
+                <span className="text-sm font-mono font-medium text-secondary-600 dark:text-secondary-400 whitespace-nowrap">
+                  {uploadProgress}%
+                </span>
+              </div>
+
+              {/* Botones de control */}
+              <div className="flex items-center gap-2">
+                {uploadStatus === "uploading" && (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={cancelUpload}
+                      disabled={importing}
+                      className="text-xs px-3 py-1"
+                    >
+                      <Icon name="FiX" className="mr-1" size="sm" />
+                      Cancelar
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={resetUpload}
+                      disabled={importing}
+                      className="text-xs px-3 py-1"
+                    >
+                      <Icon name="FiRefreshCw" className="mr-1" size="sm" />
+                      Reintentar
+                    </Button>
+                  </>
+                )}
+
+                {uploadStatus === "error" && (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={resetUpload}
+                      className="text-xs px-3 py-1"
+                    >
+                      <Icon name="FiRefreshCw" className="mr-1" size="sm" />
+                      Reintentar
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={cancelUpload}
+                      className="text-xs px-3 py-1"
+                    >
+                      <Icon name="FiX" className="mr-1" size="sm" />
+                      Cerrar
+                    </Button>
+                  </>
+                )}
+
+                {uploadStatus === "success" && (
+                  <>
+                    {previewData && canImport && (
+                      <Button
+                        size="sm"
+                        onClick={handleImport}
+                        disabled={importing}
+                        className="text-xs px-3 py-1 bg-green-600 hover:bg-green-700 text-white"
+                      >
+                        {importing ? (
+                          <>
+                            <Loader
+                              size="sm"
+                              variant="spinner"
+                              className="mr-1"
+                              text="Importando..."
+                            />
+                          </>
+                        ) : (
+                          <>
+                            <Icon name="FiUpload" className="mr-1" size="sm" />
+                            Importar Datos
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </>
+                )}
+
+                {uploadStatus === "processing" && (
+                  <Button size="sm" disabled className="text-xs px-3 py-1">
+                    <Loader
+                      size="sm"
+                      variant="spinner"
+                      className="mr-1"
+                      text="Procesando..."
+                    />
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

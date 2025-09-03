@@ -12,9 +12,11 @@ export const useAdminData = () => {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({});
 
-  const loadInitialData = async () => {
+  const loadInitialData = async (showLoading = true) => {
     try {
-      setLoading(true);
+      if (showLoading) {
+        setLoading(true);
+      }
 
       // Cargar datos iniciales
       const [products, categories, brands, subcategories, stats] = await Promise.all([
@@ -55,13 +57,20 @@ export const useAdminData = () => {
     } catch (error) {
       console.error("Error cargando datos iniciales:", error);
     } finally {
-      setLoading(false);
+      if (showLoading) {
+        setLoading(false);
+      }
     }
   };
 
   useEffect(() => {
     loadInitialData();
   }, []);
+
+  // Función para refrescar datos sin mostrar loading
+  const refreshData = () => {
+    loadInitialData(false);
+  };
 
   return {
     products,
@@ -71,5 +80,6 @@ export const useAdminData = () => {
     loading,
     stats,
     loadInitialData,
+    refreshData,
   };
 };

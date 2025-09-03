@@ -167,6 +167,19 @@ export const productEndpoints = {
       console.error('Error al exportar productos con relaciones:', error);
       throw error;
     }
+  },
+
+  // Limpiar todos los productos
+  async clearAllProducts() {
+    try {
+      const response = await apiRequest('/products/clear', {
+        method: 'DELETE'
+      });
+      return response;
+    } catch (error) {
+      console.error('Error al limpiar productos:', error);
+      throw error;
+    }
   }
 };
 

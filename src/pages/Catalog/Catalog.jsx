@@ -95,6 +95,8 @@ const Catalog = () => {
       const matchesSearch = 
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (product.sku && product.sku.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (product.sku_ec && product.sku_ec.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (product.series && product.series.toLowerCase().includes(searchTerm.toLowerCase()));
       
       const matchesCategory = selectedCategory === "all" || product.category_id === parseInt(selectedCategory);
@@ -154,7 +156,7 @@ const Catalog = () => {
                     label="Buscar productos"
                     value={searchTerm}
                     onChange={(value) => setSearchTerm(value)}
-                    placeholder="Nombre, descripción..."
+                    placeholder="Nombre, descripción, SKU..."
                     icon={<Icon name="FiSearch" size="sm" />}
                   />
                 </div>

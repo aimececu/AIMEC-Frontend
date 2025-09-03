@@ -24,6 +24,9 @@ const ProductCard = ({
     potencia_kw,
     voltaje,
     frame_size,
+    corriente,
+    comunicacion,
+    alimentacion,
   } = product;
   const { addToCart, isInCart } = useCart();
 
@@ -102,6 +105,30 @@ const ProductCard = ({
                       <span className="text-secondary-500 dark:text-secondary-400">Frame:</span>
                       <span className="ml-1 font-medium text-secondary-700 dark:text-secondary-300">
                         {frame_size}
+                      </span>
+                    </div>
+                  )}
+                  {corriente && (
+                    <div className="text-xs">
+                      <span className="text-secondary-500 dark:text-secondary-400">Corriente:</span>
+                      <span className="ml-1 font-medium text-secondary-700 dark:text-secondary-300">
+                        {corriente} A
+                      </span>
+                    </div>
+                  )}
+                  {comunicacion && (
+                    <div className="text-xs">
+                      <span className="text-secondary-500 dark:text-secondary-400">Comunicación:</span>
+                      <span className="ml-1 font-medium text-secondary-700 dark:text-secondary-300">
+                        {comunicacion}
+                      </span>
+                    </div>
+                  )}
+                  {alimentacion && (
+                    <div className="text-xs">
+                      <span className="text-secondary-500 dark:text-secondary-400">Alimentación:</span>
+                      <span className="ml-1 font-medium text-secondary-700 dark:text-secondary-300">
+                        {alimentacion}
                       </span>
                     </div>
                   )}
@@ -213,6 +240,30 @@ const ProductCard = ({
                   </span>
                 </div>
               )}
+              {corriente && (
+                <div className="text-xs">
+                  <span className="text-secondary-500 dark:text-secondary-400">Corriente:</span>
+                  <span className="ml-1 font-medium text-secondary-700 dark:text-secondary-300">
+                    {corriente} A
+                  </span>
+                </div>
+              )}
+              {comunicacion && (
+                <div className="text-xs">
+                  <span className="text-secondary-500 dark:text-secondary-400">Comunicación:</span>
+                  <span className="ml-1 font-medium text-secondary-700 dark:text-secondary-300">
+                    {comunicacion}
+                  </span>
+                </div>
+              )}
+              {alimentacion && (
+                <div className="text-xs">
+                  <span className="text-secondary-500 dark:text-secondary-400">Alimentación:</span>
+                  <span className="ml-1 font-medium text-secondary-700 dark:text-secondary-300">
+                    {alimentacion}
+                  </span>
+                </div>
+              )}
             </div>
           )}
 
@@ -236,7 +287,7 @@ const ProductCard = ({
           <div className="flex items-center justify-between gap-2">
             <div className="flex flex-col items-baseline gap-0 flex-shrink-0">
               <span className="text-lg font-bold text-primary-600 dark:text-primary-400">
-                ${(parseFloat(price) || 0).toFixed(2)}
+                ${price || "0.00"}
               </span>
             </div>
 

@@ -76,14 +76,6 @@ const AdminDashboard = ({ stats, onImportClick, onNavigate, loading = false }) =
             <Icon name="FiSettings" className="text-2xl" />
             <span className="text-sm font-medium text-center">Gestionar Datos</span>
           </button>
-          
-          <button 
-            onClick={onImportClick}
-            className="flex flex-col items-center gap-3 p-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 hover:shadow-lg"
-          >
-            <Icon name="FiUpload" className="text-2xl" />
-            <span className="text-sm font-medium text-center">Importar Productos</span>
-          </button>
 
           <button 
             onClick={() => onNavigate('products')}
@@ -91,6 +83,14 @@ const AdminDashboard = ({ stats, onImportClick, onNavigate, loading = false }) =
           >
             <Icon name="FiList" className="text-2xl" />
             <span className="text-sm font-medium text-center">Ver Productos</span>
+          </button>
+          
+          <button 
+            onClick={onImportClick}
+            className="flex flex-col items-center gap-3 p-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 hover:shadow-lg"
+          >
+            <Icon name="FiUpload" className="text-2xl" />
+            <span className="text-sm font-medium text-center">Importar Productos</span>
           </button>
         </div>
       </Card>

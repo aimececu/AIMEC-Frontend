@@ -7,10 +7,6 @@ import Input from "../ui/Input";
 import Loader from "../ui/Loader";
 import { importEndpoints } from "../../api/endpoints/import";
 import { productEndpoints } from "../../api/endpoints/products";
-import { getAccessoriesByProduct } from "../../api/endpoints/accessories";
-import { productFeatureEndpoints } from "../../api/endpoints/productFeatures";
-import { productApplicationEndpoints } from "../../api/endpoints/productApplications";
-import { relatedProductsEndpoints } from "../../api/endpoints/relatedProducts";
 import Modal from "../ui/Modal";
 import { useToast } from "../../context/ToastContext";
 
@@ -355,15 +351,50 @@ const ImportData = ({ onRefresh }) => {
           text: `Procesando ${products.length} productos para exportación...`,
         });
 
-        // Preparar datos para CSV
-        const csvData = products.map((product) => {
-          return {
+        // Importar ExcelJS dinámicamente
+        const ExcelJS = await import('exceljs');
+
+        // Crear un nuevo workbook
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Productos');
+
+        // Definir las columnas
+        worksheet.columns = [
+          { header: 'SKU', key: 'sku', width: 20 },
+          { header: 'Nombre', key: 'nombre', width: 30 },
+          { header: 'Descripción', key: 'descripcion', width: 40 },
+          { header: 'Marca', key: 'marca', width: 15 },
+          { header: 'Categoría', key: 'categoria', width: 20 },
+          { header: 'Subcategoría', key: 'subcategoria', width: 20 },
+          { header: 'Precio', key: 'precio', width: 12 },
+          { header: 'Stock', key: 'stock', width: 10 },
+          { header: 'Stock Mínimo', key: 'stock_minimo', width: 12 },
+          { header: 'Peso', key: 'peso', width: 10 },
+          { header: 'Dimensiones', key: 'dimensiones', width: 15 },
+          { header: 'Imagen', key: 'imagen', width: 30 },
+          { header: 'Características', key: 'caracteristicas', width: 50 },
+          { header: 'Aplicaciones', key: 'aplicaciones', width: 50 },
+          { header: 'Accesorios', key: 'accesorios', width: 30 },
+          { header: 'Productos Relacionados', key: 'productos_relacionados', width: 40 }
+        ];
+
+        // Estilizar la fila de encabezados
+        worksheet.getRow(1).font = { bold: true };
+        worksheet.getRow(1).fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FFE6F3FF' }
+        };
+
+        // Agregar los datos
+        products.forEach((product) => {
+          worksheet.addRow({
             sku: product.sku || "",
             nombre: product.name || "",
             descripcion: product.description || "",
             marca: product.brand || "",
             categoria: product.category || "",
-            subcategoria: product.subcategory || "",
+            subcategoría: product.subcategory || "",
             precio: product.price || "",
             stock: product.stock_quantity || "",
             stock_minimo: product.min_stock_level || "",
@@ -384,62 +415,56 @@ const ImportData = ({ onRefresh }) => {
                   .map((rp) => `${rp.sku}:${rp.type}`)
                   .join(";")
               : "",
-          };
+          });
         });
 
-        // Convertir a CSV
-        const headers = Object.keys(csvData[0] || {});
-        const csvContent = [
-          headers.join(","),
-          ...csvData.map((row) =>
-            headers
-              .map((header) => {
-                const value = row[header] || "";
-                // Convertir a string y escapar comillas
-                const stringValue = String(value);
-                const escapedValue = stringValue.replace(/"/g, '""');
-                // Envolver en comillas si contiene comas o punto y coma
-                return stringValue.includes(",") || stringValue.includes(";")
-                  ? `"${escapedValue}"`
-                  : escapedValue;
-              })
-              .join(",")
-          ),
-        ].join("\n");
+        // Aplicar bordes a todas las celdas con datos
+        const rowCount = worksheet.rowCount;
+        const colCount = worksheet.columnCount;
+        
+        for (let row = 1; row <= rowCount; row++) {
+          for (let col = 1; col <= colCount; col++) {
+            const cell = worksheet.getCell(row, col);
+            cell.border = {
+              top: { style: 'thin' },
+              left: { style: 'thin' },
+              bottom: { style: 'thin' },
+              right: { style: 'thin' }
+            };
+          }
+        }
 
-        // Agregar BOM UTF-8 para caracteres especiales
-        const BOM = "\uFEFF";
-        const csvWithBOM = BOM + csvContent;
-
-        // Descargar archivo
-        const blob = new Blob([csvWithBOM], {
-          type: "text/csv;charset=utf-8;",
+        // Generar el archivo Excel
+        const buffer = await workbook.xlsx.writeBuffer();
+        
+        // Crear y descargar el archivo
+        const blob = new Blob([buffer], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         });
+        
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
+        const a = document.createElement('a');
         a.href = url;
-        a.download = `productos_sistema_${
-          new Date().toISOString().split("T")[0]
-        }.csv`;
+        a.download = `productos_sistema_${new Date().toISOString().split('T')[0]}.xlsx`;
         a.click();
         window.URL.revokeObjectURL(url);
 
         // Contar productos con datos adicionales
-        const productsWithFeatures = csvData.filter(
-          (p) => p.caracteristicas
+        const productsWithFeatures = products.filter(
+          (p) => Array.isArray(p.features) && p.features.length > 0
         ).length;
-        const productsWithApplications = csvData.filter(
-          (p) => p.aplicaciones
+        const productsWithApplications = products.filter(
+          (p) => Array.isArray(p.applications) && p.applications.length > 0
         ).length;
-        const productsWithAccessories = csvData.filter(
-          (p) => p.accesorios
+        const productsWithAccessories = products.filter(
+          (p) => Array.isArray(p.accessories) && p.accessories.length > 0
         ).length;
-        const productsWithRelated = csvData.filter(
-          (p) => p.productos_relacionados
+        const productsWithRelated = products.filter(
+          (p) => Array.isArray(p.related_products) && p.related_products.length > 0
         ).length;
 
         console.log("=== RESUMEN DE EXPORTACIÓN ===");
-        console.log(`Total productos: ${csvData.length}`);
+        console.log(`Total productos: ${products.length}`);
         console.log(`Con características: ${productsWithFeatures}`);
         console.log(`Con aplicaciones: ${productsWithApplications}`);
         console.log(`Con accesorios: ${productsWithAccessories}`);
@@ -447,7 +472,7 @@ const ImportData = ({ onRefresh }) => {
         console.log("===============================");
 
         showToast(
-          `Exportación completada exitosamente. ${csvData.length} productos exportados con todas sus relaciones en una sola operación.`,
+          `Exportación completada exitosamente. ${products.length} productos exportados en formato Excel con todas sus relaciones.`,
           "success",
           6000
         );
@@ -895,38 +920,7 @@ const ImportData = ({ onRefresh }) => {
           </div>
         </Card>
       )}
-
-      {/* Mensajes */}
-      {message.text && (
-        <Card
-          className={`p-4 ${
-            message.type === "success"
-              ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
-              : "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            <Icon
-              name={
-                message.type === "success" ? "FiCheckCircle" : "FiAlertCircle"
-              }
-              className={
-                message.type === "success" ? "text-green-500" : "text-red-500"
-              }
-            />
-            <span
-              className={`text-sm ${
-                message.type === "success"
-                  ? "text-green-700 dark:text-green-300"
-                  : "text-red-700 dark:text-red-300"
-              }`}
-            >
-              {message.text}
-            </span>
-          </div>
-        </Card>
-      )}
-
+      
       {/* Modal de confirmación para limpiar productos */}
       <Modal
         isOpen={showConfirmModal}

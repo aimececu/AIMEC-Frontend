@@ -27,8 +27,6 @@ export const useAdminData = () => {
         infoEndpoints.getSystemStats()
       ]);
 
-      console.log(products);
-
       // Usar directamente los datos del backend sin transformaciones
       if (products.success) {
         setProducts(
@@ -37,8 +35,6 @@ export const useAdminData = () => {
       }
 
       if (categories.success) {
-        console.log('Categorías recibidas:', categories.data);
-        console.log('Primera categoría:', categories.data[0]);
         setCategories(categories.data || []);
       }
 
@@ -47,7 +43,6 @@ export const useAdminData = () => {
       }
 
       if (subcategories.success) {
-        console.log('Subcategorías recibidas:', subcategories.data);
         setSubcategories(subcategories.data || []);
       }
 

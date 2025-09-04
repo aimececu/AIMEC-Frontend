@@ -50,29 +50,24 @@ const ImportData = ({ onRefresh }) => {
     setLoading(true);
     setUploadStatus("uploading");
     setUploadProgress(10);
-    console.log("Iniciando subida - Estado:", "uploading", "Progreso:", 10);
 
     try {
-      console.log("Previewing file:", selectedFile);
 
       // Crear un AbortController para poder cancelar la operación
       const abortController = new AbortController();
       setUploadAbortController(abortController);
 
       setUploadProgress(25);
-      console.log("Progreso actualizado:", 25);
 
       const response = await importEndpoints.previewImportData(selectedFile);
 
       if (response.success) {
         setUploadProgress(75);
-        console.log("Progreso actualizado:", 75);
         setPreviewData(response.data.preview);
         setValidationErrors(response.data.validation_errors || []);
         setCanImport(response.data.can_import);
         setUploadProgress(100);
         setUploadStatus("success");
-        console.log("Subida completada - Estado:", "success", "Progreso:", 100);
 
         if (
           response.data.validation_errors &&
@@ -93,7 +88,6 @@ const ImportData = ({ onRefresh }) => {
         showToast(response.error || "Error al procesar el archivo", "error");
       }
     } catch (error) {
-      console.error("Error procesando archivo:", error);
       setUploadStatus("error");
 
       if (error.name === "AbortError") {
@@ -152,8 +146,6 @@ const ImportData = ({ onRefresh }) => {
 
       const response = await importEndpoints.importSystemData(file);
 
-      console.log(response);
-
       if (response.success) {
         const results = response.results;
         setUploadProgress(75);
@@ -208,7 +200,6 @@ const ImportData = ({ onRefresh }) => {
         showToast(response.error || "Error durante la importación", "error");
       }
     } catch (error) {
-      console.error("Error importando datos:", error);
       setUploadStatus("error");
       showToast(
         error.message ||
@@ -293,7 +284,6 @@ const ImportData = ({ onRefresh }) => {
         showToast(response.error || "Error al limpiar productos", "error");
       }
     } catch (error) {
-      console.error("Error limpiando productos:", error);
       showToast(
         "Error al limpiar productos. Verifica la conexión y vuelve a intentar.",
         "error"
@@ -343,8 +333,6 @@ const ImportData = ({ onRefresh }) => {
 
       if (response.success && response.data) {
         const products = response.data;
-
-        console.log("Productos con relaciones recibidos:", products);
 
         setMessage({
           type: "info",
@@ -463,14 +451,6 @@ const ImportData = ({ onRefresh }) => {
           (p) => Array.isArray(p.related_products) && p.related_products.length > 0
         ).length;
 
-        console.log("=== RESUMEN DE EXPORTACIÓN ===");
-        console.log(`Total productos: ${products.length}`);
-        console.log(`Con características: ${productsWithFeatures}`);
-        console.log(`Con aplicaciones: ${productsWithApplications}`);
-        console.log(`Con accesorios: ${productsWithAccessories}`);
-        console.log(`Con productos relacionados: ${productsWithRelated}`);
-        console.log("===============================");
-
         showToast(
           `Exportación completada exitosamente. ${products.length} productos exportados en formato Excel con todas sus relaciones.`,
           "success",
@@ -483,7 +463,6 @@ const ImportData = ({ onRefresh }) => {
         });
       }
     } catch (error) {
-      console.error("Error exportando datos:", error);
       setMessage({
         type: "error",
         text: "Error al exportar los datos del sistema. Verifica la conexión y vuelve a intentar.",
@@ -501,8 +480,6 @@ const ImportData = ({ onRefresh }) => {
 
       if (response.success && response.data) {
         const products = response.data.products || response.data || [];
-
-        console.log("Estructura de productos recibida:", products[0]);
 
         setMessage({
           type: "info",
@@ -587,7 +564,6 @@ const ImportData = ({ onRefresh }) => {
         });
       }
     } catch (error) {
-      console.error("Error exportando datos básicos:", error);
       setMessage({
         type: "error",
         text: "Error al exportar los datos básicos del sistema. Verifica la conexión y vuelve a intentar.",

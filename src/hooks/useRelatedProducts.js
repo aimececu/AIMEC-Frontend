@@ -19,14 +19,12 @@ export const useRelatedProducts = (productId) => {
    */
   const loadRelatedProducts = useCallback(async () => {
     if (!productId) return;
-    console.log(productId);
 
     setLoading(true);
     setError(null);
 
     try {
       const response = await relatedProductsEndpoints.getByProduct(productId);
-      console.log(response);
       
       if (response.success) {
         setMainProduct(response.data.mainProduct);
@@ -35,7 +33,6 @@ export const useRelatedProducts = (productId) => {
         setError('Error al cargar productos relacionados');
       }
     } catch (err) {
-      console.log('Error al cargar productos relacionados:', err);
       setError('Error al cargar productos relacionados');
     } finally {
       setLoading(false);
@@ -65,7 +62,6 @@ export const useRelatedProducts = (productId) => {
         return false;
       }
     } catch (err) {
-      console.log('Error al agregar producto relacionado:', err);
       const errorMessage = err.response?.data?.message || 'Error al agregar producto relacionado';
       showToast(errorMessage, 'error');
       return false;
@@ -107,7 +103,6 @@ export const useRelatedProducts = (productId) => {
         return false;
       }
     } catch (err) {
-      console.log('Error al agregar múltiples productos relacionados:', err);
       const errorMessage = err.response?.data?.message || 'Error al agregar productos relacionados';
       showToast(errorMessage, 'error');
       return false;
@@ -133,7 +128,6 @@ export const useRelatedProducts = (productId) => {
         return false;
       }
     } catch (err) {
-      console.log('Error al actualizar producto relacionado:', err);
       const errorMessage = err.response?.data?.message || 'Error al actualizar producto relacionado';
       showToast(errorMessage, 'error');
       return false;
@@ -158,7 +152,6 @@ export const useRelatedProducts = (productId) => {
         return false;
       }
     } catch (err) {
-      console.log('Error al eliminar producto relacionado:', err);
       const errorMessage = err.response?.data?.message || 'Error al eliminar producto relacionado';
       showToast(errorMessage, 'error');
       return false;

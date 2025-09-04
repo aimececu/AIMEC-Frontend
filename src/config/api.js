@@ -146,6 +146,18 @@ export const ENDPOINTS = {
     UPDATE: (id) => `/relatedProducts/${id}`,
     DELETE: (id) => `/relatedProducts/${id}`,
     BY_PRODUCT: (productId) => `/relatedProducts/product/${productId}`
+  },
+
+  // Email
+  EMAIL: {
+    CONTACT: '/email/contact',
+    TEST: '/email/test',
+    STATUS: '/email/status'
+  },
+
+  // Cotizaciones
+  QUOTATIONS: {
+    SEND: '/quotations/send'
   }
 };
 

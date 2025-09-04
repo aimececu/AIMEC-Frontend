@@ -32,14 +32,12 @@ const ProductDetail = () => {
   useEffect(() => {
     setActiveTab("specifications");
     setQuantity(1);
-    console.log("ProductDetail: ID cambiado a:", id);
   }, [id]);
 
   // Cargar el producto desde la API
   useEffect(() => {
     const loadProduct = async () => {
       try {
-        console.log("ProductDetail: Cargando producto con ID:", id);
         setLoading(true);
         setError(null); // Resetear error al cambiar de producto
         setProduct(null); // Resetear producto anterior
@@ -47,7 +45,6 @@ const ProductDetail = () => {
         const response = await productEndpoints.getProductById(id);
         if (response.success) {
           setProduct(response.data);
-          console.log("ProductDetail: Producto cargado:", response.data.name);
         } else {
           setError("Producto no encontrado");
         }
@@ -154,7 +151,6 @@ const ProductDetail = () => {
     dimensions,
   } = product;
 
-  console.log("ProductDetail: Producto cargado:", product);
 
   // Simplificar variables usando solo los campos que existen
   const image = main_image;

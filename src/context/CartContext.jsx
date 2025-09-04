@@ -147,18 +147,14 @@ export const CartProvider = ({ children }) => {
   // Cargar carrito desde localStorage al inicializar
   useEffect(() => {
     const savedCart = localStorage.getItem('cart');
-    console.log('CartContext: Cargando carrito desde localStorage:', savedCart);
     if (savedCart) {
       try {
         const parsedCart = JSON.parse(savedCart);
-        console.log('CartContext: Carrito parseado:', parsedCart);
         dispatch({ type: CART_ACTIONS.SET_CART, payload: { items: parsedCart } });
       } catch (error) {
         console.error('Error al cargar el carrito:', error);
       }
-    } else {
-      console.log('CartContext: No hay carrito guardado en localStorage');
-    }
+    } 
     setIsInitialized(true);
   }, []);
 
@@ -166,10 +162,7 @@ export const CartProvider = ({ children }) => {
   useEffect(() => {
     // Solo guardar después de la inicialización
     if (isInitialized) {
-      console.log('CartContext: Guardando carrito en localStorage:', state.items);
       localStorage.setItem('cart', JSON.stringify(state.items));
-    } else {
-      console.log('CartContext: No guardando durante inicialización');
     }
   }, [state.items, isInitialized]);
 

@@ -149,10 +149,7 @@ export const useProducts = (loadInitialData) => {
     }
   };
 
-  const handleEditProduct = (product) => {
-
-    console.log(product);
-    
+  const handleEditProduct = (product) => {    
     setEditingProduct(product);
     
     // Usar directamente los datos del backend (ya son texto)

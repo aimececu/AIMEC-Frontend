@@ -21,12 +21,10 @@ export const useAccessories = (productId) => {
     
     try {
       const response = await getAccessoriesByProduct(productId);
-      console.log('🔍 Response completa de accesorios:', response);
       
       if (response.success) {
         // Asegurar que siempre tengamos un array, incluso si está vacío
         const accessoriesData = response.data?.accessories || [];
-        console.log('🔍 Accesorios extraídos:', accessoriesData);
         
         setAccessories(Array.isArray(accessoriesData) ? accessoriesData : []);
       } else {

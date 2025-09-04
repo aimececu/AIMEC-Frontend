@@ -8,10 +8,13 @@ import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import ImageWithFallback from '../../components/ui/ImageWithFallback';
 import { useCart } from '../../context/CartContext';
+import { useToast } from '../../context/ToastContext';
+import quotationService from '../../services/quotationService';
 import clsx from 'clsx';
 
 const Quotation = () => {
   const { items, total, itemCount, removeFromCart, updateQuantity, clearCart } = useCart();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const [customerInfo, setCustomerInfo] = useState({
     name: '',
@@ -20,6 +23,7 @@ const Quotation = () => {
     company: '',
     message: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Debug: Log del estado del carrito
   console.log('Quotation: Estado del carrito:', { items, total, itemCount });
@@ -32,14 +36,68 @@ const Quotation = () => {
     }
   };
 
-  const handleSubmitQuotation = () => {
-    // Aquí se enviaría la cotización
-    console.log('Enviando cotización:', {
+  const handleSubmitQuotation = async () => {
+    // Validar que hay items en el carrito
+    if (!items || items.length === 0) {
+      showToast('No hay productos en la cotización', 'error');
+      return;
+    }
+
+    // Validar datos del cliente
+    const validation = quotationService.validateQuotationData({
       customerInfo,
       items,
       total
     });
-    alert('Cotización enviada exitosamente');
+
+    if (!validation.isValid) {
+      const firstError = Object.values(validation.errors)[0];
+      showToast(firstError, 'error');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Preparar datos de la cotización
+      const quotationData = {
+        customerInfo,
+        items: items.map(item => ({
+          productId: item.id,
+          productName: item.name,
+          quantity: item.quantity,
+          price: item.price,
+          total: item.quantity * item.price
+        })),
+        total,
+        notes: customerInfo.message
+      };
+
+      // Enviar cotización
+      const result = await quotationService.sendQuotation(quotationData);
+      
+      if (result.success) {
+        showToast(result.message, 'success');
+        
+        // Limpiar carrito y formulario
+        clearCart();
+        setCustomerInfo({
+          name: '',
+          email: '',
+          phone: '',
+          company: '',
+          message: ''
+        });
+        
+        // Redirigir a la página principal
+        navigate('/');
+      }
+    } catch (error) {
+      showToast(error.message, 'error');
+      console.error('Error enviando cotización:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (itemCount === 0) {
@@ -262,10 +320,11 @@ const Quotation = () => {
                   onClick={handleSubmitQuotation}
                   fullWidth
                   size="lg"
-                  disabled={!customerInfo.name || !customerInfo.email}
+                  loading={isSubmitting}
+                  disabled={!customerInfo.name || !customerInfo.email || isSubmitting}
+                  icon={!isSubmitting ? <Icon name="FiSend" className="mr-2" /> : null}
                 >
-                  <Icon name="FiSend" className="mr-2" />
-                  Enviar Cotización
+                  {isSubmitting ? 'Enviando...' : 'Enviar Cotización'}
                 </Button>
                 <Button
                   variant="outline"

@@ -9,8 +9,13 @@ import Icon from "../../components/ui/Icon";
 import Input from "../../components/ui/Input";
 import Section from "../../components/ui/Section";
 import TextArea from "../../components/ui/TextArea";
+import { useTheme } from "../../context/ThemeContext";
+import { useToast } from "../../context/ToastContext";
+import emailService from "../../services/emailService";
 
 const Home = () => {
+  const { colors } = useTheme();
+  const { showToast } = useToast();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -18,28 +23,52 @@ const Home = () => {
     company: "",
     message: "",
   });
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const handleInputChange = (value, name) => {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Aquí puedes agregar la lógica para enviar el formulario
-    console.log("Formulario enviado:", formData);
-    // Resetear formulario
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      company: "",
-      message: "",
-    });
-    alert("¡Gracias por tu mensaje! Te contactaremos pronto.");
+
+    // Validar formulario
+    const validation = emailService.validateContactForm(formData);
+    if (!validation.isValid) {
+      // Mostrar el primer error encontrado
+      const firstError = Object.values(validation.errors)[0];
+      showToast(firstError, "error");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Enviar correo
+      const result = await emailService.sendContactForm(formData);
+
+      if (result.success) {
+        // Mostrar mensaje de éxito
+        showToast(result.message, "success");
+
+        // Resetear formulario
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          company: "",
+          message: "",
+        });
+      }
+    } catch (error) {
+      // Mostrar mensaje de error
+      showToast(error.message, "error");
+      console.error("Error enviando formulario:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleWhatsApp = () => {
@@ -81,70 +110,80 @@ const Home = () => {
     {
       title: "Componentes Industriales",
       subtitle: "de Alta Calidad",
-      description: "Especialistas en instalación y programación de componentes industriales. Soluciones tecnológicas avanzadas para el sector industrial.",
-      backgroundImage: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+      description:
+        "Especialistas en instalación y programación de componentes industriales. Soluciones tecnológicas avanzadas para el sector industrial.",
+      backgroundImage:
+        "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
       overlay: "bg-gradient-to-r from-primary-600/80 to-primary-700/80",
       buttons: [
-                 {
-           text: "Ver Productos",
-           variant: "white",
-           size: "lg",
-           link: "/productos"
-         },
-        
-      ]
+        {
+          text: "Ver Productos",
+          variant: "white",
+          size: "lg",
+          link: "/productos",
+        },
+      ],
     },
     {
       title: "Instalación y Programación",
       subtitle: "Especialistas en Componentes",
-      description: "Instalamos y programamos componentes industriales con precisión técnica. Desde PLCs hasta variadores de frecuencia, garantizamos un funcionamiento óptimo.",
-      backgroundImage: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+      description:
+        "Instalamos y programamos componentes industriales con precisión técnica. Desde PLCs hasta variadores de frecuencia, garantizamos un funcionamiento óptimo.",
+      backgroundImage:
+        "https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
       overlay: "bg-gradient-to-r from-blue-600/80 to-blue-800/80",
       layout: "split", // Layout dividido
-      internalImage: "https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+      internalImage:
+        "https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
       imagePosition: "left", // Imagen a la izquierda
       buttons: [
         {
           text: "Servicios Técnicos",
           variant: "white",
           size: "lg",
-          link: "/servicios"
+          link: "/servicios",
         },
         {
           text: "Solicitar Cotización",
           variant: "outline",
           size: "lg",
           link: "/contacto",
-          className: "!border-white !text-white hover:!bg-white hover:!text-blue-600"
-        }
-      ]
+          className:
+            "!border-white !text-white hover:!bg-white hover:!text-blue-600",
+        },
+      ],
     },
     {
       title: "Siemens",
       subtitle: "Tecnología de Vanguardia",
-      description: "Distribuidor autorizado de productos Siemens. PLCs, variadores de frecuencia, HMI y más componentes industriales de la más alta calidad.",
-      backgroundImage: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+      description:
+        "Distribuidor autorizado de productos Siemens. PLCs, variadores de frecuencia, HMI y más componentes industriales de la más alta calidad.",
+      backgroundImage:
+        "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
       overlay: "bg-gradient-to-r from-blue-600/80 to-blue-800/80",
       layout: "split", // Layout dividido
-      internalImage: "https://automaq.pe/w_files/img/producto/6sl3225_0be31_5ua0hd_1595563351.jpg",
+      internalImage:
+        "https://automaq.pe/w_files/img/producto/6sl3225_0be31_5ua0hd_1595563351.jpg",
       imagePosition: "left", // Imagen a la izquierda
-      internalImageClassName: "max-h-64 md:max-h-96 lg:max-h-[500px] rounded-lg shadow-2xl",
+      internalImageClassName:
+        "max-h-64 md:max-h-96 lg:max-h-[500px] rounded-lg shadow-2xl",
       buttons: [
         {
           text: "Ver Productos Siemens",
           variant: "white",
           size: "lg",
-          link: "/productos"
+          link: "/productos",
         },
         {
           text: "Solicitar Cotización",
           variant: "outline",
           size: "lg",
           link: "/contacto",
-          className: "!border-white !text-white hover:!bg-white hover:!text-blue-600"
-        }
-      ]
-    }
+          className:
+            "!border-white !text-white hover:!bg-white hover:!text-blue-600",
+        },
+      ],
+    },
   ];
 
   const brands = [
@@ -188,7 +227,7 @@ const Home = () => {
         padding="none"
         className="h-[calc(100vh-4rem)] min-h-[536px]"
       >
-        <HeroSlider 
+        <HeroSlider
           slides={heroSlides}
           autoPlay={true}
           interval={6000}
@@ -235,42 +274,41 @@ const Home = () => {
         </Container>
       </Section>
 
-                                                       {/* Brands Section */}
-         <Section background="light">
-           <Container>
-             <div className="text-center mb-12">
-               <Heading level={2} className="mb-4">
-                 Marcas de Confianza
-               </Heading>
-               <p className="text-lg text-secondary-600 dark:text-secondary-300 max-w-3xl mx-auto">
-                 Distribuidores autorizados de las marcas líderes en automatización industrial
-               </p>
-             </div>
+      {/* Brands Section */}
+      <Section background="light">
+        <Container>
+          <div className="text-center mb-12">
+            <Heading level={2} className="mb-4">
+              Marcas de Confianza
+            </Heading>
+            <p className="text-lg text-secondary-600 dark:text-secondary-300 max-w-3xl mx-auto">
+              Distribuidores autorizados de las marcas líderes en automatización
+              industrial
+            </p>
+          </div>
 
-                           {/* Simple Brands Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 mb-8">
-                {brands.map((brand, index) => (
-                  <div
-                    key={index}
-                    className="group flex flex-col items-center justify-center p-4 hover:shadow-lg transition-all duration-300"
-                  >
-                    <div className="w-16 h-16 mb-3 flex items-center justify-center">
-                      <img
-                        src={brand.logo}
-                        alt={`${brand.name} logo`}
-                        className="max-w-full max-h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
-                      />
-                    </div>
-                    <h3 className="font-medium text-secondary-900 dark:text-white text-sm text-center">
-                      {brand.name}
-                    </h3>
-                  </div>
-                ))}
+          {/* Simple Brands Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 mb-8">
+            {brands.map((brand, index) => (
+              <div
+                key={index}
+                className="group flex flex-col items-center justify-center p-4 hover:shadow-lg transition-all duration-300"
+              >
+                <div className="w-16 h-16 mb-3 flex items-center justify-center">
+                  <img
+                    src={brand.logo}
+                    alt={`${brand.name} logo`}
+                    className="max-w-full max-h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
+                  />
+                </div>
+                <h3 className="font-medium text-secondary-900 dark:text-white text-sm text-center">
+                  {brand.name}
+                </h3>
               </div>
-
-          
-           </Container>
-         </Section>
+            ))}
+          </div>
+        </Container>
+      </Section>
 
       {/* CTA Section */}
       <Section background="primary">
@@ -283,9 +321,16 @@ const Home = () => {
               Descubre nuestra amplia gama de componentes industriales y
               servicios técnicos especializados.
             </p>
-                         <Button variant="white" size="lg" as={Link} to="/productos">
-               Explorar Productos
-             </Button>
+            <Button
+              variant="primary"
+              mainColor={colors.primary[500]}
+              textColor={colors.primary[100]}
+              size="lg"
+              as={Link}
+              to="/productos"
+            >
+              Explorar Productos
+            </Button>
           </div>
         </Container>
       </Section>
@@ -315,7 +360,7 @@ const Home = () => {
                     label="Nombre completo *"
                     name="name"
                     value={formData.name}
-                    onChange={handleInputChange}
+                    onChange={(value) => handleInputChange(value, "name")}
                     required
                     placeholder="Tu nombre"
                   />
@@ -324,7 +369,7 @@ const Home = () => {
                     type="email"
                     name="email"
                     value={formData.email}
-                    onChange={handleInputChange}
+                    onChange={(value) => handleInputChange(value, "email")}
                     required
                     placeholder="tu@email.com"
                   />
@@ -335,14 +380,14 @@ const Home = () => {
                     type="tel"
                     name="phone"
                     value={formData.phone}
-                    onChange={handleInputChange}
+                    onChange={(value) => handleInputChange(value, "phone")}
                     placeholder="+1 234 567 890"
                   />
                   <Input
                     label="Empresa"
                     name="company"
                     value={formData.company}
-                    onChange={handleInputChange}
+                    onChange={(value) => handleInputChange(value, "company")}
                     placeholder="Nombre de tu empresa"
                   />
                 </div>
@@ -350,7 +395,7 @@ const Home = () => {
                   label="Mensaje *"
                   name="message"
                   value={formData.message}
-                  onChange={handleInputChange}
+                  onChange={(value) => handleInputChange(value, "message")}
                   required
                   rows="4"
                   placeholder="Cuéntanos sobre tu proyecto o consulta..."
@@ -360,9 +405,11 @@ const Home = () => {
                   variant="primary"
                   size="lg"
                   fullWidth
-                  icon={<Icon name="FiSend" />}
+                  loading={isSubmitting}
+                  disabled={isSubmitting}
+                  icon={!isSubmitting ? <Icon name="FiSend" /> : null}
                 >
-                  Enviar mensaje
+                  {isSubmitting ? "Enviando..." : "Enviar mensaje"}
                 </Button>
               </form>
             </Card>
@@ -391,7 +438,7 @@ const Home = () => {
                         Email
                       </p>
                       <p className="text-blue-700 dark:text-blue-300">
-                        info@aimec.com
+                        info@aimec-ec.com
                       </p>
                     </div>
                   </div>
@@ -417,9 +464,7 @@ const Home = () => {
                         Dirección
                       </p>
                       <p className="text-blue-700 dark:text-blue-300">
-                        Ciudad Industrial, País
-                        <br />
-                        Zona Industrial Norte
+                        Cuenca, Ecuador
                       </p>
                     </div>
                   </div>
@@ -439,7 +484,9 @@ const Home = () => {
                   a tus consultas.
                 </p>
                 <Button
-                  variant="whatsapp"
+                  variant="primary"
+                  mainColor={"green"}
+                  textColor={"#fff"}
                   size="xl"
                   fullWidth
                   icon={<Icon name="FiMessageCircle" size="lg" />}

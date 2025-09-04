@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Button from "../../components/ui/Button";
 import Card from "../../components/ui/Card";
 import Container from "../../components/ui/Container";
@@ -16,6 +16,7 @@ import emailService from "../../services/emailService";
 const Home = () => {
   const { colors } = useTheme();
   const { showToast } = useToast();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -147,7 +148,7 @@ const Home = () => {
           text: "Solicitar Cotización",
           variant: "outline",
           size: "lg",
-          link: "/contacto",
+          link: "#contacto",
           className:
             "!border-white !text-white hover:!bg-white hover:!text-blue-600",
         },
@@ -326,8 +327,7 @@ const Home = () => {
               mainColor={colors.primary[500]}
               textColor={colors.primary[100]}
               size="lg"
-              as={Link}
-              to="/productos"
+              onClick={() => navigate("/productos")}
             >
               Explorar Productos
             </Button>

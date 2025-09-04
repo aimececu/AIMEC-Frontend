@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Button from './Button';
 import Icon from './Icon';
 
@@ -66,6 +66,7 @@ const HeroSlider = ({
       className={`relative overflow-hidden ${className}`}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
+      style={{ isolation: 'isolate' }}
     >
       {/* Slides Container */}
       <div className="relative h-full">
@@ -73,7 +74,7 @@ const HeroSlider = ({
           <div
             key={index}
             className={`absolute inset-0 transition-opacity duration-300 ${
-              index === currentSlide ? 'opacity-100' : 'opacity-0'
+              index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
             }`}
           >
             {/* Background Image */}
@@ -92,18 +93,20 @@ const HeroSlider = ({
             )}
 
             {/* Content Container */}
-            <div className={`relative h-full flex items-center ${slide.contentPosition || 'justify-center'}`}>
+            <div className={`relative z-20 h-full flex items-center ${slide.contentPosition || 'justify-center'}`}>
               <div className={`container mx-auto px-4 ${slide.contentAlignment || 'text-center'}`}>
                 {/* Glass Effect Container */}
                 {slide.glassEffect && (
-                  <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl p-8 md:p-12 max-w-4xl mx-auto">
+                  <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl p-8 md:p-12 max-w-4xl mx-auto relative z-30">
                     <HeroSlideContent slide={slide} />
                   </div>
                 )}
 
                 {/* Regular Content */}
                 {!slide.glassEffect && (
-                  <HeroSlideContent slide={slide} />
+                  <div className="relative z-30">
+                    <HeroSlideContent slide={slide} />
+                  </div>
                 )}
               </div>
             </div>
@@ -165,6 +168,7 @@ const HeroSlider = ({
 
 // Separate component for slide content
 const HeroSlideContent = ({ slide }) => {
+  const navigate = useNavigate();
   // Si el slide tiene un layout personalizado, usarlo
   if (slide.layout === 'split') {
     return (
@@ -206,16 +210,14 @@ const HeroSlideContent = ({ slide }) => {
 
             {/* Buttons */}
             {slide.buttons && slide.buttons.length > 0 && (
-              <div className={`flex flex-col sm:flex-row gap-4 justify-center ${slide.buttonsPosition || 'mt-8'}`}>
+              <div className={`flex flex-col sm:flex-row gap-4 justify-center ${slide.buttonsPosition || 'mt-8'} relative z-40`}>
                 {slide.buttons.map((button, index) => (
                   <Button
                     key={index}
                     variant={button.variant || 'primary'}
                     size={button.size || 'lg'}
-                    as={button.link ? Link : 'button'}
-                    to={button.link}
-                    onClick={button.onClick}
-                    className={button.className}
+                    onClick={button.link ? () => navigate(button.link) : button.onClick}
+                    className={`${button.className || ''} relative z-50`}
                     icon={button.icon}
                     fullWidth={button.fullWidth}
                   >
@@ -267,16 +269,14 @@ const HeroSlideContent = ({ slide }) => {
 
       {/* Buttons */}
       {slide.buttons && slide.buttons.length > 0 && (
-        <div className={`flex flex-col sm:flex-row gap-4 justify-center ${slide.buttonsPosition || 'mt-8'}`}>
+        <div className={`flex flex-col sm:flex-row gap-4 justify-center ${slide.buttonsPosition || 'mt-8'} relative z-40`}>
           {slide.buttons.map((button, index) => (
             <Button
               key={index}
               variant={button.variant || 'primary'}
               size={button.size || 'lg'}
-              as={button.link ? Link : 'button'}
-              to={button.link}
-              onClick={button.onClick}
-              className={button.className}
+              onClick={button.link ? () => navigate(button.link) : button.onClick}
+              className={`${button.className || ''} relative z-50`}
               icon={button.icon}
               fullWidth={button.fullWidth}
             >

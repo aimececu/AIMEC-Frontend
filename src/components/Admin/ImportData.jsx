@@ -367,7 +367,7 @@ const ImportData = ({ onRefresh }) => {
           { header: "Corriente", key: "corriente", width: 15 },
           { header: "Comunicación", key: "comunicacion", width: 15 },
           { header: "Alimentación", key: "alimentacion", width: 15 },
-          { header: "Imagen", key: "main_image", width: 30 },
+          { header: "Imagen", key: "imagen", width: 30 },
           { header: "Características", key: "caracteristicas", width: 50 },
           { header: "Aplicaciones", key: "aplicaciones", width: 50 },
           { header: "Accesorios", key: "accesorios", width: 30 },

@@ -52,7 +52,6 @@ const ImportData = ({ onRefresh }) => {
     setUploadProgress(10);
 
     try {
-
       // Crear un AbortController para poder cancelar la operación
       const abortController = new AbortController();
       setUploadAbortController(abortController);
@@ -330,6 +329,8 @@ const ImportData = ({ onRefresh }) => {
 
       // Usar el nuevo endpoint que obtiene todo en una sola llamada
       const response = await productEndpoints.exportProductsWithRelations();
+      console.log(response.data);
+      
 
       if (response.success && response.data) {
         const products = response.data;
@@ -340,54 +341,72 @@ const ImportData = ({ onRefresh }) => {
         });
 
         // Importar ExcelJS dinámicamente
-        const ExcelJS = await import('exceljs');
+        const ExcelJS = await import("exceljs");
 
         // Crear un nuevo workbook
         const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet('Productos');
+        const worksheet = workbook.addWorksheet("Productos");
 
         // Definir las columnas
         worksheet.columns = [
-          { header: 'SKU', key: 'sku', width: 20 },
-          { header: 'Nombre', key: 'nombre', width: 30 },
-          { header: 'Descripción', key: 'descripcion', width: 40 },
-          { header: 'Marca', key: 'marca', width: 15 },
-          { header: 'Categoría', key: 'categoria', width: 20 },
-          { header: 'Subcategoría', key: 'subcategoria', width: 20 },
-          { header: 'Precio', key: 'precio', width: 12 },
-          { header: 'Stock', key: 'stock', width: 10 },
-          { header: 'Stock Mínimo', key: 'stock_minimo', width: 12 },
-          { header: 'Peso', key: 'peso', width: 10 },
-          { header: 'Dimensiones', key: 'dimensiones', width: 15 },
-          { header: 'Imagen', key: 'imagen', width: 30 },
-          { header: 'Características', key: 'caracteristicas', width: 50 },
-          { header: 'Aplicaciones', key: 'aplicaciones', width: 50 },
-          { header: 'Accesorios', key: 'accesorios', width: 30 },
-          { header: 'Productos Relacionados', key: 'productos_relacionados', width: 40 }
+          { header: "SKU", key: "sku", width: 20 },
+          { header: "SKU EC", key: "sku_ec", width: 20 },
+          { header: "Nombre", key: "nombre", width: 30 },
+          { header: "Descripción", key: "descripcion", width: 40 },
+          { header: "Marca", key: "marca", width: 15 },
+          { header: "Categoria", key: "categoria", width: 20 },
+          { header: "Subcategoria", key: "subcategoria", width: 20 },
+          { header: "Precio", key: "precio", width: 12 },
+          { header: "Stock", key: "stock", width: 10 },
+          { header: "Stock Mínimo", key: "stock_minimo", width: 12 },
+          { header: "Peso", key: "peso", width: 10 },
+          { header: "Dimensiones", key: "dimensiones", width: 15 },
+          { header: "Potencia (kW)", key: "potencia_kw", width: 15 },
+          { header: "Voltaje", key: "voltaje", width: 15 },
+          { header: "Frame Size", key: "frame_size", width: 15 },
+          { header: "Corriente", key: "corriente", width: 15 },
+          { header: "Comunicación", key: "comunicacion", width: 15 },
+          { header: "Alimentación", key: "alimentacion", width: 15 },
+          { header: "Imagen", key: "main_image", width: 30 },
+          { header: "Características", key: "caracteristicas", width: 50 },
+          { header: "Aplicaciones", key: "aplicaciones", width: 50 },
+          { header: "Accesorios", key: "accesorios", width: 30 },
+          {
+            header: "Productos relacionados",
+            key: "productos_relacionados",
+            width: 40,
+          },
         ];
 
         // Estilizar la fila de encabezados
         worksheet.getRow(1).font = { bold: true };
         worksheet.getRow(1).fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'FFE6F3FF' }
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FFE6F3FF" },
         };
 
         // Agregar los datos
         products.forEach((product) => {
           worksheet.addRow({
             sku: product.sku || "",
+            sku_ec: product.sku_ec || "",
             nombre: product.name || "",
             descripcion: product.description || "",
             marca: product.brand || "",
             categoria: product.category || "",
-            subcategoría: product.subcategory || "",
+            subcategoria: product.subcategory || "",
             precio: product.price || "",
             stock: product.stock_quantity || "",
             stock_minimo: product.min_stock_level || "",
             peso: product.weight || "",
             dimensiones: product.dimensions || "",
+            potencia_kw: product.potencia_kw || "",
+            voltaje: product.voltaje || "",
+            frame_size: product.frame_size || "",
+            corriente: product.corriente || "",
+            comunicacion: product.comunicacion || "",
+            alimentacion: product.alimentacion || "",
             imagen: product.main_image || "",
             caracteristicas: Array.isArray(product.features)
               ? product.features.join(";")
@@ -409,31 +428,33 @@ const ImportData = ({ onRefresh }) => {
         // Aplicar bordes a todas las celdas con datos
         const rowCount = worksheet.rowCount;
         const colCount = worksheet.columnCount;
-        
+
         for (let row = 1; row <= rowCount; row++) {
           for (let col = 1; col <= colCount; col++) {
             const cell = worksheet.getCell(row, col);
             cell.border = {
-              top: { style: 'thin' },
-              left: { style: 'thin' },
-              bottom: { style: 'thin' },
-              right: { style: 'thin' }
+              top: { style: "thin" },
+              left: { style: "thin" },
+              bottom: { style: "thin" },
+              right: { style: "thin" },
             };
           }
         }
 
         // Generar el archivo Excel
         const buffer = await workbook.xlsx.writeBuffer();
-        
+
         // Crear y descargar el archivo
         const blob = new Blob([buffer], {
-          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         });
-        
+
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         a.href = url;
-        a.download = `productos_sistema_${new Date().toISOString().split('T')[0]}.xlsx`;
+        a.download = `productos_sistema_${
+          new Date().toISOString().split("T")[0]
+        }.xlsx`;
         a.click();
         window.URL.revokeObjectURL(url);
 
@@ -448,7 +469,8 @@ const ImportData = ({ onRefresh }) => {
           (p) => Array.isArray(p.accessories) && p.accessories.length > 0
         ).length;
         const productsWithRelated = products.filter(
-          (p) => Array.isArray(p.related_products) && p.related_products.length > 0
+          (p) =>
+            Array.isArray(p.related_products) && p.related_products.length > 0
         ).length;
 
         showToast(
@@ -896,7 +918,7 @@ const ImportData = ({ onRefresh }) => {
           </div>
         </Card>
       )}
-      
+
       {/* Modal de confirmación para limpiar productos */}
       <Modal
         isOpen={showConfirmModal}

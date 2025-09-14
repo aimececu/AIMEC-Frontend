@@ -77,14 +77,6 @@ const Footer = () => {
                     Productos
                   </Link>
                 </li>
-                <li>
-                  <Link
-                    to="/admin"
-                    className="text-gray-300 hover:text-white transition-colors duration-200 text-sm hover:translate-x-1 inline-block"
-                  >
-                    Administración
-                  </Link>
-                </li>
               </ul>
             </div>
 

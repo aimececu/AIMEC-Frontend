@@ -53,7 +53,7 @@ const Login = () => {
           <Card padding="xl">
             <div className="text-center mb-6">
               <Heading level={2} className="mb-2">
-                Administración
+                Iniciar sesión
               </Heading>
               <p className="text-secondary-600 dark:text-secondary-300">
                 Ingresa tus credenciales

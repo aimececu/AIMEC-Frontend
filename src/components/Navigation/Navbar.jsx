@@ -17,10 +17,6 @@ const Navbar = () => {
     { path: '/productos', label: 'Productos' },
   ];
 
-  // Agregar enlace de administración solo si está autenticado
-  if (isAuthenticated) {
-    navItems.push({ path: '/admin', label: 'Administración' });
-  }
 
   const isActive = (path) => location.pathname === path;
 

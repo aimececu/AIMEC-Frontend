@@ -82,48 +82,68 @@ const Home = () => {
 
   const features = [
     {
-      icon: <Icon name="FiTool" size="xl" />,
-      title: "Instalación Profesional",
+      icon: (
+        <img
+          src="/features/1.svg"
+          alt="PLC"
+          style={{ height: "55px", filter: "none" }}
+          className="svg-primary"
+        />
+      ),
+      title: "Programación PLC y Sistemas SCADA",
       description:
-        "Equipo técnico especializado en instalación de componentes industriales con años de experiencia.",
+        "Programación de PLC y HMI, sistemas SCADA Siemens y comunicación de equipos industriales.",
     },
     {
-      icon: <Icon name="FiUsers" size="xl" />,
-      title: "Soporte Técnico",
+      icon: (
+        <img
+          src="/features/2.svg"
+          alt="Planos"
+          style={{ height: "55px", filter: "none" }}
+          className="svg-primary"
+        />
+      ),
+      title: "Diseño y levantamiento de planos electricos",
       description:
-        "Asistencia técnica 24/7 para resolver cualquier problema con nuestros productos y servicios.",
+        "Elaboración de planos eléctricos detallados y levantamiento de instalaciones existentes para proyectos industriales.",
     },
     {
-      icon: <Icon name="FiTruck" size="xl" />,
-      title: "Entrega Rápida",
+      icon: (
+        <img
+          src="/features/3.svg"
+          alt="Tableros"
+          style={{ height: "55px", filter: "none" }}
+          className="svg-primary"
+        />
+      ),
+      title: "Diseño de Tableros Eléctricos",
       description:
-        "Envío rápido y seguro a cualquier parte del país con seguimiento en tiempo real.",
+        "Diseño y construcción de tableros eléctricos de control y distribución de energía para instalaciones industriales.",
     },
     {
-      icon: <Icon name="FiAward" size="xl" />,
-      title: "Calidad Garantizada",
+      icon: (
+        <img
+          src="/features/4.svg"
+          alt="Motor"
+          style={{ height: "55px", filter: "none" }}
+          className="svg-primary"
+        />
+      ),
+      title: "Control y Arranque de Motores",
       description:
-        "Todos nuestros productos cuentan con garantía y certificaciones de calidad internacional.",
+        "Servicio especializado en control de motores eléctricos DC y AC mediante el uso de variadores y drives de distintas gamas y fabricantes.",
     },
   ];
 
   const heroSlides = [
     {
-      title: "Componentes Industriales",
-      subtitle: "de Alta Calidad",
+      title: "Ingeniería mecatrónica",
+      subtitle: "Automatización y Control Industrial",
       description:
-        "Especialistas en instalación y programación de componentes industriales. Soluciones tecnológicas avanzadas para el sector industrial.",
+        "Especialistas en ingeniería mecatrónica. Soluciones tecnológicas avanzadas para el sector industrial.",
       backgroundImage:
         "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
       overlay: "bg-gradient-to-r from-primary-600/80 to-primary-700/80",
-      buttons: [
-        {
-          text: "Ver Productos",
-          variant: "white",
-          size: "lg",
-          link: "/productos",
-        },
-      ],
     },
     {
       title: "Instalación y Programación",
@@ -134,25 +154,8 @@ const Home = () => {
         "https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
       overlay: "bg-gradient-to-r from-blue-600/80 to-blue-800/80",
       layout: "split", // Layout dividido
-      internalImage:
-        "https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+
       imagePosition: "left", // Imagen a la izquierda
-      buttons: [
-        {
-          text: "Servicios Técnicos",
-          variant: "white",
-          size: "lg",
-          link: "/servicios",
-        },
-        {
-          text: "Solicitar Cotización",
-          variant: "outline",
-          size: "lg",
-          link: "#contacto",
-          className:
-            "!border-white !text-white hover:!bg-white hover:!text-blue-600",
-        },
-      ],
     },
     {
       title: "Siemens",
@@ -190,33 +193,38 @@ const Home = () => {
   const brands = [
     {
       name: "Siemens",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Siemens_logo.svg/2560px-Siemens_logo.svg.png",
+      logo: "/siemens-logo.png",
       category: "Automatización Industrial",
     },
     {
-      name: "Allen Bradley",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Rockwell_Automation_logo.svg/2560px-Rockwell_Automation_logo.svg.png",
+      name: "Delta",
+      logo: "/delta-logo.webp",
       category: "Control Industrial",
     },
     {
-      name: "Schneider Electric",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Schneider_Electric_2007.svg/2560px-Schneider_Electric_2007.svg.png",
+      name: "Allen Bradley",
+      logo: "/allen-bradley-logo.png",
       category: "Electrónica Industrial",
     },
     {
-      name: "Omron",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Omron_logo.svg/2560px-Omron_logo.svg.png",
-      category: "Sensores y Control",
+      name: "Schneider Electric",
+      logo: "/schneider-electric-logo.png",
+      category: "Electrónica Industrial",
     },
     {
-      name: "Mitsubishi",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Mitsubishi_logo.svg/2560px-Mitsubishi_logo.svg.png",
-      category: "Automatización",
+      name: "LS Electric",
+      logo: "/ls-electric-logo.webp",
+      category: "Electrónica Industrial",
     },
     {
       name: "ABB",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/ABB_logo.svg/2560px-ABB_logo.svg.png",
-      category: "Tecnología Industrial",
+      logo: "/abb-logo.png",
+      category: "Electrónica Industrial",
+    },
+    {
+      name: "Chint",
+      logo: "/chint-logo.png",
+      category: "Electrónica Industrial",
     },
   ];
 
@@ -260,10 +268,10 @@ const Home = () => {
                 hover
                 className="text-center"
               >
-                <div className="text-primary-600 dark:text-primary-400 mb-4 flex justify-center">
+                <div className="text-primary-600 dark:text-primary-400 mb-2 flex justify-center">
                   {feature.icon}
                 </div>
-                <Heading level={3} className="mb-2">
+                <Heading level={4} className="mb-2">
                   {feature.title}
                 </Heading>
                 <p className="text-secondary-600 dark:text-secondary-300">
@@ -289,11 +297,11 @@ const Home = () => {
           </div>
 
           {/* Simple Brands Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mb-8">
             {brands.map((brand, index) => (
               <div
                 key={index}
-                className="group flex flex-col items-center justify-center p-4 hover:shadow-lg transition-all duration-300"
+                className="group flex flex-col items-center justify-center p-4 hover:shadow-lg transition-all duration-300 rounded-md"
               >
                 <div className="w-16 h-16 mb-3 flex items-center justify-center">
                   <img

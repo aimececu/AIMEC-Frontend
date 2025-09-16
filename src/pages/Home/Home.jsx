@@ -249,32 +249,40 @@ const Home = () => {
       {/* Features Section */}
       <Section background="default">
         <Container>
-          <div className="text-center mb-12">
-            <Heading level={2} className="mb-4">
+          <div className="text-center mb-8 md:mb-12">
+            <Heading level={2} className="mb-3 md:mb-4">
               ¿Por qué elegirnos?
             </Heading>
-            <p className="text-lg text-secondary-600 dark:text-secondary-300 max-w-2xl mx-auto">
+            <p className="text-base md:text-lg text-secondary-600 dark:text-secondary-300 max-w-2xl mx-auto">
               Ofrecemos soluciones integrales con la más alta calidad y servicio
               técnico especializado.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
             {features.map((feature, index) => (
               <Card
                 key={index}
                 variant="light"
-                padding="lg"
+                padding="md"
                 hover
                 className="text-center"
               >
                 <div className="text-primary-600 dark:text-primary-400 mb-2 flex justify-center">
-                  {feature.icon}
+                  <div className="w-12 h-12 md:w-14 md:h-14 flex items-center justify-center">
+                    {React.cloneElement(feature.icon, {
+                      style: { 
+                        height: "40px", 
+                        filter: "none",
+                        ...feature.icon.props.style 
+                      }
+                    })}
+                  </div>
                 </div>
-                <Heading level={4} className="mb-2">
+                <Heading level={4} className="mb-2 text-base md:text-lg">
                   {feature.title}
                 </Heading>
-                <p className="text-secondary-600 dark:text-secondary-300">
+                <p className="text-sm md:text-base text-secondary-600 dark:text-secondary-300 leading-relaxed">
                   {feature.description}
                 </p>
               </Card>
@@ -286,31 +294,31 @@ const Home = () => {
       {/* Brands Section */}
       <Section background="light">
         <Container>
-          <div className="text-center mb-12">
-            <Heading level={2} className="mb-4">
+          <div className="text-center mb-8 md:mb-12">
+            <Heading level={2} className="mb-3 md:mb-4">
               Marcas de Confianza
             </Heading>
-            <p className="text-lg text-secondary-600 dark:text-secondary-300 max-w-3xl mx-auto">
+            <p className="text-base md:text-lg text-secondary-600 dark:text-secondary-300 max-w-3xl mx-auto">
               Distribuidores autorizados de las marcas líderes en automatización
               industrial
             </p>
           </div>
 
           {/* Simple Brands Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8 mb-8">
             {brands.map((brand, index) => (
               <div
                 key={index}
-                className="group flex flex-col items-center justify-center p-4 hover:shadow-lg transition-all duration-300 rounded-md"
+                className="group flex flex-col items-center justify-center p-3 md:p-4 hover:shadow-lg transition-all duration-300 rounded-md"
               >
-                <div className="w-16 h-16 mb-3 flex items-center justify-center">
+                <div className="w-20 h-20 md:w-16 md:h-16 mb-2 md:mb-3 flex items-center justify-center">
                   <img
                     src={brand.logo}
                     alt={`${brand.name} logo`}
-                    className="max-w-full max-h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
+                    className="max-w-full max-h-full object-contain filter-none md:filter md:grayscale md:group-hover:grayscale-0 transition-all duration-300"
                   />
                 </div>
-                <h3 className="font-medium text-secondary-900 dark:text-white text-sm text-center">
+                <h3 className="font-medium text-secondary-900 dark:text-white text-xs md:text-sm text-center leading-tight">
                   {brand.name}
                 </h3>
               </div>

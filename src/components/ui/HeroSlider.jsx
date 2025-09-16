@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from './Button';
 import Icon from './Icon';
@@ -13,6 +13,9 @@ const HeroSlider = ({
 }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+  const sliderRef = useRef(null);
 
   // Auto-play functionality
   useEffect(() => {
@@ -59,13 +62,41 @@ const HeroSlider = ({
     setTimeout(() => setIsTransitioning(false), 300);
   }, [currentSlide, isTransitioning]);
 
+  // Touch handlers for mobile swipe
+  const handleTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (isLeftSwipe) {
+      nextSlide();
+    } else if (isRightSwipe) {
+      prevSlide();
+    }
+  };
+
   if (!slides.length) return null;
 
   return (
     <div 
+      ref={sliderRef}
       className={`relative overflow-hidden ${className}`}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
       style={{ isolation: 'isolate' }}
     >
       {/* Slides Container */}
@@ -119,22 +150,24 @@ const HeroSlider = ({
         <>
           <button
             onClick={prevSlide}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-full p-3 transition-all duration-300 group"
+            className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 bg-white/30 hover:bg-white/40 backdrop-blur-sm border border-white/40 rounded-full p-2 md:p-3 transition-all duration-300 group touch-manipulation"
             aria-label="Slide anterior"
+            disabled={isTransitioning}
           >
             <Icon 
               name="FiChevronLeft" 
-              className="text-white text-xl group-hover:scale-110 transition-transform" 
+              className="text-white text-lg md:text-xl group-hover:scale-110 transition-transform" 
             />
           </button>
           <button
             onClick={nextSlide}
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-full p-3 transition-all duration-300 group"
+            className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 bg-white/30 hover:bg-white/40 backdrop-blur-sm border border-white/40 rounded-full p-2 md:p-3 transition-all duration-300 group touch-manipulation"
             aria-label="Slide siguiente"
+            disabled={isTransitioning}
           >
             <Icon 
               name="FiChevronRight" 
-              className="text-white text-xl group-hover:scale-110 transition-transform" 
+              className="text-white text-lg md:text-xl group-hover:scale-110 transition-transform" 
             />
           </button>
         </>
@@ -142,24 +175,25 @@ const HeroSlider = ({
 
       {/* Dots Navigation */}
       {showDots && slides.length > 1 && (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex space-x-2">
+        <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-20 flex space-x-2 md:space-x-3">
           {slides.map((_, index) => (
             <button
               key={index}
               onClick={() => goToSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
+              className={`w-3 h-3 md:w-4 md:h-4 rounded-full transition-all duration-300 touch-manipulation ${
                 index === currentSlide 
                   ? 'bg-white scale-125' 
-                  : 'bg-white/50 hover:bg-white/75'
+                  : 'bg-white/60 hover:bg-white/80'
               }`}
               aria-label={`Ir al slide ${index + 1}`}
+              disabled={isTransitioning}
             />
           ))}
         </div>
       )}
 
       {/* Slide Counter */}
-      <div className="absolute top-6 right-6 z-10 bg-black/20 backdrop-blur-sm border border-white/30 rounded-full px-3 py-1 text-white text-sm">
+      <div className="absolute top-4 right-4 md:top-6 md:right-6 z-20 bg-black/30 backdrop-blur-sm border border-white/40 rounded-full px-2 py-1 md:px-3 md:py-1 text-white text-xs md:text-sm font-medium">
         {currentSlide + 1} / {slides.length}
       </div>
     </div>

@@ -52,8 +52,8 @@ const Navbar = () => {
             ))}
           </div>
 
-          {/* Theme Toggle, Cart & Mobile Menu Button */}
-          <div className="flex items-center space-x-4">
+          {/* Desktop: Theme Toggle, Login/User Menu & Cart */}
+          <div className="hidden md:flex items-center space-x-4">
             {/* Cart Widget */}
             <CartWidget />
             
@@ -68,7 +68,7 @@ const Navbar = () => {
             {/* Login/User Menu */}
             {isAuthenticated ? (
               <div className="flex items-center gap-2">
-                <span className="text-sm text-secondary-600 dark:text-secondary-300 hidden sm:block">
+                <span className="text-sm text-secondary-600 dark:text-secondary-300">
                   {user?.name}
                 </span>
                 <Link
@@ -88,11 +88,17 @@ const Navbar = () => {
                 <Icon name="FiLogIn" size="sm" />
               </Link>
             )}
+          </div>
 
+          {/* Mobile: Only Cart & Menu Button */}
+          <div className="flex md:hidden items-center space-x-4">
+            {/* Cart Widget */}
+            <CartWidget />
+            
             {/* Mobile menu button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 rounded-lg bg-secondary-100 dark:bg-secondary-700 text-secondary-600 dark:text-secondary-300 hover:bg-secondary-200 dark:hover:bg-secondary-600 transition-colors duration-200"
+              className="p-2 rounded-lg bg-secondary-100 dark:bg-secondary-700 text-secondary-600 dark:text-secondary-300 hover:bg-secondary-200 dark:hover:bg-secondary-600 transition-colors duration-200"
               aria-label="Toggle menu"
             >
               {isMenuOpen ? <Icon name="FiX" /> : <Icon name="FiMenu" />}
@@ -103,14 +109,15 @@ const Navbar = () => {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-secondary-200 dark:border-secondary-700">
-            <div className="flex flex-col space-y-4">
+            <div className="flex flex-col space-y-2">
+              {/* Navigation Items */}
               {navItems.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
                   onClick={() => setIsMenuOpen(false)}
                   className={clsx(
-                    'text-sm font-medium px-4 py-2 rounded-lg transition-colors duration-200',
+                    'text-sm font-medium px-4 py-3 rounded-lg transition-colors duration-200',
                     isActive(item.path)
                       ? 'bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400'
                       : 'text-secondary-600 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-700'
@@ -119,25 +126,29 @@ const Navbar = () => {
                   {item.label}
                 </Link>
               ))}
-              {/* Cart link en móvil */}
-              <Link
-                to="/cotizacion"
-                onClick={() => setIsMenuOpen(false)}
-                className="text-sm font-medium px-4 py-2 rounded-lg transition-colors duration-200 text-secondary-600 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-700 flex items-center gap-2"
+              
+              {/* Theme Toggle */}
+              <button
+                onClick={() => {
+                  toggleTheme();
+                  setIsMenuOpen(false);
+                }}
+                className="text-sm font-medium px-4 py-3 rounded-lg transition-colors duration-200 text-secondary-600 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-700 flex items-center gap-3"
               >
-                <Icon name="FiShoppingCart" size="sm" />
-                Cotización
-              </Link>
-              {/* Login/Admin link en móvil */}
+                <Icon name={isDark ? "FiSun" : "FiMoon"} size="sm" />
+                {isDark ? 'Modo Claro' : 'Modo Oscuro'}
+              </button>
+              
+              {/* Login/Admin */}
               {isAuthenticated ? (
                 <div className="px-4 py-2">
-                  <div className="text-sm text-secondary-500 dark:text-secondary-400 mb-2">
+                  <div className="text-xs text-secondary-500 dark:text-secondary-400 mb-2">
                     Conectado como: {user?.name}
                   </div>
                   <Link
                     to="/admin"
                     onClick={() => setIsMenuOpen(false)}
-                    className="text-sm font-medium px-4 py-2 rounded-lg transition-colors duration-200 bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 flex items-center gap-2"
+                    className="text-sm font-medium px-4 py-3 rounded-lg transition-colors duration-200 bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 flex items-center gap-3"
                   >
                     <Icon name="FiSettings" size="sm" />
                     Panel de Administración
@@ -147,7 +158,7 @@ const Navbar = () => {
                 <Link
                   to="/login"
                   onClick={() => setIsMenuOpen(false)}
-                  className="text-sm font-medium px-4 py-2 rounded-lg transition-colors duration-200 text-secondary-600 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-700 flex items-center gap-2"
+                  className="text-sm font-medium px-4 py-3 rounded-lg transition-colors duration-200 text-secondary-600 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-700 flex items-center gap-3"
                 >
                   <Icon name="FiLogIn" size="sm" />
                   Iniciar Sesión

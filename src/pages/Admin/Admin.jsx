@@ -93,37 +93,43 @@ const Admin = () => {
   return (
     <div className="min-h-screen bg-secondary-50 dark:bg-secondary-900">
       <Container>
-        <div className="py-8">
+        <div className="py-4 lg:py-8 px-4 lg:px-0">
           {/* Header con información del usuario */}
-          <div className="mb-8">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="mb-6 lg:mb-8">
+            <div className="flex flex-col gap-4">
               <div>
-                <Heading level={1} className="mb-2">
+                <Heading level={1} className="mb-2 text-xl lg:text-3xl">
                   Panel de Administración
                 </Heading>
-                <p className="text-secondary-600 dark:text-secondary-300">
+                <p className="text-secondary-600 dark:text-secondary-300 text-sm lg:text-base">
                   Gestiona los productos del catálogo
                 </p>
               </div>
 
               {/* User info and logout */}
-              <div className="flex items-center gap-4">
-                <div className="text-right">
-                  <p className="text-sm font-medium text-secondary-900 dark:text-white">
-                    {user?.name}
-                  </p>
-                  <p className="text-xs text-secondary-500 dark:text-secondary-400">
-                    {user?.email}
-                  </p>
+              <div className="flex items-center justify-between bg-white dark:bg-secondary-800 p-3 rounded-lg border border-secondary-200 dark:border-secondary-700">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center">
+                    <Icon name="FiUser" size="sm" className="text-primary-600 dark:text-primary-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-secondary-900 dark:text-white">
+                      {user?.name}
+                    </p>
+                    <p className="text-xs text-secondary-500 dark:text-secondary-400">
+                      {user?.email}
+                    </p>
+                  </div>
                 </div>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={handleLogout}
-                  className="text-red-600 hover:text-red-700"
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
                 >
-                  <Icon name="FiLogOut" size="sm" className="mr-2" />
-                  Cerrar Sesión
+                  <Icon name="FiLogOut" size="sm" className="mr-1 lg:mr-2" />
+                  <span className="hidden sm:inline">Cerrar Sesión</span>
+                  <span className="sm:hidden">Salir</span>
                 </Button>
               </div>
             </div>
@@ -131,29 +137,31 @@ const Admin = () => {
 
           {/* Tabs de navegación */}
           <div className="mb-6">
-            <nav className="flex space-x-8">
+            <nav className="flex space-x-2 sm:space-x-8 overflow-x-auto pb-2">
               {[
-                { id: "dashboard", label: "Dashboard", icon: "FiHome" },
+                { id: "dashboard", label: "Dashboard", icon: "FiHome", shortLabel: "Dash" },
                 {
                   id: "administration",
                   label: "Administración",
                   icon: "FiSettings",
+                  shortLabel: "Admin"
                 },
-                { id: "products", label: "Productos", icon: "FiPackage" },
-                { id: "import", label: "Importar", icon: "FiUpload" },
+                { id: "products", label: "Productos", icon: "FiPackage", shortLabel: "Prod" },
+                { id: "import", label: "Importar", icon: "FiUpload", shortLabel: "Imp" },
               ].map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={clsx(
-                    "flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200",
+                    "flex items-center gap-1 sm:gap-2 py-2 px-2 sm:px-1 border-b-2 font-medium text-xs sm:text-sm transition-colors duration-200 whitespace-nowrap",
                     activeTab === tab.id
                       ? "border-primary-500 text-primary-600 dark:text-primary-400"
                       : "border-transparent text-secondary-500 dark:text-secondary-400 hover:text-secondary-700 dark:hover:text-secondary-300"
                   )}
                 >
                   <Icon name={tab.icon} size="sm" />
-                  {tab.label}
+                  <span className="hidden sm:inline">{tab.label}</span>
+                  <span className="sm:hidden">{tab.shortLabel}</span>
                 </button>
               ))}
             </nav>

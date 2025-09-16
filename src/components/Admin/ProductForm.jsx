@@ -60,15 +60,17 @@ const ProductForm = ({
     : "Agregar Nuevo Producto";
 
   const modalFooter = (
-    <div className="flex justify-end gap-4">
-      <Button type="button" variant="outline" onClick={onCancel}>
+    <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-4">
+      <Button type="button" variant="outline" onClick={onCancel} size="sm" className="w-full sm:w-auto">
         Cancelar
       </Button>
       
       {/* Botón dinámico según la pestaña activa */}
       {activeTab === "general" && (
-        <Button type="submit" form="product-form">
-          {editingProduct ? "Actualizar Producto" : "Crear Producto"}
+        <Button type="submit" form="product-form" size="sm" className="w-full sm:w-auto">
+          <span className="text-sm">
+            {editingProduct ? "Actualizar Producto" : "Crear Producto"}
+          </span>
         </Button>
       )}
       
@@ -76,9 +78,10 @@ const ProductForm = ({
         <Button 
           type="button" 
           onClick={handleSaveAccessories}
-          className="bg-primary-600 hover:bg-primary-700"
+          className="bg-primary-600 hover:bg-primary-700 w-full sm:w-auto"
+          size="sm"
         >
-          Guardar Accesorios
+          <span className="text-sm">Guardar Accesorios</span>
         </Button>
       )}
       
@@ -93,65 +96,71 @@ const ProductForm = ({
       title={modalTitle}
       footer={modalFooter}
       size="max-w-4xl"
+      className="max-h-[90vh] overflow-y-auto"
     >
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Pestañas */}
         <div className="border-b border-gray-200 dark:border-gray-700">
-          <nav className="-mb-px flex space-x-8">
+          <nav className="-mb-px flex space-x-2 sm:space-x-8 overflow-x-auto pb-2">
             <button
               type="button"
               onClick={() => setActiveTab("general")}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              className={`py-2 px-2 sm:px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
                 activeTab === "general"
                   ? "border-primary-500 text-primary-600 dark:text-primary-400"
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
               }`}
             >
-              Información General
+              <span className="hidden sm:inline">Información General</span>
+              <span className="sm:hidden">General</span>
             </button>
             <button
               type="button"
               onClick={() => setActiveTab("features")}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              className={`py-2 px-2 sm:px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
                 activeTab === "features"
                   ? "border-primary-500 text-primary-600 dark:text-primary-400"
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
               }`}
             >
-              Características
+              <span className="hidden sm:inline">Características</span>
+              <span className="sm:hidden">Features</span>
             </button>
             <button
               type="button"
               onClick={() => setActiveTab("applications")}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              className={`py-2 px-2 sm:px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
                 activeTab === "applications"
                   ? "border-primary-500 text-primary-600 dark:text-primary-400"
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
               }`}
             >
-              Aplicaciones
+              <span className="hidden sm:inline">Aplicaciones</span>
+              <span className="sm:hidden">Apps</span>
             </button>
             <button
               type="button"
               onClick={() => setActiveTab("accessories")}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              className={`py-2 px-2 sm:px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
                 activeTab === "accessories"
                   ? "border-primary-500 text-primary-600 dark:text-primary-400"
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
               }`}
             >
-              Accesorios
+              <span className="hidden sm:inline">Accesorios</span>
+              <span className="sm:hidden">Acc</span>
             </button>
             <button
               type="button"
               onClick={() => setActiveTab("related")}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              className={`py-2 px-2 sm:px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
                 activeTab === "related"
                   ? "border-primary-500 text-primary-600 dark:text-primary-400"
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
               }`}
             >
-              Productos Relacionados
+              <span className="hidden sm:inline">Productos Relacionados</span>
+              <span className="sm:hidden">Rel</span>
             </button>
           </nav>
         </div>
@@ -159,7 +168,7 @@ const ProductForm = ({
         {/* Contenido de las pestañas */}
         {activeTab === "general" && (
           <form id="product-form" onSubmit={onSubmit}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               {/* SKU */}
               <Input
                 label="SKU"
@@ -362,7 +371,7 @@ const ProductForm = ({
 
         {/* Pestaña de Características */}
         {activeTab === "features" && editingProduct && (
-          <div className="py-4">
+          <div className="py-2 sm:py-4">
             <ProductFeaturesManager
               productId={editingProduct.id}
               productName={editingProduct.name}
@@ -373,7 +382,7 @@ const ProductForm = ({
 
         {/* Pestaña de Aplicaciones */}
         {activeTab === "applications" && editingProduct && (
-          <div className="py-4">
+          <div className="py-2 sm:py-4">
             <ProductApplicationsManager
               productId={editingProduct.id}
               productName={editingProduct.name}
@@ -385,7 +394,7 @@ const ProductForm = ({
         {/* Pestaña de Accesorios */}
         {activeTab === "accessories" && editingProduct && (
           <div 
-            className="py-4"
+            className="py-2 sm:py-4"
             onClick={(e) => e.stopPropagation()}
             onKeyDown={(e) => e.stopPropagation()}
           >
@@ -399,7 +408,7 @@ const ProductForm = ({
 
         {/* Pestaña de Productos Relacionados */}
         {activeTab === "related" && editingProduct && (
-          <div className="py-4">
+          <div className="py-2 sm:py-4">
             <ProductRelatedManager
               productId={editingProduct.id}
               productName={editingProduct.name}
@@ -410,8 +419,8 @@ const ProductForm = ({
         {/* Mensaje cuando no hay producto seleccionado */}
         {(activeTab === "features" || activeTab === "applications" || activeTab === "accessories" || activeTab === "related") &&
           !editingProduct && (
-            <div className="text-center py-8">
-              <p className="text-gray-500 dark:text-gray-400">
+            <div className="text-center py-4 sm:py-8">
+              <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 px-4">
                 Guarda el producto primero para poder gestionar sus
                 características, aplicaciones, accesorios y productos relacionados
               </p>

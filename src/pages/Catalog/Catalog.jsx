@@ -1194,44 +1194,12 @@ const Catalog = () => {
             <div className="flex-1 min-w-0">
               {/* Toolbar */}
               <Card padding="md" className="mb-6">
-                <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                  <div className="flex-1 text-secondary-600 dark:text-secondary-300 text-sm">
-                    {filteredProducts.length} productos encontrados
-                  </div>
-
-                  <div className="flex items-center gap-4">
-                    {/* Items per page selector */}
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-secondary-600 dark:text-secondary-300 whitespace-nowrap">
-                        Mostrar:
-                      </span>
-                      <Select
-                        options={[
-                          { value: 6, label: "6 por página" },
-                          { value: 12, label: "12 por página" },
-                          { value: 24, label: "24 por página" },
-                          { value: 48, label: "48 por página" },
-                        ]}
-                        value={itemsPerPage}
-                        onChange={handleItemsPerPageChange}
-                        className="w-32"
-                      />
-                    </div>
-
-                    {/* Sort */}
-                    <Select
-                      options={[
-                        { value: "default", label: "Ordenar por" },
-                        { value: "name", label: "Nombre A-Z" },
-                        { value: "price-low", label: "Precio: Menor a Mayor" },
-                        { value: "price-high", label: "Precio: Mayor a Menor" },
-                        { value: "rating", label: "Mejor Valorados" },
-                        { value: "stock", label: "Más Stock" },
-                      ]}
-                      value={sortOption}
-                      onChange={handleSortChange}
-                      className="w-48"
-                    />
+                <div className="space-y-4">
+                  {/* Top row: Product count and View toggle */}
+                  <div className="flex justify-between items-center">
+                    <span className="text-secondary-600 dark:text-secondary-300 text-sm">
+                      {filteredProducts.length} productos encontrados
+                    </span>
 
                     {/* View Mode Toggle */}
                     <div className="flex items-center gap-1 bg-secondary-100 dark:bg-secondary-700 rounded-lg p-1">
@@ -1258,6 +1226,35 @@ const Catalog = () => {
                         <Icon name="FiList" size="sm" />
                       </button>
                     </div>
+                  </div>
+
+                  {/* Bottom row: Filters */}
+                  <div className="flex flex-row items-start sm:items-center gap-2 sm:gap-4">
+                    {/* Items per page selector */}
+                    <Select
+                      options={[
+                        { value: 6, label: "6 por página" },
+                        { value: 12, label: "12 por página" },
+                        { value: 24, label: "24 por página" },
+                        { value: 48, label: "48 por página" },
+                      ]}
+                      value={itemsPerPage}
+                      onChange={handleItemsPerPageChange}
+                    />
+
+                    {/* Sort */}
+                    <Select
+                      options={[
+                        { value: "default", label: "Ordenar por" },
+                        { value: "name", label: "Nombre A-Z" },
+                        { value: "price-low", label: "Precio: Menor a Mayor" },
+                        { value: "price-high", label: "Precio: Mayor a Menor" },
+                        { value: "rating", label: "Mejor Valorados" },
+                        { value: "stock", label: "Más Stock" },
+                      ]}
+                      value={sortOption}
+                      onChange={handleSortChange}
+                    />
                   </div>
                 </div>
               </Card>

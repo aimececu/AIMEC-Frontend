@@ -1,32 +1,30 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import Icon from '../../components/ui/Icon';
-import Container from '../../components/ui/Container';
-import Heading from '../../components/ui/Heading';
-import Card from '../../components/ui/Card';
-import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
-import ImageWithFallback from '../../components/ui/ImageWithFallback';
-import { useCart } from '../../context/CartContext';
-import { useToast } from '../../context/ToastContext';
-import quotationService from '../../services/quotationService';
-import clsx from 'clsx';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import Icon from "../../components/ui/Icon";
+import Container from "../../components/ui/Container";
+import Heading from "../../components/ui/Heading";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
+import ImageWithFallback from "../../components/ui/ImageWithFallback";
+import { useCart } from "../../context/CartContext";
+import { useToast } from "../../context/ToastContext";
+import quotationService from "../../services/quotationService";
+import clsx from "clsx";
 
 const Quotation = () => {
-  const { items, total, itemCount, removeFromCart, updateQuantity, clearCart } = useCart();
+  const { items, total, itemCount, removeFromCart, updateQuantity, clearCart } =
+    useCart();
   const { showToast } = useToast();
   const navigate = useNavigate();
   const [customerInfo, setCustomerInfo] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    company: '',
-    message: ''
+    name: "",
+    email: "",
+    phone: "",
+    company: "",
+    message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Debug: Log del estado del carrito
-  console.log('Quotation: Estado del carrito:', { items, total, itemCount });
 
   const handleQuantityChange = (productId, newQuantity) => {
     if (newQuantity <= 0) {
@@ -39,7 +37,7 @@ const Quotation = () => {
   const handleSubmitQuotation = async () => {
     // Validar que hay items en el carrito
     if (!items || items.length === 0) {
-      showToast('No hay productos en la cotización', 'error');
+      showToast("No hay productos en la cotización", "error");
       return;
     }
 
@@ -47,12 +45,12 @@ const Quotation = () => {
     const validation = quotationService.validateQuotationData({
       customerInfo,
       items,
-      total
+      total,
     });
 
     if (!validation.isValid) {
       const firstError = Object.values(validation.errors)[0];
-      showToast(firstError, 'error');
+      showToast(firstError, "error");
       return;
     }
 
@@ -62,39 +60,39 @@ const Quotation = () => {
       // Preparar datos de la cotización
       const quotationData = {
         customerInfo,
-        items: items.map(item => ({
+        items: items.map((item) => ({
           productId: item.id,
           productName: item.name,
           quantity: item.quantity,
           price: item.price,
-          total: item.quantity * item.price
+          total: item.quantity * item.price,
         })),
         total,
-        notes: customerInfo.message
+        notes: customerInfo.message,
       };
 
       // Enviar cotización
       const result = await quotationService.sendQuotation(quotationData);
-      
+
       if (result.success) {
-        showToast(result.message, 'success');
-        
+        showToast(result.message, "success");
+
         // Limpiar carrito y formulario
         clearCart();
         setCustomerInfo({
-          name: '',
-          email: '',
-          phone: '',
-          company: '',
-          message: ''
+          name: "",
+          email: "",
+          phone: "",
+          company: "",
+          message: "",
         });
-        
+
         // Redirigir a la página principal
-        navigate('/');
+        navigate("/");
       }
     } catch (error) {
-      showToast(error.message, 'error');
-      console.error('Error enviando cotización:', error);
+      showToast(error.message, "error");
+      console.error("Error enviando cotización:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -104,19 +102,25 @@ const Quotation = () => {
     return (
       <div className="min-h-screen bg-secondary-50 dark:bg-secondary-900">
         <Container>
-          <div className="py-16 text-center">
-            <div className="text-secondary-400 dark:text-secondary-500 text-8xl mb-6">
+          <div className="py-8 lg:py-16 text-center px-4">
+            <div className="text-secondary-400 dark:text-secondary-500 text-6xl lg:text-8xl mb-4 lg:mb-6">
               🛒
             </div>
-            <Heading level={1} className="mb-4">
+            <Heading level={1} className="mb-3 lg:mb-4 text-2xl lg:text-3xl">
               Tu cotización está vacía
             </Heading>
-            <p className="text-secondary-600 dark:text-secondary-300 mb-8 max-w-md mx-auto">
-              Agrega productos desde nuestro catálogo para crear una cotización personalizada
+            <p className="text-secondary-600 dark:text-secondary-300 mb-6 lg:mb-8 max-w-md mx-auto text-sm lg:text-base">
+              Agrega productos desde nuestro catálogo para crear una cotización
+              personalizada
             </p>
-            <Button size="lg" onClick={() => navigate('/productos')}>
-              <Icon name="FiShoppingBag" className="mr-2" />
-              Explorar Catálogo
+            <Button
+              size="md lg:lg"
+              onClick={() => navigate("/productos")}
+              className="text-sm lg:text-base"
+            >
+              <Icon name="FiShoppingBag" className="mr-1 lg:mr-2" />
+              <span className="hidden sm:inline">Explorar Catálogo</span>
+              <span className="sm:hidden">Explorar</span>
             </Button>
           </div>
         </Container>
@@ -127,33 +131,34 @@ const Quotation = () => {
   return (
     <div className="min-h-screen bg-secondary-50 dark:bg-secondary-900">
       <Container>
-        <div className="py-8">
+        <div className="py-4 lg:py-8 px-4 lg:px-0">
           {/* Header */}
-          <div className="mb-8">
-            <Heading level={1} className="mb-2">
+          <div className="mb-6 lg:mb-8">
+            <Heading level={1} className="mb-2 text-xl lg:text-3xl">
               Cotización
             </Heading>
-            <p className="text-secondary-600 dark:text-secondary-300">
+            <p className="text-secondary-600 dark:text-secondary-300 text-sm lg:text-base">
               Revisa y personaliza tu cotización antes de enviarla
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-8">
             {/* Lista de productos */}
             <div className="lg:col-span-2">
-              <Card padding="lg" className="mb-6">
-                <div className="flex justify-between items-center mb-6">
-                  <Heading level={3}>
+              <Card padding="lg" className="mb-4 lg:mb-6">
+                <div className="flex justify-between items-center mb-4 lg:mb-6">
+                  <Heading level={3} className="text-lg lg:text-xl">
                     Productos ({itemCount})
                   </Heading>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={clearCart}
-                    className="text-red-600 hover:text-red-700"
+                    className="text-red-600 hover:text-red-700 text-sm"
                   >
-                    <Icon name="FiTrash2" size="sm" className="mr-2" />
-                    Vaciar Cotización
+                    <Icon name="FiTrash2" size="sm" className="mr-1 sm:mr-2" />
+                    <span className="hidden sm:inline">Vaciar Cotización</span>
+                    <span className="sm:hidden">Vaciar</span>
                   </Button>
                 </div>
 
@@ -161,77 +166,99 @@ const Quotation = () => {
                   {items.map((item) => (
                     <div
                       key={item.id}
-                      className="flex items-center gap-4 p-4 border border-secondary-200 dark:border-secondary-700 rounded-lg"
+                      className="bg-white dark:bg-secondary-800 border border-secondary-200 dark:border-secondary-700 rounded-xl p-4 shadow-sm"
                     >
-                      {/* Imagen del producto */}
-                      <div className="w-20 h-20 flex-shrink-0">
-                        <ImageWithFallback
-                          src={item.image}
-                          alt={item.name}
-                          className="w-full h-full object-cover rounded-lg"
-                        />
-                      </div>
-
-                      {/* Información del producto */}
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-secondary-900 dark:text-white mb-1 ">
-                          {item.name}
-                        </h4>
-                        <p className="text-sm text-secondary-600 dark:text-secondary-300 mb-2 line-clamp-2">
-                          {item.description}
-                        </p>
-                        <div className="flex items-center gap-4">
-                          <span className="text-xs text-secondary-500 dark:text-secondary-400">
-                            {typeof item.brand === 'object' ? item.brand?.name || 'Sin marca' : item.brand || 'Sin marca'}
-                          </span>
-                          <span className="text-xs text-secondary-500 dark:text-secondary-400">
-                            {typeof item.category === 'object' ? item.category?.name || 'Sin categoría' : item.category || 'Sin categoría'}
-                          </span>
+                      {/* Header del producto */}
+                      <div className="flex items-start gap-3 mb-3">
+                        {/* Imagen del producto */}
+                        <div className="w-20 h-20 flex-shrink-0">
+                          <ImageWithFallback
+                            src={item.image}
+                            alt={item.name}
+                            className="w-full h-full object-cover rounded-lg"
+                          />
                         </div>
-                      </div>
 
-                      {/* Cantidad */}
-                      <div className="flex items-center gap-2">
+                        {/* Información del producto */}
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold text-secondary-900 dark:text-white mb-1 text-base">
+                            {item.name}
+                          </h4>
+                          <p className="text-sm text-secondary-600 dark:text-secondary-300 mb-2 line-clamp-2">
+                            {item.description}
+                          </p>
+                          <div className="flex items-center gap-3">
+                            <span className="text-xs bg-secondary-100 dark:bg-secondary-700 text-secondary-600 dark:text-secondary-300 px-2 py-1 rounded-full">
+                              {typeof item.brand === "object"
+                                ? item.brand?.name || "Sin marca"
+                                : item.brand || "Sin marca"}
+                            </span>
+                            <span className="text-xs bg-secondary-100 dark:bg-secondary-700 text-secondary-600 dark:text-secondary-300 px-2 py-1 rounded-full">
+                              {typeof item.category === "object"
+                                ? item.category?.name || "Sin categoría"
+                                : item.category || "Sin categoría"}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Botón eliminar */}
                         <Button
-                          variant="outline"
+                          variant="ghost"
                           size="sm"
-                          onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                          className="w-8 h-8 p-0"
+                          onClick={() => removeFromCart(item.id)}
+                          className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 p-2"
                         >
-                          -
-                        </Button>
-                        <span className="w-12 text-center font-medium">
-                          {item.quantity}
-                        </span>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                          className="w-8 h-8 p-0"
-                        >
-                          +
+                          <Icon name="FiX" size="sm" />
                         </Button>
                       </div>
 
-                      {/* Precio */}
-                      <div className="text-right min-w-[100px]">
-                        <div className="font-semibold text-secondary-900 dark:text-white">
-                          ${(parseFloat(item.price || 0) * item.quantity).toFixed(2)}
+                      {/* Footer con controles y precio */}
+                      <div className="flex items-center justify-between pt-3 border-t border-secondary-100 dark:border-secondary-700">
+                        {/* Controles de cantidad */}
+                        <div className="flex items-center gap-3">
+                          <span className="text-sm text-secondary-600 dark:text-secondary-400">
+                            Cantidad:
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                handleQuantityChange(item.id, item.quantity - 1)
+                              }
+                              className="w-8 h-8 p-0 rounded-full"
+                            >
+                              -
+                            </Button>
+                            <span className="w-10 text-center font-medium text-base">
+                              {item.quantity}
+                            </span>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                handleQuantityChange(item.id, item.quantity + 1)
+                              }
+                              className="w-8 h-8 p-0 rounded-full"
+                            >
+                              +
+                            </Button>
+                          </div>
                         </div>
-                        <div className="text-sm text-secondary-500 dark:text-secondary-400">
-                          ${parseFloat(item.price || 0).toFixed(2)} c/u
+
+                        {/* Precio */}
+                        <div className="text-right">
+                          <div className="font-bold text-lg text-secondary-900 dark:text-white">
+                            $
+                            {(
+                              parseFloat(item.price || 0) * item.quantity
+                            ).toFixed(2)}
+                          </div>
+                          <div className="text-sm text-secondary-500 dark:text-secondary-400">
+                            ${parseFloat(item.price || 0).toFixed(2)} c/u
+                          </div>
                         </div>
                       </div>
-
-                      {/* Botón eliminar */}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeFromCart(item.id)}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <Icon name="FiX" size="sm" />
-                      </Button>
                     </div>
                   ))}
                 </div>
@@ -239,29 +266,34 @@ const Quotation = () => {
             </div>
 
             {/* Formulario de contacto y resumen */}
-            <div className="space-y-6">
+            <div className="space-y-4 lg:space-y-6">
               {/* Resumen */}
-              <Card padding="lg">
-                <Heading level={3} className="mb-4">
+              <Card
+                padding="lg"
+                className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 border-primary-200 dark:border-primary-700"
+              >
+                <Heading level={3} className="mb-4 text-lg font-semibold">
                   Resumen de Cotización
                 </Heading>
                 <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-secondary-600 dark:text-secondary-300">
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-secondary-600 dark:text-secondary-300 font-medium">
                       Productos ({itemCount})
                     </span>
-                    <span className="font-medium">
+                    <span className="font-semibold text-secondary-900 dark:text-white">
                       ${parseFloat(total || 0).toFixed(2)}
                     </span>
                   </div>
-                  <div className="border-t border-secondary-200 dark:border-secondary-700 pt-3">
-                    <div className="flex justify-between text-lg font-bold">
-                      <span>Total Estimado</span>
-                      <span className="text-primary-600 dark:text-primary-400">
+                  <div className="border-t border-primary-200 dark:border-primary-700 pt-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-lg font-bold text-secondary-900 dark:text-white">
+                        Total Estimado
+                      </span>
+                      <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
                         ${parseFloat(total || 0).toFixed(2)}
                       </span>
                     </div>
-                    <p className="text-xs text-secondary-500 dark:text-secondary-400 mt-1">
+                    <p className="text-xs text-secondary-500 dark:text-secondary-400 mt-2 text-center">
                       * Los precios son estimados y pueden variar
                     </p>
                   </div>
@@ -270,33 +302,41 @@ const Quotation = () => {
 
               {/* Formulario de contacto */}
               <Card padding="lg">
-                <Heading level={3} className="mb-4">
+                <Heading level={3} className="mb-4 text-lg">
                   Información de Contacto
                 </Heading>
                 <div className="space-y-4">
                   <Input
                     label="Nombre completo"
                     value={customerInfo.name}
-                    onChange={(value) => setCustomerInfo({...customerInfo, name: value})}
+                    onChange={(value) =>
+                      setCustomerInfo({ ...customerInfo, name: value })
+                    }
                     placeholder="Tu nombre completo"
                   />
                   <Input
                     label="Email"
                     type="email"
                     value={customerInfo.email}
-                    onChange={(value) => setCustomerInfo({...customerInfo, email: value})}
+                    onChange={(value) =>
+                      setCustomerInfo({ ...customerInfo, email: value })
+                    }
                     placeholder="tu@email.com"
                   />
                   <Input
                     label="Teléfono"
                     value={customerInfo.phone}
-                    onChange={(value) => setCustomerInfo({...customerInfo, phone: value})}
+                    onChange={(value) =>
+                      setCustomerInfo({ ...customerInfo, phone: value })
+                    }
                     placeholder="+1 234 567 8900"
                   />
                   <Input
                     label="Empresa"
                     value={customerInfo.company}
-                    onChange={(value) => setCustomerInfo({...customerInfo, company: value})}
+                    onChange={(value) =>
+                      setCustomerInfo({ ...customerInfo, company: value })
+                    }
                     placeholder="Nombre de tu empresa"
                   />
                   <div>
@@ -305,10 +345,15 @@ const Quotation = () => {
                     </label>
                     <textarea
                       value={customerInfo.message}
-                      onChange={(e) => setCustomerInfo({...customerInfo, message: e.target.value})}
+                      onChange={(e) =>
+                        setCustomerInfo({
+                          ...customerInfo,
+                          message: e.target.value,
+                        })
+                      }
                       placeholder="Comentarios o requisitos especiales..."
-                      className="w-full px-3 py-2 border border-secondary-300 dark:border-secondary-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-secondary-700 text-secondary-900 dark:text-white resize-none"
-                      rows={4}
+                      className="w-full px-3 py-2 border border-secondary-300 dark:border-secondary-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-secondary-700 text-secondary-900 dark:text-white resize-none text-sm"
+                      rows={3}
                     />
                   </div>
                 </div>
@@ -321,18 +366,30 @@ const Quotation = () => {
                   fullWidth
                   size="lg"
                   loading={isSubmitting}
-                  disabled={!customerInfo.name || !customerInfo.email || isSubmitting}
-                  icon={!isSubmitting ? <Icon name="FiSend" className="mr-2" /> : null}
+                  disabled={
+                    !customerInfo.name || !customerInfo.email || isSubmitting
+                  }
+                  icon={
+                    !isSubmitting ? (
+                      <Icon name="FiSend" className="mr-2" />
+                    ) : null
+                  }
+                  className="bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
                 >
-                  {isSubmitting ? 'Enviando...' : 'Enviar Cotización'}
+                  {isSubmitting ? "Enviando..." : "Enviar Cotización"}
                 </Button>
                 <Button
                   variant="outline"
                   fullWidth
-                  onClick={() => navigate('/productos')}
+                  size="lg"
+                  onClick={() => navigate("/productos")}
+                  className="border-2 border-primary-200 hover:border-primary-300 text-primary-700 hover:text-primary-800 font-semibold py-3 rounded-xl hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-200"
                 >
                   <Icon name="FiPlus" className="mr-2" />
-                  Agregar Más Productos
+                  <span className="hidden sm:inline">
+                    Agregar Más Productos
+                  </span>
+                  <span className="sm:hidden">Agregar Productos</span>
                 </Button>
               </div>
             </div>
@@ -343,4 +400,4 @@ const Quotation = () => {
   );
 };
 
-export default Quotation; 
+export default Quotation;

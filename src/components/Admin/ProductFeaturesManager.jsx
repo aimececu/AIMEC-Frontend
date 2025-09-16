@@ -126,9 +126,9 @@ const ProductFeaturesManager = ({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+    <div className="space-y-3 sm:space-y-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
           Características del Producto
         </h3>
         <Button
@@ -137,22 +137,23 @@ const ProductFeaturesManager = ({
             e.stopPropagation();
             openCreateModal();
           }}
-          className="bg-primary-600 hover:bg-primary-700"
-          icon={<Icon name="FiPlus" />}
+          className="bg-primary-600 hover:bg-primary-700 w-full sm:w-auto"
+          size="sm"
+          icon={<Icon name="FiPlus" size="sm" />}
         >
-          Agregar Característica
+          <span className="text-sm">Agregar Característica</span>
         </Button>
       </div>
 
       {loading ? (
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">Cargando...</p>
+        <div className="text-center py-6 sm:py-8">
+          <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-primary-600 mx-auto"></div>
+          <p className="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">Cargando...</p>
         </div>
       ) : features.length === 0 ? (
-        <Card className="p-8 text-center">
-          <Icon name="FiList" className="text-4xl text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-500 dark:text-gray-400">
+        <Card className="p-6 sm:p-8 text-center">
+          <Icon name="FiList" className="text-3xl sm:text-4xl text-gray-400 mx-auto mb-3 sm:mb-4" />
+          <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">
             No hay características definidas para este producto
           </p>
           <Button
@@ -161,22 +162,23 @@ const ProductFeaturesManager = ({
               e.stopPropagation();
               openCreateModal();
             }}
-            className="mt-4 bg-primary-600 hover:bg-primary-700"
+            className="mt-3 sm:mt-4 bg-primary-600 hover:bg-primary-700 w-full sm:w-auto"
+            size="sm"
           >
-            Agregar Primera Característica
+            <span className="text-sm">Agregar Primera Característica</span>
           </Button>
         </Card>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2 sm:space-y-3">
           {features.map((feature) => (
-            <Card key={feature.id} className="p-4">
-              <div className="flex justify-between items-center">
-                <div className="flex-1">
-                  <span className="text-gray-900 dark:text-white">
+            <Card key={feature.id} className="p-3 sm:p-4">
+              <div className="flex justify-between items-start sm:items-center gap-3">
+                <div className="flex-1 min-w-0">
+                  <span className="text-sm sm:text-base text-gray-900 dark:text-white break-words">
                     {feature.sort_order}. {feature.feature_text}
                   </span>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-1 sm:gap-2 flex-shrink-0">
                   <Button
                     onClick={(e) => {
                       e.preventDefault();
@@ -184,7 +186,7 @@ const ProductFeaturesManager = ({
                       handleEdit(feature);
                     }}
                     size="sm"
-                    icon={<Icon name="FiEdit" />}
+                    icon={<Icon name="FiEdit" size="sm" />}
                     iconOnly
                     variant="outline"
                     className="text-blue-600 border-blue-600 hover:bg-blue-50"
@@ -195,7 +197,7 @@ const ProductFeaturesManager = ({
                       e.stopPropagation();
                       handleDelete(feature.id);
                     }}
-                    icon={<Icon name="FiTrash2" />}
+                    icon={<Icon name="FiTrash2" size="sm" />}
                     iconOnly
                     size="sm"
                     variant="outline"
@@ -221,8 +223,9 @@ const ProductFeaturesManager = ({
         title={
           editingFeature ? "Editar Característica" : "Nueva Característica"
         }
+        size="max-w-md"
       >
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           <div>
             <TextArea
               label="Característica"
@@ -249,7 +252,7 @@ const ProductFeaturesManager = ({
             />
           </div>
 
-          <div className="flex justify-end gap-3 pt-4">
+          <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-3 sm:pt-4">
             <Button
               type="button"
               variant="outline"
@@ -258,8 +261,10 @@ const ProductFeaturesManager = ({
                 e.stopPropagation();
                 setShowModal(false);
               }}
+              size="sm"
+              className="w-full sm:w-auto"
             >
-              Cancelar
+              <span className="text-sm">Cancelar</span>
             </Button>
             <Button
               type="button"
@@ -269,13 +274,16 @@ const ProductFeaturesManager = ({
                 handleSubmit();
               }}
               disabled={loading || !formData.feature_text.trim()}
-              className="bg-primary-600 hover:bg-primary-700"
+              className="bg-primary-600 hover:bg-primary-700 w-full sm:w-auto"
+              size="sm"
             >
-              {loading
-                ? "Guardando..."
-                : editingFeature
+              <span className="text-sm">
+                {loading
+                  ? "Guardando..."
+                  : editingFeature
                 ? "Actualizar"
                 : "Crear"}
+              </span>
             </Button>
           </div>
         </div>

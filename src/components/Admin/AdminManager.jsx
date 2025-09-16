@@ -338,69 +338,109 @@ const AdminManager = ({
 
     return (
       <div className="w-full max-h-[450px] overflow-y-auto">
-        <table className="min-w-full bg-white dark:bg-secondary-800 rounded-lg overflow-hidden">
-          <thead className="bg-secondary-100 dark:bg-secondary-700">
-            <tr>
-              {columns.map((col) => (
-                <th
-                  key={col.key}
-                  className="px-6 py-3 text-left text-xs font-medium text-secondary-500 dark:text-secondary-300 uppercase tracking-wider"
-                >
-                  {col.label}
-                </th>
-              ))}
-              <th className="px-6 py-3 text-right text-xs font-medium text-secondary-500 dark:text-secondary-300 uppercase tracking-wider">
-                Acciones
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-secondary-200 dark:divide-secondary-700">
-            {data.map((item) => (
-              <tr
-                key={item.id}
-                className="hover:bg-secondary-50 dark:hover:bg-secondary-700"
-              >
+        {/* Desktop Table */}
+        <div className="hidden lg:block">
+          <table className="min-w-full bg-white dark:bg-secondary-800 rounded-lg overflow-hidden">
+            <thead className="bg-secondary-100 dark:bg-secondary-700">
+              <tr>
                 {columns.map((col) => (
-                  <td
+                  <th
                     key={col.key}
-                    className="px-6 py-4 text-sm text-secondary-900 dark:text-white break-words"
+                    className="px-6 py-3 text-left text-xs font-medium text-secondary-500 dark:text-secondary-300 uppercase tracking-wider"
                   >
-                    {col.render ? (
-                      col.render(item)
-                    ) : (
-                      <span className="break-words">
-                        {item[col.key] || "-"}
-                      </span>
-                    )}
-                  </td>
+                    {col.label}
+                  </th>
                 ))}
-                <td className="px-6 py-4 text-right text-sm font-medium whitespace-nowrap">
-                  <button
-                    onClick={() => handleEdit(item)}
-                    className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3"
-                  >
-                    Editar
-                  </button>
-                  <button
-                    onClick={() => handleDelete(item.id)}
-                    className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
-                  >
-                    Eliminar
-                  </button>
-                </td>
+                <th className="px-6 py-3 text-right text-xs font-medium text-secondary-500 dark:text-secondary-300 uppercase tracking-wider">
+                  Acciones
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-secondary-200 dark:divide-secondary-700">
+              {data.map((item) => (
+                <tr
+                  key={item.id}
+                  className="hover:bg-secondary-50 dark:hover:bg-secondary-700"
+                >
+                  {columns.map((col) => (
+                    <td
+                      key={col.key}
+                      className="px-6 py-4 text-sm text-secondary-900 dark:text-white break-words"
+                    >
+                      {col.render ? (
+                        col.render(item)
+                      ) : (
+                        <span className="break-words">
+                          {item[col.key] || "-"}
+                        </span>
+                      )}
+                    </td>
+                  ))}
+                  <td className="px-6 py-4 text-right text-sm font-medium whitespace-nowrap">
+                    <button
+                      onClick={() => handleEdit(item)}
+                      className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => handleDelete(item.id)}
+                      className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                    >
+                      Eliminar
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Mobile Cards */}
+        <div className="lg:hidden space-y-3">
+          {data.map((item) => (
+            <div
+              key={item.id}
+              className="bg-white dark:bg-secondary-800 rounded-lg p-4 border border-secondary-200 dark:border-secondary-700"
+            >
+              <div className="space-y-2">
+                {columns.map((col) => (
+                  <div key={col.key} className="flex flex-col">
+                    <span className="text-xs font-medium text-secondary-500 dark:text-secondary-400 uppercase tracking-wider">
+                      {col.label}
+                    </span>
+                    <span className="text-sm text-secondary-900 dark:text-white break-words">
+                      {col.render ? col.render(item) : (item[col.key] || "-")}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <div className="flex justify-end gap-2 mt-3 pt-3 border-t border-secondary-200 dark:border-secondary-700">
+                <button
+                  onClick={() => handleEdit(item)}
+                  className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium"
+                >
+                  Editar
+                </button>
+                <button
+                  onClick={() => handleDelete(item.id)}
+                  className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium"
+                >
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Sub-tabs */}
       <div className="border-b border-secondary-200 dark:border-secondary-700">
-        <nav className="-mb-px flex space-x-8">
+        <nav className="-mb-px flex space-x-2 sm:space-x-8 overflow-x-auto pb-2">
           {subTabs.map((tab) => (
             <button
               key={tab.id}
@@ -408,13 +448,13 @@ const AdminManager = ({
                 setActiveSubTab(tab.id);
                 console.log(tab.id);
               }}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              className={`py-2 px-2 sm:px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
                 activeSubTab === tab.id
                   ? "border-blue-500 text-blue-600 dark:text-blue-400"
                   : "border-transparent text-secondary-500 hover:text-secondary-700 hover:border-secondary-300 dark:text-secondary-400 dark:hover:text-secondary-300"
               }`}
             >
-              <Icon name={tab.icon} className="inline-block w-4 h-4 mr-2" />
+              <Icon name={tab.icon} className="inline-block w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               {tab.label}
             </button>
           ))}
@@ -422,18 +462,20 @@ const AdminManager = ({
       </div>
 
       {/* Content */}
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-secondary-900 dark:text-white">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
+        <h2 className="text-lg sm:text-2xl font-bold text-secondary-900 dark:text-white">
           {subTabs.find((tab) => tab.id === activeSubTab)?.label}
         </h2>
-        <Button onClick={handleNew} variant="primary">
-          <Icon name="FiPlus" className="w-4 h-4 mr-2" />
-          Nuevo{" "}
-          {activeSubTab === "categories"
-            ? "Categoría"
-            : activeSubTab === "subcategories"
-            ? "Subcategoría"
-            : "Marca"}
+        <Button onClick={handleNew} variant="primary" size="sm" className="w-full sm:w-auto">
+          <Icon name="FiPlus" className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+          <span className="text-xs sm:text-sm">
+            Nuevo{" "}
+            {activeSubTab === "categories"
+              ? "Categoría"
+              : activeSubTab === "subcategories"
+              ? "Subcategoría"
+              : "Marca"}
+          </span>
         </Button>
       </div>
 
@@ -452,17 +494,17 @@ const AdminManager = ({
             : "Marca"
         }`}
         footer={
-          <div className="flex justify-end space-x-3">
-            <Button onClick={resetForm} variant="secondary">
+          <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
+            <Button onClick={resetForm} variant="secondary" size="sm" className="w-full sm:w-auto">
               Cancelar
             </Button>
-            <Button onClick={handleSubmit} variant="primary" disabled={loading}>
-              {loading ? <Loader className="w-4 h-4" /> : "Guardar"}
+            <Button onClick={handleSubmit} variant="primary" disabled={loading} size="sm" className="w-full sm:w-auto">
+              {loading ? <Loader className="w-3 h-3 sm:w-4 sm:h-4" /> : "Guardar"}
             </Button>
           </div>
         }
       >
-        <form onSubmit={handleSubmit}>{renderForm()}</form>
+        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">{renderForm()}</form>
       </Modal>
 
       {/* Modal de Confirmación */}
@@ -474,28 +516,30 @@ const AdminManager = ({
         }}
         title="Confirmar eliminación"
         footer={
-          <div className="flex justify-end space-x-3">
+          <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
             <Button 
               onClick={() => {
                 setShowConfirmDialog(false);
                 setItemToDelete(null);
               }} 
               variant="secondary"
+              size="sm"
+              className="w-full sm:w-auto"
             >
               Cancelar
             </Button>
-            <Button onClick={confirmDelete} variant="danger">
+            <Button onClick={confirmDelete} variant="danger" size="sm" className="w-full sm:w-auto">
               Eliminar
             </Button>
           </div>
         }
       >
         <div className="text-center">
-          <Icon name="FiAlertTriangle" className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <p className="text-lg font-medium text-secondary-900 dark:text-white mb-2">
+          <Icon name="FiAlertTriangle" className="w-8 h-8 sm:w-12 sm:h-12 text-red-500 mx-auto mb-3 sm:mb-4" />
+          <p className="text-base sm:text-lg font-medium text-secondary-900 dark:text-white mb-2">
             ¿Estás seguro de que quieres eliminar este elemento?
           </p>
-          <p className="text-sm text-secondary-600 dark:text-secondary-400">
+          <p className="text-xs sm:text-sm text-secondary-600 dark:text-secondary-400">
             Esta acción no se puede deshacer.
           </p>
         </div>

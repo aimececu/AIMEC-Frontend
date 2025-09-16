@@ -481,25 +481,26 @@ const ProductRelatedManager = ({ productId, productName }) => {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="mb-6">
-        <div className="flex justify-between items-center flex-row gap-2">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+    <div className="space-y-3 sm:space-y-4">
+      <div className="mb-4 sm:mb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-2">
+          <div className="flex-1 min-w-0">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
               Productos Relacionados
             </h3>
-            <p className="text-gray-600">
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
               Gestiona los productos relacionados con "{productName}"
             </p>
           </div>
           {/* Botón para agregar */}
-          <div className="mb-6">
+          <div className="w-full sm:w-auto">
             <Button
               onClick={handleAddClick}
-              className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+              className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 w-full sm:w-auto"
+              size="sm"
             >
-              <Icon name="FiPlus" />
-              Agregar Productos Relacionados
+              <Icon name="FiPlus" size="sm" />
+              <span className="text-sm">Agregar Productos Relacionados</span>
             </Button>
           </div>
         </div>
@@ -510,11 +511,17 @@ const ProductRelatedManager = ({ productId, productName }) => {
         isOpen={showAddSection}
         onClose={() => setShowAddSection(false)}
         title="Agregar Productos Relacionados"
-        size="md"
+        size="max-w-4xl"
+        className="max-h-[90vh] overflow-y-auto"
         footer={
-          <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={() => setShowAddSection(false)}>
-              Cancelar
+          <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
+            <Button
+              variant="outline"
+              onClick={() => setShowAddSection(false)}
+              size="sm"
+              className="w-full sm:w-auto"
+            >
+              <span className="text-sm">Cancelar</span>
             </Button>
             <Button
               onClick={handleSaveSelected}
@@ -523,19 +530,22 @@ const ProductRelatedManager = ({ productId, productName }) => {
                 selectedProductIds.length === 0 ||
                 (showNewRelationshipInput && newRelationshipTypeError)
               }
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto"
+              size="sm"
             >
-              <Icon name="FiSave" />
-              Guardar Productos Seleccionados ({selectedProductIds.length})
+              <Icon name="FiSave" size="sm" />
+              <span className="text-sm">
+                Guardar Productos Seleccionados ({selectedProductIds.length})
+              </span>
             </Button>
           </div>
         }
       >
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* Tipo de relación */}
           <div>
             {!showNewRelationshipInput ? (
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 <Select
                   value={selectedRelationshipType}
                   onChange={(value) => handleRelationshipTypeChange(value)}
@@ -554,9 +564,9 @@ const ProductRelatedManager = ({ productId, productName }) => {
                 />
               </div>
             ) : (
-              <div className="space-y-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
-                <div className="flex items-center justify-between">
-                  <h5 className="text-sm font-medium text-blue-800 dark:text-blue-200">
+              <div className="space-y-2 sm:space-y-3 p-3 sm:p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
+                  <h5 className="text-xs sm:text-sm font-medium text-blue-800 dark:text-blue-200">
                     ✨ Creando nuevo tipo de relación
                   </h5>
                   <Button
@@ -567,10 +577,10 @@ const ProductRelatedManager = ({ productId, productName }) => {
                       setNewRelationshipType("");
                       setNewRelationshipTypeError("");
                     }}
-                    className="text-blue-600 hover:text-blue-700 border-blue-300 hover:border-blue-400"
+                    className="text-blue-600 hover:text-blue-700 border-blue-300 hover:border-blue-400 w-full sm:w-auto"
                   >
                     <Icon name="FiX" size="sm" />
-                    Cancelar
+                    <span className="text-sm">Cancelar</span>
                   </Button>
                 </div>
 
@@ -605,34 +615,35 @@ const ProductRelatedManager = ({ productId, productName }) => {
 
           {/* Lista de productos disponibles con checkboxes */}
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <h5 className="text-md font-medium text-gray-700 dark:text-gray-200">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-3">
+              <h5 className="text-sm sm:text-base font-medium text-gray-700 dark:text-gray-200">
                 Seleccionar Productos ({selectedProductIds.length}{" "}
                 seleccionados)
               </h5>
-              <div className="flex-1 max-w-xs ml-4">
+              <div className="w-full sm:flex-1 sm:max-w-xs sm:ml-4">
                 <Input
                   type="text"
                   value={searchTerm}
                   onChange={(value) => setSearchTerm(value)}
                   placeholder="Buscar productos..."
                   className="w-full"
+                  size="sm"
                 />
               </div>
             </div>
 
             {productsLoading ? (
-              <div className="flex justify-center items-center py-12">
+              <div className="flex justify-center items-center py-8 sm:py-12">
                 <Loader size="lg" text="Cargando productos..." />
               </div>
             ) : (
-              <div className="space-y-2">
-                <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <div className="space-y-1 sm:space-y-2">
+                <div className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Productos Disponibles:
                   {searchTerm.trim() === "" &&
                   products.filter((p) => p.id !== productId && p.is_active)
                     .length > 30 ? (
-                    <span className="text-xs font-normal text-gray-500 ml-2">
+                    <span className="text-xs font-normal text-gray-500 ml-1 sm:ml-2">
                       (Mostrando 30 de{" "}
                       {
                         products.filter(
@@ -642,7 +653,7 @@ const ProductRelatedManager = ({ productId, productName }) => {
                       )
                     </span>
                   ) : (
-                    <span className="text-xs font-normal text-gray-500 ml-2">
+                    <span className="text-xs font-normal text-gray-500 ml-1 sm:ml-2">
                       (
                       {
                         products
@@ -676,48 +687,49 @@ const ProductRelatedManager = ({ productId, productName }) => {
                         .includes(searchTerm.toLowerCase())
                   )
                   .map((relatedProduct) => (
-                    <Checkbox
+                    <div
                       key={`current-${relatedProduct.id}`}
-                      checked={selectedProductIds.includes(
-                        relatedProduct.relatedProduct.id
-                      )}
-                      onChange={() =>
-                        handleProductSelection(relatedProduct.relatedProduct.id)
-                      }
-                      card={true}
-                      size="md"
-                      variant="success"
-                      align="center"
-                      label={
-                        <div className="flex items-center gap-3 min-w-0 flex-1">
-                          <ImageWithFallback
-                            src={getProductImage(
+                      className="p-2 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600"
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <Checkbox
+                          checked={selectedProductIds.includes(
+                            relatedProduct.relatedProduct.id
+                          )}
+                          onChange={() =>
+                            handleProductSelection(
                               relatedProduct.relatedProduct.id
-                            )}
-                            alt={relatedProduct.relatedProduct.name}
-                            className="w-12 h-12 object-cover rounded-lg"
-                          />
-                          <div className="min-w-0 flex-1">
-                            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                              {relatedProduct.relatedProduct.name}
-                            </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              SKU: {relatedProduct.relatedProduct.sku}
-                            </p>
-                            <p className="text-xs text-gray-400 dark:text-gray-500">
-                              ${relatedProduct.relatedProduct.price}
-                            </p>
-                          </div>
+                            )
+                          }
+                          size="sm"
+                          
+                          variant="success"
+                        />
+                        <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
+                          ✓ Ya relacionado
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <ImageWithFallback
+                          src={getProductImage(
+                            relatedProduct.relatedProduct.id
+                          )}
+                          alt={relatedProduct.relatedProduct.name}
+                          className="w-6 h-6 object-cover rounded flex-shrink-0"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-medium text-gray-900 dark:text-white truncate">
+                            {relatedProduct.relatedProduct.name}
+                          </p>
                         </div>
-                      }
-                      description={
-                        <>
-                          <span className="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                            ✓ Ya relacionado
-                          </span>
-                        </>
-                      }
-                    />
+                        <span className="text-xs font-semibold text-gray-900 dark:text-white">
+                          ${relatedProduct.relatedProduct.price}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate ml-8">
+                        SKU: {relatedProduct.relatedProduct.sku}
+                      </p>
+                    </div>
                   ))}
 
                 {/* Mostrar productos disponibles para agregar (máximo 30 si no hay búsqueda) */}
@@ -745,35 +757,40 @@ const ProductRelatedManager = ({ productId, productName }) => {
                       : availableProducts;
 
                   return displayedProducts.map((product) => (
-                    <Checkbox
+                    <div
                       key={`available-${product.id}`}
-                      checked={selectedProductIds.includes(product.id)}
-                      onChange={() => handleProductSelection(product.id)}
-                      card={true}
-                      size="md"
-                      variant="primary"
-                      align="center"
-                      label={
-                        <div className="flex items-center gap-3 min-w-0 flex-1">
-                          <ImageWithFallback
-                            src={product.main_image}
-                            alt={product.name}
-                            className="w-12 h-12 object-cover rounded-lg"
-                          />
-                          <div className="min-w-0 flex-1">
-                            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                              {product.name}
-                            </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              SKU: {product.sku}
-                            </p>
-                            <p className="text-xs text-gray-400 dark:text-gray-500">
-                              ${product.price}
-                            </p>
-                          </div>
+                      className="p-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <Checkbox
+                          checked={selectedProductIds.includes(product.id)}
+                          onChange={() => handleProductSelection(product.id)}
+                          size="sm"
+                          variant="primary"
+                        />
+                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
+                          Disponible
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <ImageWithFallback
+                          src={product.main_image}
+                          alt={product.name}
+                          className="w-6 h-6 object-cover rounded flex-shrink-0"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-medium text-gray-900 dark:text-white truncate">
+                            {product.name}
+                          </p>
                         </div>
-                      }
-                    />
+                        <span className="text-xs font-semibold text-gray-900 dark:text-white">
+                          ${product.price}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate ml-8">
+                        SKU: {product.sku}
+                      </p>
+                    </div>
                   ));
                 })()}
 
@@ -797,14 +814,17 @@ const ProductRelatedManager = ({ productId, productName }) => {
         isOpen={showEditGroupModal}
         onClose={() => setShowEditGroupModal(false)}
         title="Editar Grupo de Productos Relacionados"
-        size="lg"
+        size="max-w-4xl"
+        className="max-h-[95vh] overflow-hidden flex flex-col w-full"
         footer={
-          <div className="flex justify-end gap-3">
+          <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
             <Button
               variant="outline"
               onClick={() => setShowEditGroupModal(false)}
+              size="sm"
+              className="w-full sm:w-auto"
             >
-              Cancelar
+              <span className="text-sm">Cancelar</span>
             </Button>
             <Button
               onClick={handleEditGroupSubmit}
@@ -813,242 +833,269 @@ const ProductRelatedManager = ({ productId, productName }) => {
                   !editingGroupData.newRelationshipType) ||
                 (!showChangeNameInput && !hasGroupChanges())
               }
+              size="sm"
+              className="w-full sm:w-auto"
             >
-              <Icon name="FiSave" />
-              {showChangeNameInput ? "Actualizar Grupo" : "Guardar Cambios"}
+              <Icon name="FiSave" size="sm" />
+              <span className="text-sm">
+                {showChangeNameInput ? "Actualizar Grupo" : "Guardar Cambios"}
+              </span>
             </Button>
           </div>
         }
       >
-        <div className="space-y-6">
-          {/* Tipo de relación actual */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Tipo de Relación Actual
-            </label>
-            <p className="text-gray-900 dark:text-white p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
-              {editingGroupData.relationshipType}
-            </p>
-          </div>
-
-          {/* Nuevo tipo de relación - Solo se muestra cuando se hace clic en cambiar nombre */}
-          {showChangeNameInput && (
+        <div className="flex-1 overflow-y-auto p-2 sm:p-4">
+          <div className="space-y-3 sm:space-y-4 max-w-full">
+            {/* Tipo de relación actual */}
             <div>
-              <Input
-                type="text"
-                value={editingGroupData.newRelationshipType}
-                onChange={(value) =>
-                  setEditingGroupData((prev) => ({
-                    ...prev,
-                    newRelationshipType: value,
-                  }))
-                }
-                label="Nuevo Tipo de Relación"
-                helperText="Escribe el nuevo tipo de relación para todo el grupo"
-                placeholder="Escribe el nuevo tipo de relación"
-                className="w-full max-w-md"
-                required
-              />
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Tipo de Relación Actual
+              </label>
+              <p className="text-sm sm:text-base text-gray-900 dark:text-white p-2 sm:p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                {editingGroupData.relationshipType}
+              </p>
             </div>
-          )}
 
-          {/* Lista de productos del grupo */}
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <h5 className="text-md font-medium text-gray-700 dark:text-gray-200">
-                Productos en este grupo ({editingGroupData.products.length})
-              </h5>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={toggleChangeNameInput}
-                >
-                  <Icon
-                    name={showChangeNameInput ? "FiX" : "FiEdit"}
+            {/* Nuevo tipo de relación - Solo se muestra cuando se hace clic en cambiar nombre */}
+            {showChangeNameInput && (
+              <div>
+                <Input
+                  type="text"
+                  value={editingGroupData.newRelationshipType}
+                  onChange={(value) =>
+                    setEditingGroupData((prev) => ({
+                      ...prev,
+                      newRelationshipType: value,
+                    }))
+                  }
+                  label="Nuevo Tipo de Relación"
+                  helperText="Escribe el nuevo tipo de relación para todo el grupo"
+                  placeholder="Escribe el nuevo tipo de relación"
+                  className="w-full max-w-md"
+                  required
+                />
+              </div>
+            )}
+
+            {/* Lista de productos del grupo */}
+            <div className="w-full max-w-full">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-3">
+                <h5 className="text-sm sm:text-base font-medium text-gray-700 dark:text-gray-200">
+                  Productos en este grupo ({editingGroupData.products.length})
+                </h5>
+                <div className="w-full sm:w-auto">
+                  <Button
+                    variant="outline"
                     size="sm"
-                  />
-                  {showChangeNameInput ? "Cancelar Cambio" : "Cambiar Nombre"}
-                </Button>
+                    onClick={toggleChangeNameInput}
+                    className="w-full sm:w-auto"
+                  >
+                    <Icon
+                      name={showChangeNameInput ? "FiX" : "FiEdit"}
+                      size="sm"
+                    />
+                    <span className="text-sm">
+                      {showChangeNameInput
+                        ? "Cancelar Cambio"
+                        : "Cambiar Nombre"}
+                    </span>
+                  </Button>
+                </div>
               </div>
-            </div>
 
-            {/* Barra de búsqueda */}
-            <div className="mb-4">
-              <Input
-                type="text"
-                value={editingGroupSearchTerm}
-                onChange={(value) => setEditingGroupSearchTerm(value)}
-                placeholder="Buscar productos por nombre o SKU..."
-                className="w-full"
-                icon={<Icon name="FiSearch" />}
-              />
-            </div>
+              {/* Barra de búsqueda */}
+              <div className="mb-3 sm:mb-4">
+                <Input
+                  type="text"
+                  value={editingGroupSearchTerm}
+                  onChange={(value) => setEditingGroupSearchTerm(value)}
+                  placeholder="Buscar productos por nombre o SKU..."
+                  className="w-full"
+                  size="sm"
+                  icon={<Icon name="FiSearch" size="sm" />}
+                />
+              </div>
 
-            {/* Lista de productos con checkboxes */}
-            <div className="space-y-2">
-              <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Productos Disponibles:
-                {editingGroupSearchTerm.trim() === "" &&
-                products.filter((p) => p.id !== productId && p.is_active)
-                  .length > 30 ? (
-                  <span className="text-xs font-normal text-gray-500 ml-2">
-                    (Mostrando 30 de{" "}
-                    {
-                      products.filter((p) => p.id !== productId && p.is_active)
-                        .length
-                    }
+              {/* Lista de productos con checkboxes - Con scroll interno */}
+              <div className="max-h-96 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-lg p-2 w-full">
+                <div className="space-y-1 w-full">
+                  <div className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 sticky top-0 bg-white dark:bg-gray-800 py-2">
+                    Productos Disponibles:
+                    {editingGroupSearchTerm.trim() === "" &&
+                    products.filter((p) => p.id !== productId && p.is_active)
+                      .length > 30 ? (
+                      <span className="text-xs font-normal text-gray-500 ml-1 sm:ml-2">
+                        (Mostrando 30 de{" "}
+                        {
+                          products.filter(
+                            (p) => p.id !== productId && p.is_active
+                          ).length
+                        }
+                        )
+                      </span>
+                    ) : (
+                      <span className="text-xs font-normal text-gray-500 ml-1 sm:ml-2">
+                        (
+                        {(() => {
+                          const availableProducts = products
+                            .filter((p) => p.id !== productId && p.is_active)
+                            .filter(
+                              (p) =>
+                                editingGroupSearchTerm === "" ||
+                                p.name
+                                  .toLowerCase()
+                                  .includes(
+                                    editingGroupSearchTerm.toLowerCase()
+                                  ) ||
+                                p.sku
+                                  .toLowerCase()
+                                  .includes(
+                                    editingGroupSearchTerm.toLowerCase()
+                                  )
+                            );
+                          return availableProducts.length;
+                        })()}{" "}
+                        productos)
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Mostrar productos ya en el grupo como seleccionados */}
+                  {editingGroupData.products
+                    .filter(
+                      (product) =>
+                        editingGroupSearchTerm === "" ||
+                        product.relatedProduct.name
+                          .toLowerCase()
+                          .includes(editingGroupSearchTerm.toLowerCase()) ||
+                        product.relatedProduct.sku
+                          .toLowerCase()
+                          .includes(editingGroupSearchTerm.toLowerCase())
                     )
-                  </span>
-                ) : (
-                  <span className="text-xs font-normal text-gray-500 ml-2">
-                    (
-                    {(() => {
-                      const availableProducts = products
-                        .filter((p) => p.id !== productId && p.is_active)
-                        .filter(
-                          (p) =>
-                            editingGroupSearchTerm === "" ||
-                            p.name
-                              .toLowerCase()
-                              .includes(editingGroupSearchTerm.toLowerCase()) ||
-                            p.sku
-                              .toLowerCase()
-                              .includes(editingGroupSearchTerm.toLowerCase())
-                        );
-                      return availableProducts.length;
-                    })()}{" "}
-                    productos)
-                  </span>
-                )}
-              </div>
-
-              {/* Mostrar productos ya en el grupo como seleccionados */}
-              {editingGroupData.products
-                .filter(
-                  (product) =>
-                    editingGroupSearchTerm === "" ||
-                    product.relatedProduct.name
-                      .toLowerCase()
-                      .includes(editingGroupSearchTerm.toLowerCase()) ||
-                    product.relatedProduct.sku
-                      .toLowerCase()
-                      .includes(editingGroupSearchTerm.toLowerCase())
-                )
-                .map((product) => (
-                  <Checkbox
-                    key={`current-${product.id}`}
-                    checked={true}
-                    onChange={() => handleRemoveFromGroup(product.id)}
-                    card={true}
-                    size="md"
-                    variant="success"
-                    align="center"
-                    label={
-                      <div className="flex items-center gap-3 min-w-0 flex-1 relative">
-                        <ImageWithFallback
-                          src={getProductImage(product.relatedProduct.id)}
-                          alt={product.relatedProduct.name}
-                          className="w-12 h-12 object-cover rounded-lg"
-                        />
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                            {product.relatedProduct.name}
-                          </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
-                            SKU: {product.relatedProduct.sku}
-                          </p>
-                          <p className="text-xs text-gray-400 dark:text-gray-500">
+                    .map((product) => (
+                      <div
+                        key={`current-${product.id}`}
+                        className="p-2 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600"
+                      >
+                        <div className="flex items-center gap-2 mb-2">
+                          <Checkbox
+                            checked={true}
+                            onChange={() => handleRemoveFromGroup(product.id)}
+                            size="sm"
+                            variant="success"
+                          />
+                          <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
+                            ✓ En el grupo
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <ImageWithFallback
+                            src={getProductImage(product.relatedProduct.id)}
+                            alt={product.relatedProduct.name}
+                            className="w-6 h-6 object-cover rounded flex-shrink-0"
+                          />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-medium text-gray-900 dark:text-white truncate">
+                              {product.relatedProduct.name}
+                            </p>
+                          </div>
+                          <span className="text-xs font-semibold text-gray-900 dark:text-white">
                             ${product.relatedProduct.price}
-                          </p>
+                          </span>
                         </div>
-                        <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full absolute right-0 top-0">
-                          ✓ En el grupo
-                        </span>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate ml-8">
+                          SKU: {product.relatedProduct.sku}
+                        </p>
                       </div>
-                    }
-                  />
-                ))}
+                    ))}
 
-              {/* Mostrar productos disponibles para agregar al grupo (máximo 30 si no hay búsqueda) */}
-              {(() => {
-                const availableProducts = products
-                  .filter((p) => p.id !== productId && p.is_active)
-                  .filter(
-                    (p) =>
-                      !editingGroupData.products.some(
-                        (gp) => gp.relatedProduct.id === p.id
+                  {/* Mostrar productos disponibles para agregar al grupo (máximo 30 si no hay búsqueda) */}
+                  {(() => {
+                    const availableProducts = products
+                      .filter((p) => p.id !== productId && p.is_active)
+                      .filter(
+                        (p) =>
+                          !editingGroupData.products.some(
+                            (gp) => gp.relatedProduct.id === p.id
+                          )
                       )
-                  )
-                  .filter(
-                    (p) =>
-                      editingGroupSearchTerm === "" ||
-                      p.name
-                        .toLowerCase()
-                        .includes(editingGroupSearchTerm.toLowerCase()) ||
-                      p.sku
-                        .toLowerCase()
-                        .includes(editingGroupSearchTerm.toLowerCase())
-                  );
+                      .filter(
+                        (p) =>
+                          editingGroupSearchTerm === "" ||
+                          p.name
+                            .toLowerCase()
+                            .includes(editingGroupSearchTerm.toLowerCase()) ||
+                          p.sku
+                            .toLowerCase()
+                            .includes(editingGroupSearchTerm.toLowerCase())
+                      );
 
-                const displayedProducts =
-                  editingGroupSearchTerm.trim() === ""
-                    ? availableProducts.slice(0, 30)
-                    : availableProducts;
+                    const displayedProducts =
+                      editingGroupSearchTerm.trim() === ""
+                        ? availableProducts.slice(0, 30)
+                        : availableProducts;
 
-                return displayedProducts.map((product) => (
-                  <Checkbox
-                    key={`available-${product.id}`}
-                    checked={false}
-                    onChange={() => {
-                      // Agregar al grupo
-                      const newGroupProduct = {
-                        id: Date.now(), // ID temporal
-                        relationshipType: editingGroupData.relationshipType,
-                        relatedProduct: product,
-                      };
-                      setEditingGroupData((prev) => ({
-                        ...prev,
-                        products: [...prev.products, newGroupProduct],
-                      }));
-                    }}
-                    card={true}
-                    size="md"
-                    variant="primary"
-                    align="center"
-                    label={
-                      <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <ImageWithFallback
-                          src={product.main_image}
-                          alt={product.name}
-                          className="w-12 h-12 object-cover rounded-lg"
-                        />
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                            {product.name}
-                          </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
-                            SKU: {product.sku}
-                          </p>
-                          <p className="text-xs text-gray-400 dark:text-gray-500">
-                            ${product.price}
-                          </p>
+                    return displayedProducts.map((product) => (
+                      <div
+                        key={`available-${product.id}`}
+                        className="p-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                      >
+                        <div className="flex items-center gap-2 mb-2">
+                          <Checkbox
+                            checked={false}
+                            onChange={() => {
+                              // Agregar al grupo
+                              const newGroupProduct = {
+                                id: Date.now(), // ID temporal
+                                relationshipType:
+                                  editingGroupData.relationshipType,
+                                relatedProduct: product,
+                              };
+                              setEditingGroupData((prev) => ({
+                                ...prev,
+                                products: [...prev.products, newGroupProduct],
+                              }));
+                            }}
+                            size="sm"
+                            variant="primary"
+                          />
+                          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
+                            Disponible
+                          </span>
                         </div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <ImageWithFallback
+                            src={product.main_image}
+                            alt={product.name}
+                            className="w-6 h-6 object-cover rounded flex-shrink-0"
+                          />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-medium text-gray-900 dark:text-white truncate">
+                              {product.name}
+                            </p>
+                          </div>
+                          <span className="text-xs font-semibold text-gray-900 dark:text-white">
+                            ${product.price}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate ml-8">
+                          SKU: {product.sku}
+                        </p>
                       </div>
-                    }
-                  />
-                ));
-              })()}
+                    ));
+                  })()}
 
-              {/* Mensaje informativo sobre el límite de 30 productos */}
-              {editingGroupSearchTerm.trim() === "" &&
-                products.filter((p) => p.id !== productId && p.is_active)
-                  .length > 30 && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                    💡 Mostrando los primeros 30 productos. Escribe en el
-                    buscador para ver más productos.
-                  </p>
-                )}
+                  {/* Mensaje informativo sobre el límite de 30 productos */}
+                  {editingGroupSearchTerm.trim() === "" &&
+                    products.filter((p) => p.id !== productId && p.is_active)
+                      .length > 30 && (
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                        💡 Mostrando los primeros 30 productos. Escribe en el
+                        buscador para ver más productos.
+                      </p>
+                    )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1056,7 +1103,7 @@ const ProductRelatedManager = ({ productId, productName }) => {
 
       {/* Lista de productos relacionados agrupados por tipo */}
       {Object.keys(groupedRelatedProducts).length > 0 ? (
-        <div className="space-y-8">
+        <div className="space-y-4 sm:space-y-8">
           {Object.entries(groupedRelatedProducts).map(
             ([relationshipType, products]) => (
               <div
@@ -1064,39 +1111,38 @@ const ProductRelatedManager = ({ productId, productName }) => {
                 className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm dark:shadow-gray-900/20"
               >
                 {/* Header del grupo */}
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 px-6 py-4 border-b border-gray-200 dark:border-gray-600">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-blue-600 dark:bg-blue-500 text-white shadow-sm">
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-600">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
+                      <span className="inline-flex items-center px-2 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-semibold bg-blue-600 dark:bg-blue-500 text-white shadow-sm">
                         {relationshipType.charAt(0).toUpperCase() +
                           relationshipType.slice(1)}
                       </span>
-                      <span className="text-gray-600 dark:text-gray-300 text-sm font-medium">
+                      <span className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm font-medium">
                         {products.length} producto
                         {products.length !== 1 ? "s" : ""} relacionado
                         {products.length !== 1 ? "s" : ""}
                       </span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="w-full sm:w-auto">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() =>
                           handleEditGroupClick(relationshipType, products)
                         }
-                        className="flex items-center gap-1 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-300 dark:hover:border-blue-500 hover:text-blue-700 dark:hover:text-blue-400"
+                        className="flex items-center gap-1 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-300 dark:hover:border-blue-500 hover:text-blue-700 dark:hover:text-blue-400 w-full sm:w-auto"
                       >
                         <Icon name="FiEdit" size="sm" />
-                        Editar Grupo
+                        <span className="text-sm">Editar Grupo</span>
                       </Button>
-                      <div className="text-xs text-gray-500 dark:text-gray-400"></div>
                     </div>
                   </div>
                 </div>
 
                 {/* Lista de productos del grupo */}
-                <div className="p-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-2">
+                <div className="p-3 sm:p-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2 sm:gap-3">
                     {products.map((relatedProduct, index) => (
                       <div
                         key={relatedProduct.id}
@@ -1119,13 +1165,13 @@ const ProductRelatedManager = ({ productId, productName }) => {
                       >
                         <div className="flex flex-col items-center text-center">
                           {/* Imagen del producto */}
-                          <div className="mb-2">
+                          <div className="mb-1 sm:mb-2">
                             <ImageWithFallback
                               src={getProductImage(
                                 relatedProduct.relatedProduct.id
                               )}
                               alt={relatedProduct.relatedProduct.name}
-                              className="w-10 h-10 object-cover rounded-lg"
+                              className="w-8 h-8 sm:w-10 sm:h-10 object-cover rounded-lg"
                             />
                           </div>
 
@@ -1151,26 +1197,29 @@ const ProductRelatedManager = ({ productId, productName }) => {
           )}
         </div>
       ) : (
-        <Card className="text-center py-12 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border-2 border-dashed border-gray-300 dark:border-gray-600">
+        <Card className="text-center py-8 sm:py-12 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border-2 border-dashed border-gray-300 dark:border-gray-600">
           <Icon
             name="FiLink"
-            className="mx-auto mb-6 text-gray-400 dark:text-gray-500"
-            size="4xl"
+            className="mx-auto mb-4 sm:mb-6 text-gray-400 dark:text-gray-500"
+            size="3xl sm:4xl"
           />
-          <h3 className="text-lg font-medium text-gray-600 dark:text-gray-300 mb-2">
+          <h3 className="text-base sm:text-lg font-medium text-gray-600 dark:text-gray-300 mb-2">
             No hay productos relacionados configurados
           </h3>
-          <p className="text-gray-500 dark:text-gray-400 mb-6 max-w-md mx-auto">
+          <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mb-4 sm:mb-6 max-w-md mx-auto px-4">
             Comienza agregando productos relacionados para mejorar la
             experiencia de tus clientes
           </p>
           <Button
             onClick={handleAddClick}
             variant="outline"
-            className="border-blue-300 dark:border-blue-500 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-400 dark:hover:border-blue-400"
+            className="border-blue-300 dark:border-blue-500 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-400 dark:hover:border-blue-400 w-full sm:w-auto"
+            size="sm"
           >
-            <Icon name="FiPlus" className="mr-2" />
-            Agregar el primer producto relacionado
+            <Icon name="FiPlus" className="mr-2" size="sm" />
+            <span className="text-sm">
+              Agregar el primer producto relacionado
+            </span>
           </Button>
         </Card>
       )}
@@ -1180,37 +1229,42 @@ const ProductRelatedManager = ({ productId, productName }) => {
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
         title="Editar Producto Relacionado"
+        size="max-w-md"
         footer={
-          <div className="flex justify-end gap-3">
+          <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
             <Button
               type="button"
               variant="outline"
               onClick={() => setShowEditModal(false)}
+              size="sm"
+              className="w-full sm:w-auto"
             >
-              Cancelar
+              <span className="text-sm">Cancelar</span>
             </Button>
             <Button
               type="button"
               onClick={handleEditSubmit}
               disabled={!formData.relationship_type}
+              size="sm"
+              className="w-full sm:w-auto"
             >
-              Actualizar
+              <span className="text-sm">Actualizar</span>
             </Button>
           </div>
         }
       >
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Producto
             </label>
-            <p className="text-gray-900 p-2 bg-gray-50 rounded border">
+            <p className="text-sm sm:text-base text-gray-900 dark:text-white p-2 bg-gray-50 dark:bg-gray-700 rounded border">
               {selectedRelatedProduct?.relatedProduct?.name}
             </p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Tipo de Relación
             </label>
             <Select
@@ -1219,6 +1273,7 @@ const ProductRelatedManager = ({ productId, productName }) => {
                 setFormData({ ...formData, relationship_type: e.target.value })
               }
               required
+              size="sm"
             >
               {relationshipTypes.map((type) => (
                 <option key={type} value={type}>

@@ -702,7 +702,6 @@ const ProductRelatedManager = ({ productId, productName }) => {
                             )
                           }
                           size="sm"
-                          
                           variant="success"
                         />
                         <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">

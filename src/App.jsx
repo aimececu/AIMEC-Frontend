@@ -5,6 +5,7 @@ import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import Navbar from './components/Navigation/Navbar';
 import Footer from './components/Navigation/Footer';
+import WhatsAppFloat from './components/ui/WhatsAppFloat';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 import Home from './pages/Home/Home';
 import Catalog from './pages/Catalog/Catalog';
@@ -38,6 +39,7 @@ const AppContent = () => {
           </Routes>
         </main>
         <Footer />
+        <WhatsAppFloat />
       </div>
     </Router>
   );

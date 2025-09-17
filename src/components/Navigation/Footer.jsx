@@ -77,6 +77,14 @@ const Footer = () => {
                     Productos
                   </Link>
                 </li>
+                <li>
+                  <Link
+                    to="/servicios"
+                    className="text-gray-300 hover:text-white transition-colors duration-200 text-sm hover:translate-x-1 inline-block"
+                  >
+                    Servicios
+                  </Link>
+                </li>
               </ul>
             </div>
 

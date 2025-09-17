@@ -8,6 +8,7 @@ import Footer from './components/Navigation/Footer';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 import Home from './pages/Home/Home';
 import Catalog from './pages/Catalog/Catalog';
+import Services from './pages/Services/Services';
 import Admin from './pages/Admin/Admin';
 import ProductDetail from './pages/ProductDetail/ProductDetail';
 import Quotation from './pages/Quotation/Quotation';
@@ -22,6 +23,7 @@ const AppContent = () => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/productos" element={<Catalog />} />
+            <Route path="/servicios" element={<Services />} />
             <Route path="/producto/:id" element={<ProductDetail />} />
             <Route path="/cotizacion" element={<Quotation />} />
             <Route path="/login" element={<Login />} />

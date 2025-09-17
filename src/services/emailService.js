@@ -1,4 +1,4 @@
-import { sendContactEmail, sendTestEmail, getEmailStatus } from '../api/endpoints/email';
+import { sendContactEmail, sendServiceEmail, sendTestEmail, getEmailStatus } from '../api/endpoints/email';
 
 /**
  * Servicio para manejo de correos electrónicos
@@ -54,6 +54,73 @@ class EmailService {
 
     } catch (error) {
       console.error('Error en sendContactForm:', error);
+      
+      // Manejar diferentes tipos de errores
+      if (error.response) {
+        // Error de respuesta del servidor
+        const errorMessage = error.response.data?.error || 'Error del servidor';
+        throw new Error(errorMessage);
+      } else if (error.request) {
+        // Error de red
+        throw new Error('Error de conexión. Verifica tu conexión a internet e intenta nuevamente.');
+      } else {
+        // Error de validación u otro
+        throw new Error(error.message || 'Error inesperado. Intenta nuevamente.');
+      }
+    }
+  }
+
+  /**
+   * Enviar correo de consulta de servicios
+   * @param {Object} formData - Datos del formulario de servicios
+   * @returns {Promise<Object>} Resultado del envío
+   */
+  async sendServiceForm(formData) {
+    try {
+      // Validar datos requeridos
+      if (!formData.name || !formData.email || !formData.message) {
+        throw new Error('Nombre, email y mensaje son requeridos');
+      }
+
+      // Validar formato de email básico
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        throw new Error('Por favor, ingresa un email válido');
+      }
+
+      // Validar longitud del mensaje
+      if (formData.message.length < 10) {
+        throw new Error('El mensaje debe tener al menos 10 caracteres');
+      }
+
+      if (formData.message.length > 2000) {
+        throw new Error('El mensaje no puede exceder 2000 caracteres');
+      }
+
+      // Preparar datos para envío
+      const serviceData = {
+        name: formData.name.trim(),
+        email: formData.email.trim().toLowerCase(),
+        phone: formData.phone ? formData.phone.trim() : null,
+        company: formData.company ? formData.company.trim() : null,
+        service: formData.service ? formData.service.trim() : null,
+        message: formData.message.trim()
+      };
+
+      // Enviar correo
+      const result = await sendServiceEmail(serviceData);
+
+      if (result.success) {
+        return {
+          success: true,
+          message: result.message || 'Consulta de servicios enviada exitosamente. Te contactaremos pronto.'
+        };
+      } else {
+        throw new Error(result.error || 'Error enviando la consulta de servicios');
+      }
+
+    } catch (error) {
+      console.error('Error en sendServiceForm:', error);
       
       // Manejar diferentes tipos de errores
       if (error.response) {
@@ -153,6 +220,57 @@ class EmailService {
     // Validar empresa (opcional)
     if (formData.company && formData.company.length > 100) {
       errors.company = 'El nombre de la empresa no puede exceder 100 caracteres';
+    }
+
+    return {
+      isValid: Object.keys(errors).length === 0,
+      errors
+    };
+  }
+
+  /**
+   * Validar datos del formulario de servicios
+   * @param {Object} formData - Datos del formulario
+   * @returns {Object} Resultado de la validación
+   */
+  validateServiceForm(formData) {
+    const errors = {};
+
+    // Validar nombre
+    if (!formData.name || formData.name.trim().length < 2) {
+      errors.name = 'El nombre debe tener al menos 2 caracteres';
+    }
+
+    // Validar email
+    if (!formData.email) {
+      errors.email = 'El email es requerido';
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        errors.email = 'Por favor, ingresa un email válido';
+      }
+    }
+
+    // Validar mensaje
+    if (!formData.message || formData.message.trim().length < 10) {
+      errors.message = 'El mensaje debe tener al menos 10 caracteres';
+    } else if (formData.message.length > 2000) {
+      errors.message = 'El mensaje no puede exceder 2000 caracteres';
+    }
+
+    // Validar teléfono (opcional)
+    if (formData.phone && formData.phone.length > 20) {
+      errors.phone = 'El teléfono no puede exceder 20 caracteres';
+    }
+
+    // Validar empresa (opcional)
+    if (formData.company && formData.company.length > 100) {
+      errors.company = 'El nombre de la empresa no puede exceder 100 caracteres';
+    }
+
+    // Validar servicio (opcional pero recomendado)
+    if (formData.service && formData.service.length > 200) {
+      errors.service = 'El nombre del servicio no puede exceder 200 caracteres';
     }
 
     return {

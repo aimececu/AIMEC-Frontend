@@ -151,6 +151,7 @@ export const ENDPOINTS = {
   // Email
   EMAIL: {
     CONTACT: '/email/contact',
+    SERVICES: '/email/services',
     TEST: '/email/test',
     STATUS: '/email/status'
   },

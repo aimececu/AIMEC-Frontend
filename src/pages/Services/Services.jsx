@@ -126,7 +126,7 @@ const Services = () => {
     e.preventDefault();
 
     // Validar formulario
-    const validation = emailService.validateContactForm(formData);
+    const validation = emailService.validateServiceForm(formData);
     if (!validation.isValid) {
       const firstError = Object.values(validation.errors)[0];
       showToast(firstError, "error");
@@ -136,7 +136,7 @@ const Services = () => {
     setIsSubmitting(true);
 
     try {
-      const result = await emailService.sendContactForm(formData);
+      const result = await emailService.sendServiceForm(formData);
 
       if (result.success) {
         showToast(result.message, "success");
@@ -384,56 +384,6 @@ const Services = () => {
         </Section>
       </div>
 
-      {/* CTA Section */}
-      <Section background="primary" padding="xl">
-        <Container>
-          <div className="text-center">
-            <Heading level={2} className="mb-4 text-white">
-              ¿Necesitas una solución personalizada?
-            </Heading>
-            <p className="text-xl mb-8 text-primary-100 max-w-2xl mx-auto">
-              Nuestro equipo de expertos está listo para ayudarte con proyectos
-              de automatización industrial de cualquier escala.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                variant="white"
-                size="lg"
-                onClick={() => {
-                  if (formRef.current) {
-                    const element = formRef.current;
-                    const elementPosition = element.getBoundingClientRect().top;
-                    const offsetPosition =
-                      elementPosition + window.pageYOffset - 80;
-
-                    window.scrollTo({
-                      top: offsetPosition,
-                      behavior: "smooth",
-                    });
-                  }
-                }}
-                icon={<Icon name="FiMail" />}
-              >
-                Contactar Ahora
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="!border-white !text-white hover:!bg-white hover:!text-primary-600"
-                onClick={() =>
-                  window.open(
-                    "https://wa.me/1234567890?text=Hola, me interesa conocer mas sobre sus servicios de automatizacion industrial.",
-                    "_blank"
-                  )
-                }
-                icon={<Icon name="FiMessageCircle" />}
-              >
-                WhatsApp
-              </Button>
-            </div>
-          </div>
-        </Container>
-      </Section>
     </div>
   );
 };

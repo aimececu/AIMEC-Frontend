@@ -25,6 +25,30 @@ export const sendContactEmail = async (contactData) => {
 };
 
 /**
+ * Enviar correo de consulta de servicios
+ * @param {Object} serviceData - Datos del formulario de servicios
+ * @param {string} serviceData.name - Nombre completo
+ * @param {string} serviceData.email - Email del contacto
+ * @param {string} serviceData.phone - Teléfono (opcional)
+ * @param {string} serviceData.company - Empresa (opcional)
+ * @param {string} serviceData.service - Servicio de interés
+ * @param {string} serviceData.message - Mensaje
+ * @returns {Promise<Object>} Respuesta del servidor
+ */
+export const sendServiceEmail = async (serviceData) => {
+  try {
+    const response = await apiRequest(ENDPOINTS.EMAIL.SERVICES, {
+      method: 'POST',
+      body: serviceData
+    });
+    return response;
+  } catch (error) {
+    console.error('Error enviando correo de servicios:', error);
+    throw error;
+  }
+};
+
+/**
  * Enviar correo de prueba (solo en desarrollo)
  * @returns {Promise<Object>} Respuesta del servidor
  */

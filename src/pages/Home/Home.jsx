@@ -271,11 +271,11 @@ const Home = () => {
                 <div className="text-primary-600 dark:text-primary-400 mb-2 flex justify-center">
                   <div className="w-12 h-12 md:w-14 md:h-14 flex items-center justify-center">
                     {React.cloneElement(feature.icon, {
-                      style: { 
-                        height: "40px", 
+                      style: {
+                        height: "40px",
                         filter: "none",
-                        ...feature.icon.props.style 
-                      }
+                        ...feature.icon.props.style,
+                      },
                     })}
                   </div>
                 </div>
@@ -292,7 +292,7 @@ const Home = () => {
       </Section>
 
       {/* Brands Section */}
-      <Section background="light">
+      <Section background="default">
         <Container>
           <div className="text-center mb-8 md:mb-12">
             <Heading level={2} className="mb-3 md:mb-4">
@@ -305,20 +305,20 @@ const Home = () => {
           </div>
 
           {/* Simple Brands Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8 mb-8">
             {brands.map((brand, index) => (
               <div
                 key={index}
-                className="group flex flex-col items-center justify-center p-3 md:p-4 hover:shadow-lg transition-all duration-300 rounded-md"
+                className="group flex flex-col items-center justify-center p-4 md:p-6 hover:shadow-xl transition-all duration-300 rounded-lg bg-secondary-50 dark:bg-secondary-800 hover:scale-105"
               >
-                <div className="w-20 h-20 md:w-16 md:h-16 mb-2 md:mb-3 flex items-center justify-center">
+                <div className="w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 mb-3 md:mb-4 flex items-center justify-center">
                   <img
                     src={brand.logo}
                     alt={`${brand.name} logo`}
-                    className="max-w-full max-h-full object-contain filter-none md:filter md:grayscale md:group-hover:grayscale-0 transition-all duration-300"
+                    className="max-w-full max-h-full object-contain filter-none md:filter md:grayscale md:group-hover:grayscale-0 transition-all duration-300 hover:scale-110 drop-shadow-lg"
                   />
                 </div>
-                <h3 className="font-medium text-secondary-900 dark:text-white text-xs md:text-sm text-center leading-tight">
+                <h3 className="font-semibold text-secondary-900 dark:text-white text-sm md:text-base text-center leading-tight">
                   {brand.name}
                 </h3>
               </div>

@@ -446,7 +446,6 @@ const AdminManager = ({
               key={tab.id}
               onClick={() => {
                 setActiveSubTab(tab.id);
-                console.log(tab.id);
               }}
               className={`py-2 px-2 sm:px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
                 activeSubTab === tab.id

@@ -50,7 +50,6 @@ const ProductFeaturesManager = ({
   };
 
   const handleSubmit = async () => {
-    console.log("handleSubmit", formData);
     try {
       setLoading(true);
       const data = {

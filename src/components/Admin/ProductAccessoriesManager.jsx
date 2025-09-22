@@ -50,9 +50,6 @@ const AccessoriesManager = forwardRef(({ productId, productName }, ref) => {
       : filteredAvailableProducts;
 
   const handleSaveAccessories = async () => {
-    console.log(
-      "🔵 Handler handleSaveAccessories ejecutado - Click en botón Guardar Accesorios"
-    );
 
     // Verificar autenticación
     if (!isAuthenticated || !user) {

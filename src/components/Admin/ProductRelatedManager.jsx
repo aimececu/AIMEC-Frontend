@@ -91,13 +91,11 @@ const ProductRelatedManager = ({ productId, productName }) => {
     }
   }, [showEditGroupModal]);
 
-  console.log("relatedproducts", relatedProducts);
 
   // Tipos de relación únicos de productos existentes (solo los que están en la base)
   const relationshipTypes = relatedProducts
     .map((rp) => rp.relationshipType)
     .filter((type, index, arr) => arr.indexOf(type) === index);
-  console.log("relationshipTypes", relationshipTypes);
 
   /**
    * Abre la sección para agregar productos relacionados

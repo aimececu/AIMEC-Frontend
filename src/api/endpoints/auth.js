@@ -12,7 +12,6 @@ export const authEndpoints = {
       method: 'POST',
       body: { email, password }
     });
-    console.log(response);
 
     if (response.success && response.data.sessionId) {
       authUtils.saveAuth(response.data.sessionId, response.data.user);

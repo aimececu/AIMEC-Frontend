@@ -44,7 +44,7 @@ const ProductDetail = () => {
 
         const response = await productEndpoints.getProductById(id);
         console.log(response);
-        
+
         if (response.success) {
           setProduct(response.data);
         } else {
@@ -154,8 +154,6 @@ const ProductDetail = () => {
   } = product;
 
   console.log(product);
-  
-
 
   // Simplificar variables usando solo los campos que existen
   const image = main_image;
@@ -397,13 +395,13 @@ const ProductDetail = () => {
           {/* Product Tabs */}
           <Card className="mb-8">
             <div className="border-b border-secondary-200 dark:border-secondary-700">
-              <nav className="flex space-x-8">
+              <nav className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-8 overflow-x-auto">
                 {["specifications", "features", "applications"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
                     className={clsx(
-                      "py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200",
+                      "py-3 sm:py-4 px-2 sm:px-1 border-b-2 font-medium text-xs sm:text-sm transition-colors duration-200 whitespace-nowrap flex-shrink-0",
                       activeTab === tab
                         ? "border-primary-500 text-primary-600 dark:text-primary-400"
                         : "border-transparent text-secondary-500 dark:text-secondary-400 hover:text-secondary-700 dark:hover:text-secondary-300"

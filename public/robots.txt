@@ -1,0 +1,22 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://aimec-ec.com/sitemap.xml
+
+# Crawl-delay (opcional, en segundos)
+Crawl-delay: 1
+
+# Bloquear archivos innecesarios
+Disallow: /api/
+Disallow: /_next/
+Disallow: /static/
+Disallow: /*.json$
+Disallow: /admin/
+Disallow: /private/
+
+# Permitir archivos importantes
+Allow: /images/
+Allow: /assets/
+Allow: /*.css
+Allow: /*.js

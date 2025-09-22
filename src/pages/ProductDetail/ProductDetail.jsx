@@ -43,7 +43,6 @@ const ProductDetail = () => {
         setProduct(null); // Resetear producto anterior
 
         const response = await productEndpoints.getProductById(id);
-        console.log(response);
 
         if (response.success) {
           setProduct(response.data);
@@ -152,8 +151,6 @@ const ProductDetail = () => {
     weight,
     dimensions,
   } = product;
-
-  console.log(product);
 
   // Simplificar variables usando solo los campos que existen
   const image = main_image;

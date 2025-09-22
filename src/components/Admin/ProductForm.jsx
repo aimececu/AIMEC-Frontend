@@ -310,9 +310,6 @@ const ProductForm = ({
                 }))}
               />
 
-              {console.log(subcategories)}
-              {console.log(productForm)}
-
               {/* Subcategoría */}
               <Select
                 label="Subcategoría"

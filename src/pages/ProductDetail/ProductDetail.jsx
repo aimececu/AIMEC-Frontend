@@ -356,7 +356,7 @@ const ProductDetail = () => {
 
                           Gracias.`);
                       window.open(
-                        `https://wa.me/51999999999?text=${message}`,
+                        `https://wa.me/593960034460?text=${message}`,
                         "_blank"
                       );
                     }}

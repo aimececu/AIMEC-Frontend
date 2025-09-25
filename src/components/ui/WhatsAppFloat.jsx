@@ -17,7 +17,7 @@ const WhatsAppFloat = () => {
     const message = encodeURIComponent(
       "Hola, me interesa conocer más sobre sus servicios de automatización industrial y componentes."
     );
-    const phone = "1234567890"; // Reemplaza con tu número de WhatsApp
+    const phone = "593960034460"; // Reemplaza con tu número de WhatsApp
     window.open(`https://wa.me/${phone}?text=${message}`, "_blank");
   };
 

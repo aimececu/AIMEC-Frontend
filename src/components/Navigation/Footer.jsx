@@ -108,7 +108,7 @@ const Footer = () => {
                     <Icon name="FiPhone" size="xs" className="text-white" />
                   </div>
                   <div>
-                    <p className="text-gray-300 text-sm">+1 234 567 890</p>
+                    <p className="text-gray-300 text-sm">+593 96 003 4460</p>
                     <p className="text-gray-400 text-xs">Teléfono</p>
                   </div>
                 </div>

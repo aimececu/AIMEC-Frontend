@@ -76,7 +76,7 @@ const Home = () => {
     const message = encodeURIComponent(
       "Hola, me interesa conocer más sobre sus servicios de componentes industriales."
     );
-    const phone = "1234567890"; // Reemplaza con tu número de WhatsApp
+    const phone = "593960034460"; // Reemplaza con tu número de WhatsApp
     window.open(`https://wa.me/${phone}?text=${message}`, "_blank");
   };
 
@@ -467,7 +467,7 @@ const Home = () => {
                         Teléfono
                       </p>
                       <p className="text-blue-700 dark:text-blue-300">
-                        +1 234 567 890
+                        +593 96 003 4460
                       </p>
                     </div>
                   </div>

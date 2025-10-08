@@ -108,14 +108,6 @@ const Login = () => {
               </Link>
             </div>
 
-            <div className="mt-4 p-3 bg-secondary-50 dark:bg-secondary-800 rounded-lg text-xs text-secondary-600 dark:text-secondary-400">
-              <div>
-                <strong>Email:</strong> admin@aimec.com
-              </div>
-              <div>
-                <strong>Contraseña:</strong> admin123
-              </div>
-            </div>
           </Card>
         </div>
       </Container>
